@@ -7,43 +7,22 @@ using Portail_OptiVille.Data.Utilities;
 using static Portail_OptiVille.Data.Utilities.MailManager;
 using System.Net.Http;
 using Microsoft.AspNetCore.Components.Authorization;
-using Portail_OptiVille.Data.Services;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Portail_OptiVille.Data.FormModels;
 using Portail_OptiVille.Data.Attributes;
+using Portail_OptiVille.Data.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-
-#region Upload max size
-builder.Services.Configure<FormOptions>(options =>
-{
-    options.MultipartBodyLengthLimit = 75 * 1024 * 1024; // Set the maximum allowed size for the entire request
-});
-#endregion
-
-#region Configuration des services
-builder.Services.AddScoped<LicenceService>();
-builder.Services.AddScoped<ListeVillesAPI>();
-builder.Services.AddScoped<PieceJointeFormModel>();
-#endregion
-
-// Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<NEQManager>();
 builder.Services.AddScoped<ICookie, CookieService>();
 
+#region Configuration des services
+builder.Services.AddScoped<ListeVillesAPI>();
+#endregion
+
 #region Add services for DB management
-builder.Services.AddScoped<FournisseurService>();
-builder.Services.AddScoped<ContactsService>();
-builder.Services.AddScoped<CoordonneeService>();
-builder.Services.AddScoped<FichierService>();
-builder.Services.AddScoped<IdentificationService>();
-builder.Services.AddScoped<LicenceRBQService>();
-builder.Services.AddScoped<ProduitServiceService>();
 builder.Services.AddScoped<HistoriqueService>();
-builder.Services.AddScoped<FinanceService>();
 builder.Services.AddScoped<GestionUserService>();
 #endregion
 

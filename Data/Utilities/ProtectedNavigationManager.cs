@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
 using Portail_OptiVille.Data.Exceptions;
 using Portail_OptiVille.Data.Models;
-using static Portail_OptiVille.Pages.Fournisseur.Connexion.ConnexionFournisseur;
 
 namespace Portail_OptiVille.Data.Utilities
 {

@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Portail_OptiVille.Data.FormModels;
 using Portail_OptiVille.Data.Models;
 
 namespace Portail_OptiVille.Data.Services
