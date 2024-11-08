@@ -417,13 +417,13 @@ else
                                        from i in f.Identifications.DefaultIfEmpty()
                                        from c in f.Coordonnees.DefaultIfEmpty()
                                        select new FournisseurFiche
-                           {
-                               IdFournisseur = f.IdFournisseur,
-                               EtatDemande = h.EtatDemande,
-                               NomEntreprise = i.NomEntreprise,
-                               Ville = c.Ville
-                           })
-                           .ToListAsync();
+                                       {
+                                           IdFournisseur = f.IdFournisseur,
+                                           EtatDemande = h.EtatDemande,
+                                           NomEntreprise = i.NomEntreprise,
+                                           Ville = c.Ville
+                                       })
+                                       .ToListAsync();
             copieFournisseurFiches = new List<FournisseurFiche>(fournisseurFiches); 
             isLoading = false;
         }

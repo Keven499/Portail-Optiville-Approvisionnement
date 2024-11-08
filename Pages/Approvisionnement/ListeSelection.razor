@@ -1,5 +1,7 @@
 @page "/listeSelection"
+@using Data.Models
 @inject NavigationManager Navigation
+@inject A2024420517riGr1Eq6Context _context
 
 <PageTitle>Liste des sélections</PageTitle>
 <div class="d-flex justify-content-center">
@@ -105,9 +107,10 @@
 @code
 {
     List<int> selectedIds = new List<int>();
+    List<FournisseurFiche> fournisseurFiches = new List<FournisseurFiche>();
     private Dictionary<string, string> QueryParams = new();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         var queryParams = Navigation.Uri.Split('?').Skip(1).FirstOrDefault();
         if (queryParams != null)
@@ -131,6 +134,19 @@
             }
         }
         // BASED ON THIS LIST OF IDS, NOW WE NEED TO GET ALL THE DATA
+        // EXEMPLE 66, 73 (selectedIds)
+        // fournisseurFiches = await(from f in _context.Fournisseurs
+        //                           join h in _context.Historiques on f.IdFournisseur equals h.Fournisseur
+        //                           from i in f.Identifications.DefaultIfEmpty()
+        //                           from c in f.Coordonnees.DefaultIfEmpty()
+        //                           select new FournisseurFiche
+        //                               {
+        //                                   IdFournisseur = f.IdFournisseur,
+        //                                   EtatDemande = h.EtatDemande,
+        //                                   NomEntreprise = i.NomEntreprise,
+        //                                   Ville = c.Ville
+        //                               })
+        //                                .ToListAsync();
     }
 
     // STRUCTURE DE L'OBJET POUR LA FICHE
@@ -148,6 +164,6 @@
         public string Nom { get; set; }
         public string Prenom { get; set; }
         public string AdresseCourriel { get; set; }
-        public List<string> NumTelephones { get; set; }
+        public string NumTelephone { get; set; }
     }
 }
