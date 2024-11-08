@@ -1,0 +1,70 @@
+.no-focus-white-thick-border:focus,
+    .no-focus-white-thick-border:focus:active {
+        background-color: rgb(99, 188, 85);
+        border-bottom: 2px solid rgb(30, 73, 45);
+        color: white; /* Keep text color white */
+    }
+    .no-focus-white-light-border:focus:focus,
+    .no-focus-white-light-border:focus:active {
+        background-color: rgb(99, 188, 85);
+        color: white; /* Keep text color white */
+    }
+    .flex-line {
+        flex-grow: 1;
+        height: 1px;
+        background: linear-gradient(to right, transparent, #b0b0b0, transparent);
+        opacity: 0.6;
+    }
+    .list-row {
+        transition: background-color 1s ease;
+    }
+    .row-item:hover {
+        background-color: #e0e0e0; 
+    }
+    .row-item:hover button {
+        background-color: initial;
+    }
+    input[type="checkbox"].check-vert {
+        position: relative;
+        cursor: pointer;
+        appearance: none;
+        background-color: rgb(99 188 85);
+        border: 1px solid rgb(30 73 45);
+        border-radius: 4px;
+        transition: background-color 0.3s;
+    }
+    input[type="checkbox"].check-vert:checked {
+        background-color: rgb(30 73 45);
+    }
+    .listFiltre {
+        max-height: 250px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    .card-header-borders {
+        border-width: 2px 2px 0 2px; 
+        border-style: solid; 
+        border-color: rgb(30, 73, 45);
+    }
+    .placeholder-large::placeholder {
+        font-size: 16px; 
+        color: rgba(0, 0, 0, 0.5);
+        font-style: italic;
+    }
+    .placeholder-small::placeholder {
+        font-size: 14px; 
+        color: rgba(0, 0, 0, 0.5);
+        font-style: italic;
+    }
+    .border-right {
+        border-right: 1px solid rgb(30, 73, 45);
+    }
+    .bg-yellowEtat {
+        background-color: rgb(243 231 0);
+    }
+    .bg-redEtat {
+        background-color: rgb(229 0 77);
+    }
+    .bg-grayEtat {
+        background-color: gray;
+    }

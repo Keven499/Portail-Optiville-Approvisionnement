@@ -1,0 +1,153 @@
+@page "/listeSelection"
+@inject NavigationManager Navigation
+
+<PageTitle>Liste des sélections</PageTitle>
+<div class="d-flex justify-content-center">
+    <div class="card col-xxl-8 col-xl-9 col-lg-10 col-sm-12 col-12" style="border: none;">
+        <div class="card-header rounded-0 bg-vert card-header-borders py-0 px-0">
+            <div class="row m-0">
+                <div class="col-3 d-flex justify-content-center border-right">
+                    <div class="text-white titre-bold fs-4">Entreprise</div>
+                </div>
+                <div class="col-3 d-flex justify-content-center border-right">
+                    <div class="text-white titre-bold fs-4">Numéro de téléphone</div>
+                </div>
+                <div class="col-3 d-flex justify-content-center border-right">
+                    <div class="text-white titre-bold fs-4">Contact</div>
+                </div>
+                <div class="col-3 d-flex justify-content-center">
+                    <div class="text-white titre-bold fs-4">Contacté</div>
+                </div>
+            </div>
+        </div>  
+        <div style="max-height: 400px;" class="card-body border-vertFonce box-vert listFiltre p-0">
+            <!-- LISTE DES FICHES -->
+            @foreach (var ids in selectedIds)
+            {
+                <div style="height: 35px;" class="row m-0 list-row">
+                    <!-- ENTREPRISE (NOM, ADRESSE COURRIEL) -->
+                    <div class="col-3 d-flex justify-content-center align-items-center border-right">
+                        <div class="w-100 text-center">@ids</div>
+                    </div>
+                    <!-- NUMÉRO DE TÉLÉPHONES  -->
+                    <div class="col-3 d-flex justify-content-center align-items-center border-right">
+                        <div style="font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" class="d-flex texte-light fw-bold">NA</div>
+                    </div>
+                    <!-- CONTACTS (NOM, PRÉNOM, ADRESSE COURRIEL, NUMÉRO DE TÉLÉPHONE) -->
+                    <div class="col-3 d-flex justify-content-center align-items-center border-right">
+                        <div style="font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" class="d-flex texte-light fw-bold">NA</div>
+                    </div>
+                     <!-- CONTACTÉ -->
+                    <div class="col-3 d-flex justify-content-center align-items-center">
+                        <input type="checkbox" class="check-vert">
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- CERTAINES CLASSES SONT UTILISÉES À LA FOIS DASN LA PAGE RECHERCHE ET CELLE-CI, IL FAUDRAIT LES RENDRE DISPONIBLE POUR LES DEUX PAGES POUR ÉVITER LA RÉPÉTITION -->
+<style>
+    .flex-line {
+        flex-grow: 1;
+        height: 1px;
+        background: linear-gradient(to right, transparent, #b0b0b0, transparent);
+        opacity: 0.6;
+    }
+    input[type="checkbox"].check-vert {
+        position: relative;
+    using Portail_OptiVille.Data.Models;
+        cursor: pointer;
+        appearance: none;
+        background-color: rgb(99 188 85);
+        border: 1px solid rgb(30 73 45);
+        border-radius: 4px;
+        transition: background-color 0.3s;
+    }
+    input[type="checkbox"].check-vert:checked {
+        background-color: rgb(30 73 45);
+    }
+    .listFiltre {
+        max-height: 250px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    .card-header-borders {
+        border-width: 2px 2px 0 2px; 
+        border-style: solid; 
+        border-color: rgb(30, 73, 45);
+    }
+    .placeholder-large::placeholder {
+        font-size: 16px; 
+        color: rgba(0, 0, 0, 0.5);
+        font-style: italic;
+    }
+    .placeholder-small::placeholder {
+        font-size: 14px; 
+        color: rgba(0, 0, 0, 0.5);
+        font-style: italic;
+    }
+    .border-right {
+        border-right: 1px solid rgb(30, 73, 45);
+    }
+    .bg-yellowEtat {
+        background-color: rgb(243 231 0);
+    }
+    .bg-redEtat {
+        background-color: rgb(229 0 77);
+    }
+    .bg-grayEtat {
+        background-color: gray;
+    }
+</style>
+
+@code
+{
+    List<int> selectedIds = new List<int>();
+    private Dictionary<string, string> QueryParams = new();
+
+    protected override void OnInitialized()
+    {
+        var queryParams = Navigation.Uri.Split('?').Skip(1).FirstOrDefault();
+        if (queryParams != null)
+        {
+            var queryDictionary = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(queryParams);
+            foreach (var param in queryDictionary)
+            {
+                QueryParams[param.Key] = param.Value;
+            }
+        }
+        for (int i = 1; ; i++)
+        {
+            var key = $"id{i}";
+            if (QueryParams.ContainsKey(key))
+            {
+                selectedIds.Add(int.Parse(QueryParams[key]));
+            }
+            else
+            {
+                break;  
+            }
+        }
+        // BASED ON THIS LIST OF IDS, NOW WE NEED TO GET ALL THE DATA
+    }
+
+    // STRUCTURE DE L'OBJET POUR LA FICHE
+    public class FournisseurFiche
+    {
+        public string NomEntreprise { get; set; }
+        public string AdresseCourriel { get; set; }
+        public List<string> NumTelephones { get; set; }
+        public List<ContactFiche> Contacts { get; set; }
+    }
+
+    // STRUCTURE DE L'OBJET POUR CONTACT
+    public class ContactFiche
+    {
+        public string Nom { get; set; }
+        public string Prenom { get; set; }
+        public string AdresseCourriel { get; set; }
+        public List<string> NumTelephones { get; set; }
+    }
+}
