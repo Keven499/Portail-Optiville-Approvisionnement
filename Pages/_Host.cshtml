@@ -1,0 +1,23 @@
+﻿@page "/"
+@namespace Portail_OptiVille.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+<head>
+    <title>My Blazor App</title>
+    <script>
+        function setPageTitle(title) {
+            document.title = title;
+        }
+    </script>
+
+    <!-- CE LIEN EST TEMPORAIRE, ON ATTEND QUE BOOTSTRAP SOIT DOWNLOAD AVEC LES ICONS -->
+    <script src="js/dragdrop.js"></script>
+    <link rel="stylesheet" href="css/Couleurs.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+    @{
+    Layout = "_Layout";
+}
+
+<component type="typeof(App)" render-mode="ServerPrerendered" />
+
+

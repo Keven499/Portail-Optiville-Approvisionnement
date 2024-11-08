@@ -1,0 +1,63 @@
+﻿@page "/index"
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Portail_OptiVille.Data.Exceptions
+@using Portail_OptiVille.Data.Models
+@using Portail_OptiVille.Data.Utilities
+@using System.Text.RegularExpressions
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject NavigationManager navigationManager
+@inject ICookie cookie
+@inject JwtTokenGenerator tokenGenerator
+@inject A2024420517riGr1Eq6Context _context
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            // Récupération de l'email depuis la session protégée
+            var result = await ProtectedSessionStore.GetAsync<string>("Email");
+
+            if (!result.Success || string.IsNullOrEmpty(result.Value))
+            {
+                // Récupération du token depuis les cookies et extraction de l'email
+                string token = await cookie.GetValue("SToken") ?? throw new UserNotAuthenticatedException("Session expirée ou non connectée.");
+                string email = tokenGenerator.GetEmailFromToken(token);
+
+                // Vérification de la validité de l'email
+                if (!Regex.IsMatch(email, @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"))
+                    throw new UserNotAuthenticatedException("Email non valide ou session expirée.");
+
+                // Vérification de l'utilisateur et de la date d'expiration
+                var user = _context.Usersessions.FirstOrDefault(u => u.OwnerEmail == email)
+                           ?? throw new UserNotAuthenticatedException("Utilisateur non trouvé ou session expirée.");
+
+                if (user.ExpirationDate <= DateTime.Now)
+                    throw new UserNotAuthenticatedException("Session expirée.");
+
+                // Mise à jour de la session protégée avec l'email valide
+                await ProtectedSessionStore.SetAsync("Email", email);
+            }
+
+            Console.WriteLine($"Adresse courriel: {result.Value}");
+        }
+        catch (UserNotAuthenticatedException ex)
+        {
+            Console.WriteLine($"Erreur lors de la récupération de l'adresse courriel : {ex.Message}");
+            navigationManager.NavigateTo("/", true);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erreur inattendue : {ex.Message}");
+            navigationManager.NavigateTo("/", true);
+        }
+    }
+
+}

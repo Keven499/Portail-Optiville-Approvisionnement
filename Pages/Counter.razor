@@ -1,0 +1,187 @@
+﻿@page "/counter"
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Portail_OptiVille.Data.Utilities
+@using Portail_OptiVille.Data.Exceptions
+@using System.IO;
+@using System.Collections.Generic;
+@using System;
+
+@inject MailManager _mailManager
+@inject DownloadService DownloadService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject NavigationManager navigationManager
+<PageTitle>Counter</PageTitle>
+
+<h1>Test pour voir si on peut envoyer des mails</h1>
+
+<p role="status">Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="SendMail">Click me</button>
+<button @onclick="ProcessZipFile">DL le zip</button>
+
+@code {
+    private int currentCount = 0;
+    string role = "";
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+    private async Task SendMail()
+    {
+        @* string url = "https://www.registreentreprises.gouv.qc.ca/RQAnonymeGR/GR/GR03/GR03A2_22A_PIU_RecupDonnPub_PC/FichierDonneesOuvertes.aspx";
+        string outputPath = "Data\\Downloads\\entreprises.zip";
+
+        await DownloadService.DownloadFileAsync(url, outputPath);
+        await NEQManager.ManageZIP(outputPath,"Data\\Downloads\\"); *@
+        string contenuMail = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "Data", "TemplatesMail", "MailOublie.html"));
+        Console.WriteLine(contenuMail);
+        _mailManager.SendMail("kevenmichel721@gmail.com", "Test", contenuMail);
+    }
+
+    private async Task ProcessZipFile()
+    {
+        @* // 1. Télécharger le fichier ZIP
+        string url = "https://www.registreentreprises.gouv.qc.ca/RQAnonymeGR/GR/GR03/GR03A2_22A_PIU_RecupDonnPub_PC/FichierDonneesOuvertes.aspx";
+        string outputPath = Path.Combine("Data", "entreprises.zip");
+
+        await DownloadService.DownloadFileAsync(url, outputPath);
+
+
+        // 2. Décompresser le fichier ZIP
+        if(!Directory.Exists(Path.Combine("Data", "Downloads")))
+        {
+            Directory.CreateDirectory(Path.Combine("Data", "Downloads"));
+        }
+
+        // Supprimer le fichier Entreprise.csv s'il existe
+        File.Delete("Data\\Downloads\\Entreprise.csv");
+        // Décompresser le fichier ZIP
+        ZipFile.ExtractToDirectory(outputPath, Path.Combine("Data", "Downloads"));
+            
+        
+
+
+
+        FileManager fileManager = new FileManager();
+        
+        // 3. Supprimer les fichiers inutiles
+
+        File.Delete("Data\\Downloads\\ContinuationsTransformations.csv");
+        File.Delete("Data\\Downloads\\DomaineValeur.csv");
+        File.Delete("Data\\Downloads\\Etablissements.csv");
+        File.Delete("Data\\Downloads\\FusionScissions.csv");
+        File.Delete("Data\\Downloads\\Nom.csv"); *@
+        //File.Delete("Data\\JeuDonnees.zip");
+
+        // 4. Trier le fichier CSV et effectuer une recherche binaire
+
+
+
+        string inputFilePath = "Data\\Downloads\\Entreprise.csv"; // Chemin de ton fichier CSV
+        string outputFilePath = "Data\\Downloads\\Entreprise.csv"; // Chemin de sortie pour le fichier trié
+
+        //SortCsvFile(inputFilePath, outputFilePath);
+
+        string csvFilePath = "Data\\Downloads\\Entreprise.csv";
+        string targetNEQ = "2247328729"; // Le NEQ que tu cherches
+
+        // Charger les données CSV (sans tri, car déjà trié)
+        List<string[]> csvData = CsvBinarySearch.LoadAndSortCsv(csvFilePath);
+
+        // Effectuer la recherche binaire
+        int resultIndex = CsvBinarySearch.BinarySearch(csvData, targetNEQ);
+
+        if (resultIndex != -1)
+        {
+            // Récupérer les colonnes nécessaires si le NEQ est trouvé
+            var resultRow = csvData[resultIndex];
+            Console.WriteLine("NEQ trouvé !");
+            Console.WriteLine("ADR_DOMCL_LIGN1_ADR: " + resultRow[1]);
+            Console.WriteLine("ADR_DOMCL_LIGN2_ADR: " + resultRow[2]);
+            Console.WriteLine("ADR_DOMCL_LIGN3_ADR: " + resultRow[3]);
+            Console.WriteLine("ADR_DOMCL_LIGN4_ADR: " + resultRow[4]);
+        }
+        else
+        {
+            Console.WriteLine("NEQ non trouvé.");
+        }
+
+        // 5. Optionnel : Supprimer le fichier ZIP après traitement
+        // File.Delete(outputPath);
+
+    }
+
+    public static void SortCsvFile(string inputFilePath, string outputFilePath)
+    {
+        // Liste pour stocker les lignes du fichier CSV
+        List<string> csvLines = new List<string>();
+
+        // Lire le fichier CSV
+        using (StreamReader sr = new StreamReader(inputFilePath))
+        {
+            string line;
+            while ((line = sr.ReadLine()) != null)
+            {
+                csvLines.Add(line);
+            }
+        }
+
+        // Séparer et trier à partir de la colonne NEQ (la première colonne)
+        csvLines.Sort((line1, line2) =>
+        {
+            string[] data1 = line1.Split(',');
+            string[] data2 = line2.Split(',');
+
+            return string.Compare(data1[0], data2[0], StringComparison.Ordinal);
+        });
+
+        // Sauvegarder le fichier trié
+        using (StreamWriter sw = new StreamWriter(outputFilePath))
+        {
+            foreach (var line in csvLines)
+            {
+                sw.WriteLine(line);
+            }
+        }
+
+        Console.WriteLine("Fichier CSV trié et sauvegardé avec succès.");
+    }
+
+    string role2 = "";
+
+    @* protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var result = await ProtectedSessionStore.GetAsync<string>("Role");
+            if (!result.Success || string.IsNullOrEmpty(result.Value))
+            {
+                throw new UserNotAuthenticatedException("Employé non connecté ou session expirée.");
+            }
+
+            role2 = result.Value;
+        }
+        catch (UserNotAuthenticatedException ex)
+        {
+            Console.WriteLine(ex.Message);
+            await ProtectedSessionStore.DeleteAsync("Role");
+            await ProtectedSessionStore.DeleteAsync("Login");
+            await ProtectedSessionStore.DeleteAsync("Email");
+            navigationManager.NavigateTo("/Connexion-employe", true);
+        }
+        catch (InvalidOperationException ex)
+        {
+            
+        }
+    } *@
+
+
+
+}
+
+<p>Role: @role2</p>
+
+
+

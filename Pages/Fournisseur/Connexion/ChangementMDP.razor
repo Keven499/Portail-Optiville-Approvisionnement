@@ -1,0 +1,196 @@
+@page "/changement-mdp"
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.EntityFrameworkCore
+@using Portail_OptiVille.Data.Exceptions
+@using Portail_OptiVille.Data.Models
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Security.Cryptography;
+@using System.Text;
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Portail_OptiVille.Data.Utilities
+@using System.Text.RegularExpressions
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject NavigationManager NavigationManager
+@inject A2024420517riGr1Eq6Context _context
+
+<PageTitle>Changement mot de passe</PageTitle>
+
+@if (motDePasseChange)
+{
+    <div class="alert alert-success" role="alert">
+        <h4 class="alert-heading">Votre mot de passe a été changé!</h4>
+        <p>Lors de votre prochaine connexion, vous allez devoir utiliser votre nouveau mot de passe</p>
+        <hr>
+        <p class="mb-0">Vous serez redirigé vers la page de connexion dans @tempsRestant secondes.</p>
+    </div>
+}
+
+<EditForm Model="@forgotPasswordModel" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="ValidateInput">
+    <div class="form-group container-fluid">
+        <div class="row d-flex justify-content-center">
+            <div class="col-xl-6 col-xl-6 col-lg-11 col-12 col-sm-12 py-2">
+                <div class="card">
+                    <div class="card-header py-2 bg-bleuFonce">
+                        <h3 class="py-2 p-0 my-0 text-white titre-bold">Changer le Mot de Passe</h3>
+                    </div>
+                    <div class="card-body border-bleuFonce py-1">
+                        <div class="col-xl-8 col-lg-8 col-12 col-sm-12 py-2">
+                            <label class="bleuFonce texte-bold" for="MotDePasse">Nouveau Mot de Passe <i class="bi bi-braces-asterisk text-danger"></i></label>
+                            <InputText type="password" class="form-control" id="MotDePasse" @bind-Value="forgotPasswordModel.MotDePasse" />
+                            <div class="d-flex align-baseline">
+                                <i class="bi @passwordIconClass me-1"></i><ValidationMessage For="@(() => forgotPasswordModel.MotDePasse)" />
+                            </div>
+                        </div>
+                        <div class="col-xl-8 col-lg-8 col-12 col-sm-12 py-2">
+                            <label class="bleuFonce texte-bold" for="ConfirmationMotDePasse">Confirmation du Mot de Passe <i class="bi bi-braces-asterisk text-danger"></i></label>
+                            <InputText type="password" class="form-control" id="ConfirmationMotDePasse" @bind-Value="forgotPasswordModel.ConfirmationMotDePasse" />
+                            <div class="d-flex align-baseline">
+                                <i class="bi @confirmationIconClass me-1"></i><ValidationMessage For="@(() => forgotPasswordModel.ConfirmationMotDePasse)" />
+                            </div>
+                            @if (!string.IsNullOrEmpty(errorMessage))
+                            {
+                                <span class="text-danger texte-medium">@errorMessage</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="card-footer py-2 bg-bleuFonce d-flex justify-content-center">
+                        <button type="submit" id="btnBleu" class="btn bg-bleu texte-bold text-white" style="width: 200px;">Changer Mot de Passe</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <DataAnnotationsValidator />
+</EditForm>
+
+@code {
+    private ForgotPasswordModel forgotPasswordModel = new ForgotPasswordModel();
+    private string errorMessage = ""; // Message d'erreur en cas de non correspondance des mots de passe
+    private string passwordIconClass = ""; // Classe pour l'icône du mot de passe
+    private string confirmationIconClass = ""; // Classe pour l'icône de confirmation de mot de passe
+    private int tempsRestant = 10; // Temps restant avant la redirection vers la page de connexion
+    private bool motDePasseChange = false; // État pour afficher ou non le message de succès
+
+    private async Task HandleValidSubmit()
+    {
+        object? idUtilisateur = "";
+        if (forgotPasswordModel.MotDePasse != forgotPasswordModel.ConfirmationMotDePasse)
+        {
+            errorMessage = "Les mots de passe ne correspondent pas.";
+            return;
+        }
+
+        // Vérification de la complexité du mot de passe
+        if (!IsPasswordComplex(forgotPasswordModel.MotDePasse))
+        {
+            errorMessage = "Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial.";
+            return;
+        }
+
+        try
+        {
+            var result = await ProtectedSessionStore.GetAsync<string>("username");
+            if (result.Success || !string.IsNullOrEmpty(result.Value))
+            {
+                Console.WriteLine($"Adresse courriel / NEQ: {result.Value}");
+                idUtilisateur = result.Value;
+            }
+            else
+            {
+                errorMessage = "Erreur : utilisateur non trouvé.";
+                NavigationManager.NavigateTo("/", true);
+                return;
+            }
+
+            // Rechercher l'utilisateur d'abord par AdresseCourriel, puis par NEQ
+            var utilisateur = await _context.Identifications.FirstOrDefaultAsync(u => u.AdresseCourriel == idUtilisateur.ToString() || u.Neq == idUtilisateur.ToString());
+
+            if (utilisateur != null)
+            {
+                // Vérifier si le mot de passe actuel est le même que le nouveau mot de passe
+                if (utilisateur.MotDePasse == HashPassword(forgotPasswordModel.MotDePasse))
+                {
+                    errorMessage = "Votre nouveau mot de passe ne peut pas être le même que l'ancien.";
+                    return;
+                }
+
+                // Hacher et sauvegarder le nouveau mot de passe
+                var hashedPassword = HashPassword(forgotPasswordModel.MotDePasse);
+                utilisateur.MotDePasse = hashedPassword;
+                await _context.SaveChangesAsync();
+
+                // Déclencher l'affichage du message de succès
+                motDePasseChange = true;
+
+                // Démarrer un compte à rebours pour la redirection
+                while (tempsRestant > 0)
+                {
+                    await Task.Delay(1000); // Attendre 1 seconde
+                    tempsRestant--; // Décrémenter le temps restant
+                    StateHasChanged(); // Mettre à jour l'interface utilisateur
+                }
+
+                // Une fois le compte à rebours terminé, rediriger vers la page de connexion
+                NavigationManager.NavigateTo("/");
+            }
+            else
+            {
+                Console.WriteLine("Erreur : utilisateur non trouvé.");
+                errorMessage = "Erreur : utilisateur non trouvé.";
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            errorMessage = "Erreur lors de la sauvegarde du mot de passe.";
+        }
+    }
+
+    private void ValidateInput()
+    {
+        // Validation du mot de passe
+        if (string.IsNullOrEmpty(forgotPasswordModel.MotDePasse) || forgotPasswordModel.MotDePasse.Length < 8)
+        {
+            passwordIconClass = "bi-x-circle text-danger";
+        }
+        else
+        {
+            passwordIconClass = "bi-check-circle text-success";
+        }
+
+        // Validation de la confirmation du mot de passe
+        if (forgotPasswordModel.ConfirmationMotDePasse != forgotPasswordModel.MotDePasse)
+        {
+            confirmationIconClass = "bi-x-circle text-danger";
+        }
+        else
+        {
+            confirmationIconClass = "bi-check-circle text-success";
+        }
+    }
+
+    static string HashPassword(string input)
+    {
+        return Convert.ToHexString(SHA1.HashData(Encoding.UTF8.GetBytes(input)));
+    }
+
+    private bool IsPasswordComplex(string password)
+    {
+        // Vérification des critères de complexité : majuscule, minuscule, chiffre, caractère spécial
+        return password.Any(char.IsUpper) &&
+               password.Any(char.IsLower) &&
+               password.Any(char.IsDigit) &&
+               password.Any(ch => "!@#$%^&*()-_=+[]{};:,.<>?".Contains(ch));
+    }
+
+    public class ForgotPasswordModel
+    {
+        [Required(ErrorMessage = "Le mot de passe est requis")]
+        [MinLength(8, ErrorMessage = "Le mot de passe doit contenir au moins 8 caractères")]
+        public string MotDePasse { get; set; }
+
+        [Required(ErrorMessage = "La confirmation du mot de passe est requise")]
+        [Compare("MotDePasse", ErrorMessage = "Les mots de passe ne correspondent pas")]
+        public string ConfirmationMotDePasse { get; set; }
+    }
+}

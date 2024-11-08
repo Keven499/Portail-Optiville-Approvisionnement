@@ -1,0 +1,306 @@
+@using Portail_OptiVille.Data.FormModels
+@using Microsoft.EntityFrameworkCore
+@using Portail_OptiVille.Data.Models
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@inject A2024420517riGr1Eq6Context _context
+@inject IJSRuntime JS
+@inject HttpClient Http
+@using System.ComponentModel.DataAnnotations
+@using System.Text.RegularExpressions
+@using System.Linq.Expressions
+@inject LicenceService licenceService
+
+<PageTitle>Étape 5 Licence RBQ</PageTitle>
+<EditForm EditContext="@editContext">
+    <DataAnnotationsValidator />
+    <div class="card-header py-2 bg-bleuFonce">
+        <h3 class="py-2 p-0 my-0 text-white titre-bold">Licence RBQ</h3>
+    </div>
+    <div class="card-body border-bleuFonce py-1">
+        <div class="row d-flex align-baseline ">
+            <div class="col-xl-4 col-lg-6 col-12 col-sm-12 py-2">
+                <label class="bleuFonce texte-bold" for="noLicenceRBQ">Numéro</label>
+                <input type="text" @attributes="inputAttributes" id="noLicenceRBQ" placeholder="0000-0000-00 ou 0000000000" class="form-control input-bleu texte-light
+                    @GetInputClass(() => LicenceRBQFormModel.NumeroLicence) "
+                    @oninput="@(e => ButtonLogicChange(e, "NumeroLicence"))"
+                    @bind="LicenceRBQFormModel.NumeroLicence" />
+                @((MarkupString)GetValidationHTML(() => LicenceRBQFormModel.NumeroLicence))
+            </div>
+        </div>
+        <div class="row d-flex align-baseline">
+            <div class="col-xl-6 col-lg-6 col-12 col-sm-12 py-2">
+                <label class="bleuFonce texte-bold" for="statut">Statut</label>
+                <select class="form-select @GetInputClass(() => LicenceRBQFormModel.StatutLicence) input-bleu texte-light" 
+                    @attributes="inputAttributes" id="statut"
+                        @oninput="@(e => ButtonLogicChange(e, "StatutLicence"))"
+                    @bind="LicenceRBQFormModel.StatutLicence">
+                    <option value="">Veuillez choisir un statut</option>
+                    <option value="Valide">Valide</option>
+                    <option value="Valide avec restriction">Valide avec restriction</option>
+                    <option value="Non valide">Non valide</option>
+                </select>         
+                @((MarkupString)GetValidationHTML(() => LicenceRBQFormModel.StatutLicence))                               
+            </div>
+            <div class="col-xl-6 col-lg-6 col-12 col-sm-12 py-2">
+                <label class="bleuFonce texte-bold" for="licenceType">Type</label>
+                <select class="form-select @GetInputClass(() => LicenceRBQFormModel.TypeLicence) input-bleu texte-light" 
+                    @attributes="inputAttributes" id="licenceType"
+                        @oninput="@(e => ButtonLogicChange(e, "TypeLicence"))"
+                    @bind="LicenceRBQFormModel.TypeLicence">
+                    <option value="">Veuillez choisir un type</option>
+                    <option value="Entrepreneur">Entrepreneur</option>
+                    <option value="Constructeur-Propriétaire">Constructeur-Propriétaire</option>
+                </select>
+                @((MarkupString)GetValidationHTML(() => LicenceRBQFormModel.TypeLicence))        
+            </div>                              
+        </div>
+        <div class="col-xl-12 col-lg-12 col-12 col-sm-12 py-2">
+            <label class="texte-bold">Entrepeneur général</label>               
+            <div class="@GetInputClass(() => LicenceRBQFormModel.SousCategoSelected) overflow-auto card @((isDisabled ? "box-gris" : "box-bleu"))">
+            @{
+                int i = 0;
+                foreach (var categorie in categorieGeneral)
+                {
+                    <div class="row m-0">
+                        <div class="col-auto p-0">
+                            <label>
+                                <input type="checkbox" id="categorie@(i)"
+                                    checked="@LicenceRBQFormModel.SousCategoSelected[categorie.CodeSousCategorie]"
+                                    @attributes="inputAttributes"
+                                    @onchange="(e) => OnCheckboxChange(categorie.CodeSousCategorie, e)" />
+                                <span class="check-blanc"></span>
+                                    <span class="texte-14bold">@categorie.CodeSousCategorie - @categorie.TravauxPermis</span>
+                            </label>
+                        </div>
+                    </div>
+                    i++;
+                }
+            }
+            </div>
+        </div>    
+        <div class="col-xl-12 col-lg-12 col-12 col-sm-12 py-2">
+            <label class="texte-bold">Entrepeneur spécialisé</label>
+            <div class="@GetInputClass(() => LicenceRBQFormModel.SousCategoSelected) overflow-auto card @((isDisabled ? "box-gris" : "box-bleu"))">
+            @foreach (var categorie in categorieSpecialise)
+            {
+                <div class="row m-0">
+                    <div class="col-auto p-0">
+                        <label>
+                            <input type="checkbox" id="categorie@(i)"
+                                checked="@LicenceRBQFormModel.SousCategoSelected[categorie.CodeSousCategorie]"
+                                @attributes="inputAttributes"
+                                @onchange="(e) => OnCheckboxChange(categorie.CodeSousCategorie, e)" />
+                            <span class="check-blanc"></span>
+                            <span class="texte-14bold">@categorie.CodeSousCategorie - @categorie.TravauxPermis</span>
+                        </label>
+                    </div>
+                </div>
+                i++;
+            }
+            </div>
+            @((MarkupString)GetValidationHTML(() => LicenceRBQFormModel.SousCategoSelected))
+        </div>
+    </div>
+</EditForm>
+
+<style>
+    .box-gris {
+        background-color: rgb(233, 236, 239) !important;
+        border: 2px solid rgb(11, 35, 65);
+    }
+</style>
+
+@code {
+    [Parameter]
+    public Action<LicenceRBQ>? AssignReference { get; set; }
+    [Parameter]
+    public List<Categorierbq> AllCategories { get; set; }  = new List<Categorierbq>();
+    [Parameter]
+    public LicenceRBQFormModel LicenceRBQFormModel { get; set; }
+    [Parameter]
+    public bool IsRBQAnyFieldChange { get; set; }
+    [Parameter]
+    public EventCallback<bool> IsRBQAnyFieldChangeChanged { get; set; }
+    private EditContext editContext;
+    private ValidationMessageStore validationMessageStore;
+    private List<Categorierbq> categorieGeneral = new List<Categorierbq>();
+    private List<Categorierbq> categorieSpecialise = new List<Categorierbq>();
+    private Dictionary<string, object> inputAttributes;
+    private bool isSubmit = false;
+    bool isDisabled = false;
+    protected override void OnParametersSet()
+    {
+        if (AllCategories != null && AllCategories.Any())
+        {
+            try
+            {
+                //Console.WriteLine($"AllCategories: {AllCategories.Count}");
+                categorieGeneral = AllCategories
+                .Where(c => c.NomCategorie == "Général")
+                .ToList();
+                //Console.WriteLine($"categorieGeneral: {categorieGeneral.Count}");
+                categorieSpecialise = AllCategories
+                .Where(c => c.NomCategorie == "Spécialisé")
+                .ToList();
+                //Console.WriteLine($"categorieSpecialise: {categorieSpecialise.Count}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erreur lors de la récupération des personnes: {ex.Message}");
+            }
+            }
+        else
+        {
+            Console.WriteLine("AllCategories is either null or empty.");
+        }
+    }
+    protected override void OnInitialized()
+    {
+        isDisabled = LicenceRBQFormModel.Disabled;
+        inputAttributes = isDisabled
+            ? new Dictionary<string, object> { { "disabled", "disabled" } }
+            : new Dictionary<string, object>(); 
+        editContext = new EditContext(LicenceRBQFormModel);
+        editContext.OnValidationStateChanged += (sender, args) => StateHasChanged();
+        validationMessageStore = new ValidationMessageStore(editContext);
+        AssignReference?.Invoke(this);
+
+    }
+
+    private string GetInputClass<TField> (Expression<Func<TField>> fieldExpression)
+    {
+        if (!isSubmit) {
+            return "";
+        }
+        var fieldIdentifier = FieldIdentifier.Create(fieldExpression);
+        var isValid = !editContext.GetValidationMessages(fieldIdentifier).Any();
+        if (fieldIdentifier.FieldName.Equals("NumeroLicence")) {
+            return isValid ? "" : "invalid";
+        }
+
+        return isValid ? "valid" : "invalid";
+    }
+
+    private string GetValidationHTML<TField> (Expression<Func<TField>> fieldExpression) 
+    {
+        if (!isSubmit) {
+            return "";
+        }
+        var fieldIdentifier = FieldIdentifier.Create(fieldExpression);
+        var isValid = !editContext.GetValidationMessages(fieldIdentifier).Any();
+        if (fieldIdentifier.FieldName.Equals("NumeroLicence")) {
+            return isValid ? "" : "<span class=\"input-group-text text-danger\"><i class=\"bi bi-x-circle me-2\"></i><span class=\"texte-validation\">" + editContext.GetValidationMessages(fieldIdentifier).FirstOrDefault() + "</span></span>";
+        }
+
+        return isValid ? "<span class=\"input-group-text text-success\"><i class=\"bi bi-check-circle me-2\"></i><span class=\"texte-validation\">Valide</span></span>" 
+                       : "<span class=\"input-group-text text-danger\"><i class=\"bi bi-x-circle me-2\"></i><span class=\"texte-validation\">" + editContext.GetValidationMessages(fieldIdentifier).FirstOrDefault() + "</span></span>";  
+    }
+
+    public async Task<bool> TriggerValidation() 
+    {
+        validationMessageStore.Clear();
+        isSubmit = true;
+        if (!string.IsNullOrEmpty(LicenceRBQFormModel.NumeroLicence)) {
+            bool isValid = await licenceService.ValidateNumeroDeLicenceAsync(InsertHyphens(LicenceRBQFormModel.NumeroLicence));
+            if (!isValid)
+            {
+                validationMessageStore.Add(() => LicenceRBQFormModel.NumeroLicence, "Aucune correspondance");
+                editContext.NotifyValidationStateChanged();
+            }
+        }
+        StateHasChanged();
+        return editContext.Validate();
+    }
+
+    private void OnCheckboxChange(string codeSousCategorie, ChangeEventArgs e)
+    {
+        if (e.Value is bool isChecked)
+        {
+            LicenceRBQFormModel.SousCategoSelected[codeSousCategorie] = (bool)e.Value;
+            if (isChecked)
+            {
+                LicenceRBQFormModel.CodeSousCategorie.Add(codeSousCategorie);
+            }
+            else
+            {
+                LicenceRBQFormModel.CodeSousCategorie.Remove(codeSousCategorie);
+            }
+        }
+        ButtonLogicChange(null, "");
+    }
+
+    private bool ValidateSelection()
+    {
+        if (LicenceRBQFormModel == null || LicenceRBQFormModel.SousCategoSelected == null)
+        {
+            return false;
+        }
+        return LicenceRBQFormModel.SousCategoSelected.Values.Any(isSelected => isSelected);
+    }
+
+    static string InsertHyphens(string input)
+    {
+        if (input.Length == 10)
+        {
+            return input.Substring(0, 4) + "-" + input.Substring(4, 4) + "-" + input.Substring(8, 2);
+        }
+        return input;
+    }
+
+    public void ButtonLogicChange(ChangeEventArgs e, string propertyName)
+    {
+        if (e != null)
+        {
+            var value = e.Value?.ToString();
+            switch (propertyName)
+            {
+                case "NumeroLicence":
+                    LicenceRBQFormModel.NumeroLicence = e.Value.ToString();
+                    break;
+
+                case "StatutLicence":
+                    LicenceRBQFormModel.StatutLicence = e.Value.ToString();
+                    break;
+
+                case "TypeLicence":
+                    LicenceRBQFormModel.TypeLicence = e.Value.ToString();
+                    break;
+            }
+        }
+        if (!isEveryFieldEmpty())
+        {
+            IsRBQAnyFieldChange = true;
+        }
+        else
+        {
+            IsRBQAnyFieldChange = false;
+        }
+        IsRBQAnyFieldChangeChanged.InvokeAsync(IsRBQAnyFieldChange);
+    }
+
+    public bool isEveryFieldEmpty() {
+        bool isFieldsEmpty = true;
+        if (!string.IsNullOrEmpty(LicenceRBQFormModel.NumeroLicence))
+        {
+            isFieldsEmpty = false;
+            return isFieldsEmpty;
+        }
+        if (!string.IsNullOrEmpty(LicenceRBQFormModel.StatutLicence))
+        {
+            isFieldsEmpty = false;
+            return isFieldsEmpty;
+        }
+        if (!string.IsNullOrEmpty(LicenceRBQFormModel.TypeLicence))
+        {
+            isFieldsEmpty = false;
+            return isFieldsEmpty;
+        }
+        if (ValidateSelection()) 
+        {
+            isFieldsEmpty = false;
+            return isFieldsEmpty;
+        }
+        return isFieldsEmpty;
+    }
+}

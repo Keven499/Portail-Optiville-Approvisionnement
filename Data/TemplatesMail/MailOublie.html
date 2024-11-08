@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vérification de votre compte</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            padding: 10px 0;
+            background-color: rgb(0, 118, 213);
+            color: white;
+            border-radius: 8px 8px 0 0;
+        }
+        .content {
+            text-align: center;
+            padding: 20px;
+        }
+        .verification-code {
+            font-size: 24px;
+            font-weight: bold;
+            color: rgb(0, 118, 213);
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Vérification de votre compte</h2>
+        </div>
+        <div class="content">
+            <p>Bonjour,</p>
+            <p>Merci de vérifier votre adresse e-mail pour activer votre compte. Voici votre code de vérification :</p>
+            <div class="verification-code">{{VERIFICATION_CODE}}</div> <!-- À remplacer dynamiquement -->
+            <p>Veuillez entrer ce code dans l'application pour finaliser votre inscription.</p>
+            <p>Si vous n'avez pas demandé ce code, ignorez simplement ce message.</p>
+        </div>
+        <div class="footer">
+            &copy; 2024 Ville de Trois-Rivières. Tous droits réservés.
+        </div>
+    </div>
+</body>
+</html>

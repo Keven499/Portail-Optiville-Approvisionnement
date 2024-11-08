@@ -1,0 +1,222 @@
+@page "/"
+@using System.ComponentModel.DataAnnotations
+@using Portail_OptiVille.Data.Exceptions
+@using Portail_OptiVille.Data.Models
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Security.Cryptography;
+@using System.Text;
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Portail_OptiVille.Data.Utilities
+@using System.Text.RegularExpressions
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject NavigationManager NavigationManager
+@inject A2024420517riGr1Eq6Context _context
+@inject IJSRuntime JsRuntime
+@inject ICookie cookie
+@inject JwtTokenGenerator tokenGenerator
+
+@code {
+    public const int COOKIE_EXPIRATION = 3; // 3 Hours
+}
+
+<PageTitle>Connexion Fournisseurs</PageTitle>
+
+<EditForm Model="@logInModel" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="ValidateInput">
+    <!-- OnValidSubmit="HandleValidSubmit" -->
+    <div class="form-group container-fluid">
+        <div class="row d-flex justify-content-center">
+            <div class="col-xl-6 col-xl-6 col-lg-11 col-12 col-sm-12 py-2">
+                <div class="card">
+
+                    @* Identification *@
+                    <div class="card-header py-2 bg-bleuFonce">
+                        <h3 class="py-2 p-0 my-0 text-white titre-bold">Identification</h3>
+                    </div>
+                    <div class="card-body border-bleuFonce py-1">
+                        <div class="col-xl-8 col-lg-8 col-12 col-sm-12 py-2">
+                            <label class="bleuFonce texte-bold" for="Courriel">Courriel / NEQ <i class="bi bi-braces-asterisk text-danger"></i></label>
+                            <InputText class="form-control input-bleu texte-light" id="Courriel" @bind-Value="logInModel.Username" />
+                            @*Affichage de l'erreur*@
+                            <div class="d-flex align-baseline">
+                                <i class="bi @GetEmailIcon() me-1"></i><ValidationMessage For="@(() => logInModel.Username)" />
+                            </div>
+                        </div>
+
+                        <div class="col-xl-8 col-lg-8 col-12 col-sm-12 py-2">
+                            <label class="bleuFonce texte-bold" for="MotDePasse">Mot de passe <i class="bi bi-braces-asterisk text-danger"></i></label>
+                            <InputText type="password" class="form-control input-bleu texte-light" id="MotDePasse" @bind-Value="logInModel.MotDePasse" />
+                            @*Affichage de l'erreur*@
+                            <div class="d-flex align-baseline">
+                                <i class="bi @passwordIconClass me-1"></i><ValidationMessage For="@(() => logInModel.MotDePasse)" />
+                            </div>
+                        </div>
+                        <div class="py-1">
+                            <a href="/motdepasse" class="texte-medium">Mot de passe oublié</a>
+                        </div>
+                    </div>
+
+                    <div class="card-footer py-2 bg-bleuFonce d-flex justify-content-center">
+                        <button type="submit" id="btnBleu" class="btn bg-bleu texte-bold text-white" style="width: 200px;">Connexion</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <DataAnnotationsValidator />
+</EditForm>
+@code {
+
+    private LogInModel logInModel = new LogInModel();
+
+    private async void HandleValidSubmit()
+    {
+        if (IsValidInput(logInModel.Username))
+        {
+
+            // Récupérer le fournisseur qui a l'adresse courriel
+            Identification? fournisseur = _context.Identifications.FirstOrDefault(f => f.AdresseCourriel == logInModel.Username);
+            if (fournisseur is null)
+            {
+                fournisseur = _context.Identifications.FirstOrDefault(f => f.Neq == logInModel.Username);
+            }
+
+            try
+            {
+
+                if (fournisseur != null)
+                {
+                    // Vérification du mot de passe
+                    if (VerifyPassword(logInModel.MotDePasse, fournisseur.MotDePasse))
+                    {
+                        // Redirection si les informations sont correctes
+                        await ProtectedSessionStore.SetAsync("Email", fournisseur.AdresseCourriel);
+                        await ProtectedSessionStore.SetAsync("IDFournisseur", fournisseur.Fournisseur);
+
+                        string token = tokenGenerator.GenerateToken("fournisseur.AdresseCourriel");
+                        // ajouter le token dans la BD
+                        Usersession usersession = new Usersession
+                            {
+                                Token = token,
+                                OwnerEmail = fournisseur.AdresseCourriel,
+                                ExpirationDate =
+                            DateTime.Now.AddHours(COOKIE_EXPIRATION)
+                            };
+                        _context.Usersessions.Add(usersession);
+                        await _context.SaveChangesAsync();
+
+                        await cookie.SetValue("SToken", token, COOKIE_EXPIRATION);
+
+                        NavigationManager.NavigateTo("/index", true);
+                    }
+                    else
+                    {
+                        // Réinitialisation du mot de passe si incorrect
+                        logInModel.MotDePasse = "";
+                        await JsRuntime.InvokeVoidAsync("alert", "Adresse Courriel / NEQ ou mot de passe incorrect!");
+                    }
+                }
+                else
+                {
+                    // Cas où le fournisseur n'est pas trouvé
+                    await JsRuntime.InvokeVoidAsync("alert", "Adresse Courriel / NEQ ou mot de passe incorrect!");
+                }
+            }
+            catch
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Une erreur est survenue !");
+                NavigationManager.NavigateTo("/");
+
+            }
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Adresse Courriel / NEQ ou mot de passe incorrect!");
+        }
+    }
+
+
+    static string HashPassword(string input)
+    => Convert.ToHexString(SHA1.HashData(Encoding.UTF8.GetBytes(input)));
+
+    public bool VerifyPassword(string password, string hashedPassword)
+    {
+        // Hacher le mot de passe saisi
+        string newHash = HashPassword(password);
+        return newHash == hashedPassword;
+    }
+
+
+
+
+    private string emailIconClass = ""; // Par défaut
+    private string passwordIconClass = ""; // Par défaut
+
+    private void ValidateInput()
+    {
+        if (IsValidInput(logInModel.Username))
+        {
+            emailIconClass = "bi-check-circle text-success"; // Valide
+        }
+        else
+        {
+            emailIconClass = "bi-x-circle text-danger"; // Invalide
+        }
+
+        if (string.IsNullOrEmpty(logInModel.MotDePasse))
+        {
+            passwordIconClass = "bi-x-circle text-danger"; // Invalide
+        }
+        else
+        {
+            passwordIconClass = "bi-check-circle text-success"; // Valide
+        }
+    }
+
+    private bool IsValidInput(string input)
+    {
+        // Simple validation, tu peux utiliser des expressions régulières pour plus de précision
+        Regex rg = new Regex(@"^(11|22|33|88)[4-9]\d{7}$");
+
+        return (!string.IsNullOrEmpty(input) && input.Contains("@") && input.Contains(".")) || (!string.IsNullOrEmpty(input) &&
+        rg.IsMatch(input));
+    }
+
+    private string GetEmailIcon()
+    {
+        return emailIconClass;
+    }
+
+    public class LogInModel
+    {
+        [Required(ErrorMessage = "Le courriel/NEQ est requis")]
+        [RegularExpression(@"^(?:((11|22|33|88)[4-9]\d{7})|([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}))$", ErrorMessage =
+        "Le courriel/NEQ n'est pas valide")]
+        public string Username { get; set; }
+
+        [Required(ErrorMessage = "Le mot de passe est requis")]
+        public string MotDePasse { get; set; }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+
+            try
+            {
+                var result = await ProtectedSessionStore.GetAsync<string>("Email");
+                if (result.Success || !string.IsNullOrEmpty(result.Value))
+                {
+                    Console.WriteLine($"Adresse courriel: {result.Value}");
+                    NavigationManager.NavigateTo("/index", true);
+                }
+            }
+            catch
+            {
+                Console.WriteLine($"Erreur lors de la récupération de l'adresse courriel");
+            }
+
+        }
+    }
+}

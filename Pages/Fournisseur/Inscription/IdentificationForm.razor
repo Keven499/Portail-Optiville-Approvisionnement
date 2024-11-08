@@ -1,0 +1,116 @@
+@using Portail_OptiVille.Data.FormModels
+@using System.Text.RegularExpressions
+@using System.Linq.Expressions
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Portail_OptiVille.Data.Utilities
+@using Portail_OptiVille.Data.Models
+
+<PageTitle>Étape 1 Identification</PageTitle>
+<EditForm EditContext="@editContext">
+    <DataAnnotationsValidator />
+    <div class="card-header py-2 bg-bleuFonce">
+        <h3 class="py-2 my-0 text-white titre-bold">Identification</h3>
+    </div>
+    <div class="card-body border-bleuFonce py-1">
+        <div class="col-xl-4 col-lg-4 col-sm-8 col-12 py-2">
+            <label class="bleuFonce texte-bold" for="NEQ">NEQ</label>
+            <input type="text" @bind="IdenticationFormModel.NEQ" maxlength="10" class="form-control @GetInputClass(() => IdenticationFormModel.NEQ) input-bleu texte-light" id="NEQ" placeholder="0000000000"/>
+            @((MarkupString)GetValidationHTML(() => IdenticationFormModel.NEQ))
+        </div>
+        <div class="col-xl-9 col-lg-9 col-sm-12 col-12 py-2">
+            <label class="bleuFonce texte-bold" for="nomEntreprise">Nom de l'entreprise <i class="bi bi-braces-asterisk text-danger"></i></label>
+            <input type="text" id="nomEntreprise" maxlength="64" class="form-control @GetInputClass(() => IdenticationFormModel.NomEntreprise) input-bleu texte-light" @bind="IdenticationFormModel.NomEntreprise" />
+            @((MarkupString)GetValidationHTML(() => IdenticationFormModel.NomEntreprise))
+        </div>
+            <div class="col-xl-9 col-lg-9 col-sm-12 col-12 py-2">
+                <label class="bleuFonce texte-bold" for="courrielEntreprise">Courriel de l'entreprise <i class="bi bi-braces-asterisk text-danger"></i></label>
+                <input type="email" id="courrielEntreprise" maxlength="64" @bind="IdenticationFormModel.CourrielEntreprise" placeholder="courriel@votre-entreprise.extension" class="form-control @GetInputClass(() => IdenticationFormModel.CourrielEntreprise) input-bleu texte-light" />
+                @((MarkupString)GetValidationHTML(() => IdenticationFormModel.CourrielEntreprise))
+            </div>
+        <div class="row py-2 d-flex align-baseline">
+            <div class="col-xl-6 col-lg-6 col-sm-12 col-12 py-2">
+                <label class="bleuFonce texte-bold" for="MotDePasse">Mot de passe  <i class="bi bi-braces-asterisk text-danger"></i></label>
+                <input type="password" id="MotDePasse" @bind="IdenticationFormModel.MotDePasse" class="form-control @GetInputClass(() => IdenticationFormModel.MotDePasse) input-bleu texte-light" />
+                @((MarkupString)GetValidationHTML(() => IdenticationFormModel.MotDePasse))
+            </div>
+            <div class="col-xl-6 col-lg-6 col-sm-12 col-12 py-2">
+                <label class="bleuFonce texte-bold" for="ConfirmationMotDePasse">Confirmation du mot de passe <i class="bi bi-braces-asterisk text-danger"></i></label>
+                <input type="password" id="ConfirmationMotDePasse" @bind="IdenticationFormModel.ConfirmationMotDePasse" class="form-control @GetInputClass(() => IdenticationFormModel.ConfirmationMotDePasse) input-bleu texte-light" />
+                @((MarkupString)GetValidationHTML(() => IdenticationFormModel.ConfirmationMotDePasse))
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+<style>
+    .valid {
+        outline: 1px solid #26b050;
+    } 
+</style>
+
+@code {
+    [Parameter]
+    public Action<IdentificationForm>? AssignReference { get; set; }
+    [Parameter]
+    public IdenticationFormModel IdenticationFormModel { get; set; }
+    private EditContext editContext;
+    private bool isSubmit = false;
+
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(IdenticationFormModel);
+        editContext.OnValidationStateChanged += (sender, args) => StateHasChanged();
+        AssignReference?.Invoke(this);
+    }
+
+    private string GetInputClass<TField> (Expression<Func<TField>> fieldExpression)
+    {
+        if (!isSubmit) {
+            return "";
+        }
+        var fieldIdentifier = FieldIdentifier.Create(fieldExpression);
+        var isValid = !editContext.GetValidationMessages(fieldIdentifier).Any();
+
+        // THERE'S PROBABLY A BETTER WAY TO DO THIS.
+        if (string.IsNullOrEmpty(IdenticationFormModel.NEQ))
+        {
+            if (fieldIdentifier.FieldName.Equals("NEQ"))
+            {
+                return isValid ? "" : "invalid";
+            }
+        }
+
+        return isValid ? "valid" : "invalid";
+    }
+
+    private string GetValidationHTML<TField> (Expression<Func<TField>> fieldExpression) 
+    {
+        if (!isSubmit) {
+            return "";
+        }
+        var fieldIdentifier = FieldIdentifier.Create(fieldExpression);
+        var isValid = !editContext.GetValidationMessages(fieldIdentifier).Any();
+
+        // THERE'S PROBABLY A BETTER WAY TO DO THIS.
+        if (string.IsNullOrEmpty(IdenticationFormModel.NEQ))
+        {
+            if (fieldIdentifier.FieldName.Equals("NEQ"))
+            {
+                return isValid ? "" : "<span class=\"input-group-text text-danger\"><i class=\"bi bi-x-circle me-2\"></i><span class=\"texte-validation\">" + editContext.GetValidationMessages(fieldIdentifier).FirstOrDefault() + "</span></span>";
+            }
+        }
+
+        return isValid ? "<span class=\"input-group-text text-success\"><i class=\"bi bi-check-circle me-2\"></i><span class=\"texte-validation\">Valide</span></span>" 
+                       : "<span class=\"input-group-text text-danger\"><i class=\"bi bi-x-circle me-2\"></i><span class=\"texte-validation\">" + editContext.GetValidationMessages(fieldIdentifier).FirstOrDefault() + "</span></span>";  
+    }
+
+    public bool TriggerValidation() 
+    {
+        isSubmit = true;
+        bool isValid = false;
+        isValid = editContext.Validate();
+        StateHasChanged();
+        return isValid;
+    }   
+}

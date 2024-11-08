@@ -1,0 +1,353 @@
+@font-face {
+    font-family: 'Alumni Extra Bold';
+    src: url('/fonts/AlumniSans-ExtraBold.ttf');
+}
+
+@font-face {
+    font-family: 'Alumni Medium';
+    src: url('/fonts/AlumniSans-Medium.ttf');
+}
+
+@font-face {
+    font-family: 'TT Hoves Light';
+    src: url('/fonts/TT Hoves Pro Trial Light.ttf');
+}
+
+@font-face {
+    font-family: 'TT Hoves Medium';
+    src: url('/fonts/TT Hoves Pro Trial Medium.ttf');
+}
+
+@font-face {
+    font-family: 'TT Hoves Bold';
+    src: url('/fonts/TT Hoves Pro Trial Bold.ttf');
+}
+
+body 
+{
+    background-color: #eee;       
+    background-size: cover; 
+    background-position: center;        
+    background-repeat: no-repeat; 
+    background-attachment: fixed;
+}  
+
+.body-pad
+{
+    padding-top: 30px;
+}
+
+#btnBleu:hover{
+    background-color: rgb(0, 118, 213, 0.6);
+    color: white;    
+    cursor: pointer;
+}
+
+#btnVert:hover{
+    background-color: rgb(99, 188, 85, 0.6);
+    color: white;    
+    cursor: pointer;
+}
+
+#btnSupp:hover{
+    background-color: rgba(160, 17, 17);
+    color: white;    
+    cursor: pointer;
+}
+
+/* Bleu pâle */
+.bleuPale
+{
+    color: rgb(120, 198, 224);
+}
+
+.bg-bleuPale
+{
+    background-color: rgb(120, 198, 224);
+}
+
+.border-bleuPale
+{
+    border: 2px solid rgb(120, 198, 224);
+}
+
+/* Bleu */
+.bleu
+{
+    color: rgb(0, 118, 213);
+}
+
+.bg-bleu
+{
+    background-color: rgb(0, 118, 213);
+}
+
+.border-bleu
+{
+    border: 2px solid rgb(0, 118, 213);
+}
+
+.input-bleu
+{
+    background-color: rgb(0, 118, 213, 0.2);
+    border-bottom: 2px solid rgb(11, 35, 65);
+}
+
+.border-vert
+{
+    border: 2px solid rgb(0, 118, 213);
+}
+
+.input-vert
+{
+    background-color: rgb(197, 216, 0, 0.2);
+    border-bottom: 2px solid rgb(30, 73, 45);
+}
+
+.input-vert-no-border {
+    background-color: rgb(197, 216, 0, 0.2);
+}
+
+.box-bleu 
+{
+    background-color: rgb(0, 118, 213, 0.2); 
+    border: 2px solid rgb(11, 35, 65);
+}
+
+.box-vert 
+{
+    background-color: rgb(197, 216, 0, 0.2); 
+    border: 2px solid rgb(11, 35, 65);
+}
+
+.table-bleu
+{
+    background-color: rgb(0, 118, 213, 0.2) !important; 
+    border: 2px solid rgb(11, 35, 65);
+}
+
+.check-blanc
+{
+    background-color: white;
+    border: 1px solid rgb(11, 35, 65);
+    display: block;
+    width: 20px;
+    flex-shrink: 0;
+    margin-right: 3px;
+    height: 20px;
+    border-radius: 3px;
+    position: relative;
+    cursor: pointer;
+}
+
+.check-blanc:before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 6px;
+    height: 12px;
+    border: 1px solid rgb(11, 35, 65);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    opacity: 0;
+}
+
+.check-vert
+{
+    background-color: white;
+    border: 1px solid rgb(30, 73, 45);
+    width: 20px;
+    flex-shrink: 0;
+    height: 20px;
+    border-radius: 3px;
+    position: relative;
+    cursor: pointer;
+}
+
+.check-vert:before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 6px;
+    height: 12px;
+    border: 1px solid rgb(30, 73, 45);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    opacity: 0;
+}
+
+input[type="checkbox"]:checked+.check-blanc:before {
+    opacity: 1;
+}
+
+.border-Tel
+{
+    border-top: 2px solid rgb(0, 118, 213);
+}
+
+/* Bleu foncé */
+.bleuFonce
+{
+    color: rgb(11, 35, 65);
+}
+
+.bg-bleuFonce
+{
+    background-color: rgb(11, 35, 65);
+}
+
+.mini-border-bleuFonce
+{
+    border: 1px solid rgb(11, 35, 65);
+}
+
+.border-bleuFonce
+{
+    border: 2px solid rgb(11, 35, 65);
+}
+
+.borderTX-bleuFonce
+{
+    border-top: 2px solid rgb(11, 35, 65);
+    border-left: 2px solid rgb(11, 35, 65);
+    border-right: 2px solid rgb(11, 35, 65);
+}
+
+/* Vert pâle */
+.vertPale
+{
+    color: rgb(197, 216, 0);
+}
+
+.bg-vertPale
+{
+    background-color: rgb(197, 216, 0);
+}
+
+.border-vertPale
+{
+    border: 2px solid rgb(197, 216, 0);
+}
+
+/* Vert */
+.vert
+{
+    color: rgb(99, 188, 85);
+}
+
+.vertFonce {
+    color: rgb(30, 73, 45);
+}
+
+.bg-vert
+{
+    background-color: rgb(99, 188, 85);
+}
+
+.border-vert
+{
+    border: 2px solid rgb(99, 188, 85);
+}
+
+/* Vert foncé */
+.vertFonce
+{
+    color: rgb(30, 73, 45);
+}
+
+.bg-vertFonce
+{
+    background-color: rgb(30, 73, 45);
+}
+
+.border-vertFonce
+{
+    border: 2px solid rgb(30, 73, 45);
+}
+
+/* Fonts */
+.titre-bold
+{
+    font-family: 'Alumni Extra Bold';
+}
+
+.titre-90bold
+{
+    font-family: 'Alumni Extra Bold';
+    font-size: 85px;
+}
+
+.titre-30bold
+{
+    font-family: 'Alumni Extra Bold';
+    font-size: 30px;
+}
+
+.titre-medium
+{
+    font-family: 'Alumni Medium';
+}
+
+.texte-light
+{
+    font-family: 'TT Hoves Light';
+}
+
+.texte-medium
+{
+    font-family: 'TT Hoves Medium';
+}
+
+.texte-13medium
+{
+    font-family: 'TT Hoves Medium';
+    font-size: 13px;
+}
+
+.texte-bold
+{
+    font-family: 'TT Hoves Bold';
+}
+
+.texte-14bold
+{
+    font-family: 'TT Hoves Bold';
+    font-size: 14px;
+}
+
+.texte-validation
+{
+    font-family: 'TT Hoves Medium';
+    font-size: 13px;
+}
+
+@keyframes flashBackground {
+    0% {
+        background-color: rgba(177, 196, 0, 0.2);
+    }
+
+    50% {
+        background-color: rgba(177, 196, 0, 0.4);
+    }
+
+    100% {
+        background-color: rgba(177, 196, 0, 0.2);
+    }
+}
+
+.has-bottom-border {
+    border-bottom: 2px solid rgba(30, 73, 45, 0.8); /* Apply bottom border */
+}
+
+.selected-row {
+    background-color: rgba(177, 196, 0, 0.2); /* Background flashing */
+    animation: flashBackground 1s infinite; /* Animation */
+}
+
+@media (max-width: 767px) {
+    .navbar-brand img {
+        max-height: 60px; /* Taille réduite pour les petits écrans */
+    }
+}

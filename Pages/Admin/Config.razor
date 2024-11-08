@@ -1,0 +1,78 @@
+@page "/config"
+@using System.Text.Json
+@inject Portail_OptiVille.Data.Utilities.Config config
+@inject IHostEnvironment hostEnvironment // Inject IHostEnvironment to access the web root path
+<PageTitle>Gestion des paramètres</PageTitle>
+
+<div class="form-group container-fluid">
+    <div class="row d-flex justify-content-center">
+        <div class="col-xl-11 col-xl-11 col-lg-11 col-12 col-sm-12 py-2">
+            <div class="card">
+                <div class="card-header py-2 bg-vertFonce">
+                    <h3 class="py-2 p-0 my-0 text-white titre-bold">Paramètres</h3>
+                </div>
+                <div class="card-body border-vertFonce py-1">
+                    <div class="col-xl-6 col-lg-6 col-12 col-sm-12 py-2">
+                        <label for="CourrielAppro" class="vertFonce texte-bold">Courriel de l'approvisionnement</label>
+                        <InputText @bind-Value="config.CourrielAppro" type="email" class="form-control input-vert texte-light" id="CourrielAppro"
+                            readonly="@(!isEditing)" />
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-12 col-sm-12 py-2">
+                        <label for="CourrielFinance" class="vertFonce texte-bold">Courriel des finances</label>
+                        <InputText @bind-Value="config.CourrielFinance" type="email" class="form-control input-vert texte-light" id="CourrielFinance"
+                                readonly="@(!isEditing)" />
+                    </div>
+                    <div class="col-xl-4 col-lg-4 col-10 col-sm-8 py-2">
+                        <label for="DelaiRevision" class="vertFonce texte-bold">Délai avant la révision (mois)</label>
+                        <InputNumber @bind-Value="config.DelaiRevision" TValue="int" class="form-control input-vert texte-light" id="DelaiRevision"
+                                    readonly="@(!isEditing)" />
+                    </div>                    
+                    <div class="col-xl-4 col-lg-4 col-10 col-sm-8 py-2">
+                         <label for="TailleMaxFichiers" class="vertFonce texte-bold">Taille max. des fichiers joints (Mo)</label>
+                         <InputNumber @bind-Value="config.TailleMaxFichiers" TValue="int" class="form-control input-vert texte-light" id="TailleMaxFichiers"
+                                     readonly="@(!isEditing)" />
+                    </div>
+                </div>
+                    <div class="card-footer bg-vertFonce d-flex justify-content-center">
+                        <div>
+                            @if (!isEditing)
+                            {
+                                <button class="btn bg-vert texte-medium text-white" id="btnVert" style="width: 200px;" @onclick="EditConfig"><i class="bi bi-pencil me-1"></i>Modifier</button>
+                            }
+                            else
+                            {
+                                <button class="btn bg-vert texte-medium text-white" style="width: 200px;" @onclick="SaveConfig"><i class="bi bi-floppy me-1"></i>Sauvegarder</button>
+                            }
+                        </div>
+                    </div>
+                    @if (saveSuccess)
+                    {
+                        <div class="alert alert-success mt-3">La configuration a été sauvegardée!</div>
+                    }
+            </div>
+        </div>
+    </div>
+</div>
+@code {
+    private bool isEditing = false;
+    private bool saveSuccess = false;
+
+    private void EditConfig()
+    {
+        isEditing = true;
+        saveSuccess = false; 
+    }
+
+    private async Task SaveConfig()
+    {
+        var filePath = Path.Combine(hostEnvironment.ContentRootPath, "wwwroot", "Setting.json");
+        var json = JsonSerializer.Serialize(config, new JsonSerializerOptions { WriteIndented = true });
+
+        await File.WriteAllTextAsync(filePath, json);
+
+        saveSuccess = true; 
+        isEditing = false; 
+        await Task.Delay(4000); 
+        saveSuccess = false; 
+    }
+}

@@ -1,0 +1,84 @@
+@using Portail_OptiVille.Data.FormModels
+@using System.Linq.Expressions
+
+<EditForm EditContext="@editContext">
+    <DataAnnotationsValidator />
+    <div class="py-2 col-lg-12 col-xl-12 titre-bold fs-4">Téléphone @TelephoneNumber <i class="bi bi-braces-asterisk text-danger"></i></div>
+    <div class="row pb-2 d-flex align-baseline">
+        <div class="col-lg-3 col-xl-3 col-6 col-sm-6">
+            <label class="bleuFonce texte-bold" for="typeTel">Type <i class="bi bi-braces-asterisk text-danger"></i></label>
+            <select class="form-control @GetInputClass(() => telephoneFormModel.TypeTelEntreprise) input-bleu texte-light" id="typeTel" @bind="telephoneFormModel.TypeTelEntreprise">
+                <option disabled selected>Veuillez choisir un type</option>
+                <option value="Bureau">Bureau</option>
+                <option value="Télécopieur">Télécopieur</option>
+                <option value="Cellulaire">Cellulaire</option>
+            </select>
+            @((MarkupString)GetValidationHTML(() => telephoneFormModel.TypeTelEntreprise))
+        </div>
+        <div class="col-lg-5 col-xl-5 col-6 col-sm-6">
+            <label class="bleuFonce texte-bold" for="NoTel">Numéro <i class="bi bi-braces-asterisk text-danger"></i></label>
+            <input type="text" @bind="telephoneFormModel.NoTelEntreprise" maxlength="10" placeholder="0000000000" class="form-control @GetInputClass(() => telephoneFormModel.NoTelEntreprise) input-bleu texte-light" id="NoTel" />
+            @((MarkupString)GetValidationHTML(() => telephoneFormModel.NoTelEntreprise))
+        </div>
+        <div class="col-lg-3 col-xl-3 col-6 col-sm-6 pt-xl-0 pt-lg-0 pt-2 pt-sm-2 mb-3">
+            <label class="bleuFonce texte-bold" for="PosteCoordo">Poste</label>
+            <input type="text" @bind="telephoneFormModel.PosteTelEntreprise" maxlength="6" class="form-control @GetInputClass(() => telephoneFormModel.PosteTelEntreprise) input-bleu texte-light" id="PosteCoordo" />
+            @((MarkupString)GetValidationHTML(() => telephoneFormModel.PosteTelEntreprise))
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int TelephoneNumber { get; set; } = 1;
+    [Parameter]
+    public TelephoneFormModel telephoneFormModel { get; set; }   
+    private EditContext editContext { get; set; }
+    private bool isSubmit = false;
+
+    protected override void OnInitialized() 
+    {
+        editContext = new EditContext(telephoneFormModel);
+        editContext.OnValidationStateChanged += (sender, args) => StateHasChanged();
+    }
+
+    private string GetInputClass<TField> (Expression<Func<TField>> fieldExpression)
+    {
+        if (!isSubmit) {
+           return "";
+        }
+        var fieldIdentifier = FieldIdentifier.Create(fieldExpression);
+        var isValid = !editContext.GetValidationMessages(fieldIdentifier).Any();
+
+        // THERE'S PROBABLY A BETTER WAY TO DO THIS.
+        if (fieldIdentifier.FieldName.Equals("PosteTelEntreprise")) {
+            return isValid ? "" : "invalid";
+        }
+
+        return isValid ? "valid" : "invalid";
+    }
+
+    private string GetValidationHTML<TField> (Expression<Func<TField>> fieldExpression) 
+    {
+        if (!isSubmit) {
+           return "";
+        }
+        var fieldIdentifier = FieldIdentifier.Create(fieldExpression);
+        var isValid = !editContext.GetValidationMessages(fieldIdentifier).Any();
+
+        // THERE'S PROBABLY A BETTER WAY TO DO THIS.
+        if (fieldIdentifier.FieldName.Equals("PosteTelEntreprise")) {
+            return isValid ? "" : "<span class=\"input-group-text text-danger\"><i class=\"bi bi-x-circle me-2\"></i><span class=\"texte-validation\">" + editContext.GetValidationMessages(fieldIdentifier).FirstOrDefault() + "</span></span>";
+        }
+
+        return isValid ? "<span class=\"input-group-text text-success\"><i class=\"bi bi-check-circle me-2\"></i><span class=\"texte-validation\">Valide</span></span>" 
+                       : "<span class=\"input-group-text text-danger\"><i class=\"bi bi-x-circle me-2\"></i><span class=\"texte-validation\">" + editContext.GetValidationMessages(fieldIdentifier).FirstOrDefault() + "</span></span>";  
+    }
+
+    public bool TriggerValidation() 
+    {
+        isSubmit = true;
+        StateHasChanged();
+        return editContext.Validate();
+    }
+}

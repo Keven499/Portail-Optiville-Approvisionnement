@@ -1,0 +1,142 @@
+@page "/Connexion-employe"
+@using System.ComponentModel.DataAnnotations
+@using Portail_OptiVille.Data.Models
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Text;
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Microsoft.EntityFrameworkCore;
+
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject NavigationManager NavigationManager
+@inject A2024420517riGr1Eq6Context _context
+@inject IJSRuntime JsRuntime
+
+
+<EditForm Model="@employeLogInModel" OnValidSubmit="EmployeValidSubmit" OnInvalidSubmit="ValidateInput">
+    <!-- OnValidSubmit="EmployeValidSubmit" -->
+    <div class="form-group container-fluid h-100 w-100 d-flex align-items-center justify-content-center">
+        <div class="row h-100 w-100 d-flex align-items-center justify-content-center">
+            <div class="card w-75 h-75 d-flex justify-content-center p-0 m-0">
+
+                @* Identification *@
+                <div class="card-header py-2 bg-bleuFonce">
+                    <h3 class="py-2 p-0 my-0 text-white titre-bold">Identification</h3>
+                </div>
+                <div class="card-body border-bleuFonce py-1">
+                    <div class="col-xl-12 col-lg-12 py-2">
+                        <label class="bleuFonce texte-bold" for="Courriel">
+                            <i class="bi @GetEmailIcon()"></i> Courriel <i class="bi bi-braces text-success"></i>
+                        </label>
+                        <InputText type="Email" class="form-control" id="Courriel" @bind-Value="employeLogInModel.Courriel" />
+                        @*Affichage de l'erreur*@
+                        <ValidationMessage For="@(() => employeLogInModel.Courriel)" />
+                    </div>
+
+                    <div class="col-xl-12 col-lg-12 py-2">
+                        <label class="bleuFonce texte-bold" for="MotDePasse">
+                            <i class="bi @passwordIconClass"></i> Mot de passe
+                            <i class="bi bi-braces text-success"></i>
+                        </label>
+                        <InputText type="password" class="form-control" id="MotDePasse" @bind-Value="employeLogInModel.MotDePasse" />
+                        @*Affichage de l'erreur*@
+                        <ValidationMessage For="@(() => employeLogInModel.MotDePasse)" />
+                    </div>
+                </div>
+
+                <div class="card-footer py-2 bg-bleuFonce">
+                    <button type="submit" class="btn btn-success w-100">Connexion</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <DataAnnotationsValidator />
+</EditForm>
+@code {
+
+    private EmployeLogInModel employeLogInModel = new EmployeLogInModel();
+
+    private async Task EmployeValidSubmit()
+{
+    try
+    {
+        // Assure-toi d'ajouter 'using Microsoft.EntityFrameworkCore;' pour utiliser 'FirstOrDefaultAsync'
+        Employe? employe = await _context.Employes.FirstOrDefaultAsync(e => e.Courriel == employeLogInModel.Courriel);
+
+        if (employe != null)
+        {
+            // Vérification du mot de passe
+            if (employeLogInModel.MotDePasse.Equals(employe.MotDePasse))
+            {
+                    await ProtectedSessionStore.SetAsync("Email", employe.Courriel);
+                    await ProtectedSessionStore.SetAsync("Role", employe.Role);
+
+                NavigationManager.NavigateTo("/");
+            }
+            else
+            {
+                // Réinitialisation du mot de passe si incorrect
+                employeLogInModel.MotDePasse = "";
+                await JsRuntime.InvokeVoidAsync("alert", "Adresse courriel ou mot de passe incorrect !");
+            }
+        }
+        else
+        {
+            // Cas où l'employé n'est pas trouvé
+            await JsRuntime.InvokeVoidAsync("alert", "Adresse courriel ou mot de passe incorrect !");
+        }
+    }
+    catch (Exception ex)  // Assure-toi que l'exception est bien référencée ici
+    {
+        Console.WriteLine(ex);
+        await JsRuntime.InvokeVoidAsync("alert", "Une erreur est survenue: " + ex.Message);
+        NavigationManager.NavigateTo("/", true);
+    }
+}
+
+
+
+    private string emailIconClass = ""; // Par défaut
+    private string passwordIconClass = ""; // Par défaut
+
+    private void ValidateInput()
+    {
+        if (IsValidEmail(employeLogInModel.Courriel))
+        {
+            emailIconClass = "bi-check-circle text-success"; // Valide
+        }
+        else
+        {
+            emailIconClass = "bi-x-circle text-danger"; // Invalide
+        }
+
+        if (string.IsNullOrEmpty(employeLogInModel.MotDePasse))
+        {
+            passwordIconClass = "bi-x-circle text-danger"; // Invalide
+        }
+        else
+        {
+            passwordIconClass = "bi-check-circle text-success"; // Valide
+        }
+    }
+
+    private bool IsValidEmail(string email)
+    {
+        // Simple validation, tu peux utiliser des expressions régulières pour plus de précision
+        return !string.IsNullOrEmpty(email) && email.Contains("@") && email.Contains(".");
+    }
+
+    private string GetEmailIcon()
+    {
+        return emailIconClass;
+    }
+
+    public class EmployeLogInModel
+    {
+        [Required(ErrorMessage = "Le courriel est requis")]
+        [EmailAddress(ErrorMessage = "Le courriel n'est pas valide")]
+        public string Courriel { get; set; }
+
+        [Required(ErrorMessage = "Le mot de passe est requis")]
+        public string MotDePasse { get; set; }
+    }
+}
