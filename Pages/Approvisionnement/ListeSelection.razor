@@ -1,5 +1,6 @@
 @page "/listeSelection"
 @using Data.Models
+@using Microsoft.EntityFrameworkCore;
 @inject NavigationManager Navigation
 @inject A2024420517riGr1Eq6Context _context
 
@@ -12,38 +13,79 @@
                     <div class="text-white titre-bold fs-4">Entreprise</div>
                 </div>
                 <div class="col-3 d-flex justify-content-center border-right">
-                    <div class="text-white titre-bold fs-4">Numéro de téléphone</div>
+                    <div class="text-white titre-bold fs-4">Numéro de téléphone(s)</div>
                 </div>
                 <div class="col-3 d-flex justify-content-center border-right">
-                    <div class="text-white titre-bold fs-4">Contact</div>
+                    <div class="text-white titre-bold fs-4">Contact(s)</div>
                 </div>
                 <div class="col-3 d-flex justify-content-center">
                     <div class="text-white titre-bold fs-4">Contacté</div>
                 </div>
             </div>
         </div>  
-        <div style="max-height: 400px;" class="card-body border-vertFonce box-vert listFiltre p-0">
+        <div style="max-height: 400px; cursor: default;" class="card-body border-vertFonce box-vert listFiltre p-0">
             <!-- LISTE DES FICHES -->
-            @foreach (var ids in selectedIds)
+            @if (fournisseurFiches.Any())
             {
-                <div style="height: 35px;" class="row m-0 list-row">
-                    <!-- ENTREPRISE (NOM, ADRESSE COURRIEL) -->
-                    <div class="col-3 d-flex justify-content-center align-items-center border-right">
-                        <div class="w-100 text-center">@ids</div>
+                int i = 0;
+                @foreach (var fiche in fournisseurFiches)
+                {
+                    <div class="row m-0 list-row"
+                         style="@(i == 0 ? "padding-top: 16px;" : "") @(i == fournisseurFiches.Count - 1 ? "padding-bottom: 16px;" : "")">
+                        <!-- ENTREPRISE (NOM, ADRESSE COURRIEL) -->
+                        <div class="col-3 d-flex justify-content-center align-items-center border-right" style="word-wrap: break-word; white-space: normal;">
+                            <div class="row w-100 text-center">
+                                <div class="col-12">
+                                    <div class="mb-2">@fiche.NomEntreprise</div>
+                                    <div>@fiche.AdresseCourriel</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- NUMÉRO DE TÉLÉPHONES -->
+                        <div class="col-3 d-flex justify-content-center align-items-center border-right" style="word-wrap: break-word; white-space: normal;">
+                            @foreach (var telephone in fiche.NumTelephones)
+                            {
+                                <div class="row w-100 text-center">
+                                    <div class="col-12">@telephone</div>
+                                </div>
+                            }
+                        </div>
+                        <!-- CONTACTS (NOM, PRÉNOM, ADRESSE COURRIEL, NUMÉRO DE TÉLÉPHONE) -->
+                        <div class="col-3 d-flex justify-content-center align-items-center border-right" style="word-wrap: break-word; white-space: normal;">
+                            <div class="row w-100 listFiltre" style="max-height: 150px;">
+                            @{
+                                int j = 0;
+                                @foreach (var contact in fiche.Contacts)
+                                {
+                                    <div class="col-12">
+                                        <div>@contact.Prenom - @contact.Nom</div>
+                                        <div class="my-2">@contact.AdresseCourriel</div>
+                                        <div>@contact.NumTelephone</div>
+                                    </div>
+                                    @if (!(j == fiche.Contacts.Count - 1))
+                                    {
+                                        <hr style="margin-top: 16px;"/>
+                                    }
+                                    j++;
+                                }
+                            }
+                            </div>
+                        </div>
+                        <!-- CONTACTÉ -->
+                        <div class="col-3 d-flex justify-content-center align-items-center">
+                            <input type="checkbox" class="check-vert">
+                        </div>
                     </div>
-                    <!-- NUMÉRO DE TÉLÉPHONES  -->
-                    <div class="col-3 d-flex justify-content-center align-items-center border-right">
-                        <div style="font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" class="d-flex texte-light fw-bold">NA</div>
-                    </div>
-                    <!-- CONTACTS (NOM, PRÉNOM, ADRESSE COURRIEL, NUMÉRO DE TÉLÉPHONE) -->
-                    <div class="col-3 d-flex justify-content-center align-items-center border-right">
-                        <div style="font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" class="d-flex texte-light fw-bold">NA</div>
-                    </div>
-                     <!-- CONTACTÉ -->
-                    <div class="col-3 d-flex justify-content-center align-items-center">
-                        <input type="checkbox" class="check-vert">
-                    </div>
-                </div>
+                    @if (!(i == fournisseurFiches.Count - 1))
+                    {
+                        <hr />
+                    }
+                    i++;
+                }
+            }
+            else
+            {
+                <div class="text-center fw-bold py-2">NO DATA</div>
             }
         </div>
     </div>
@@ -106,8 +148,8 @@
 
 @code
 {
-    List<int> selectedIds = new List<int>();
-    List<FournisseurFiche> fournisseurFiches = new List<FournisseurFiche>();
+    private List<int> selectedIds = new List<int>();
+    private List<FournisseurFiche> fournisseurFiches = new List<FournisseurFiche>();
     private Dictionary<string, string> QueryParams = new();
 
     protected override async Task OnInitializedAsync()
@@ -133,27 +175,38 @@
                 break;  
             }
         }
-        // BASED ON THIS LIST OF IDS, NOW WE NEED TO GET ALL THE DATA
-        // EXEMPLE 66, 73 (selectedIds)
-        // fournisseurFiches = await(from f in _context.Fournisseurs
-        //                           join h in _context.Historiques on f.IdFournisseur equals h.Fournisseur
-        //                           from i in f.Identifications.DefaultIfEmpty()
-        //                           from c in f.Coordonnees.DefaultIfEmpty()
-        //                           select new FournisseurFiche
-        //                               {
-        //                                   IdFournisseur = f.IdFournisseur,
-        //                                   EtatDemande = h.EtatDemande,
-        //                                   NomEntreprise = i.NomEntreprise,
-        //                                   Ville = c.Ville
-        //                               })
-        //                                .ToListAsync();
+        fournisseurFiches = await (from f in _context.Fournisseurs
+                                       join i in _context.Identifications on f.IdFournisseur equals i.Fournisseur
+                                       join c in _context.Coordonnees on f.IdFournisseur equals c.Fournisseur
+                                       where selectedIds.Contains(f.IdFournisseur)
+                                       select new FournisseurFiche
+                                       {
+                                            NomEntreprise = i.NomEntreprise,
+                                            AdresseCourriel = i.AdresseCourriel,
+                                            NumTelephones = _context.Telephones
+                                                .Where(t => t.Coordonnee == c.IdCoordonnee && t.NumTelephone != null)
+                                                .Select(t => t.NumTelephone!)
+                                                .ToList(),
+                                            Contacts = (from contact in _context.Contacts
+                                                        join tel in _context.Telephones on contact.IdContact equals tel.Contact
+                                                        where contact.Fournisseur == f.IdFournisseur
+                                                        select new ContactFiche
+                                                        {
+                                                            Nom = contact.Nom,
+                                                            Prenom = contact.Prenom,
+                                                            AdresseCourriel = contact.AdresseCourriel,
+                                                            NumTelephone = tel.NumTelephone
+                                                        }).ToList()
+                                       })
+                               .AsSplitQuery()
+                               .ToListAsync();
+        Console.WriteLine(fournisseurFiches.Count);
     }
 
-    // STRUCTURE DE L'OBJET POUR LA FICHE
     public class FournisseurFiche
     {
-        public string NomEntreprise { get; set; }
-        public string AdresseCourriel { get; set; }
+        public string ?NomEntreprise { get; set; }
+        public string ?AdresseCourriel { get; set; }
         public List<string> NumTelephones { get; set; }
         public List<ContactFiche> Contacts { get; set; }
     }
@@ -161,9 +214,9 @@
     // STRUCTURE DE L'OBJET POUR CONTACT
     public class ContactFiche
     {
-        public string Nom { get; set; }
-        public string Prenom { get; set; }
-        public string AdresseCourriel { get; set; }
-        public string NumTelephone { get; set; }
+        public string ?Nom { get; set; }
+        public string ?Prenom { get; set; }
+        public string ?AdresseCourriel { get; set; }
+        public string ?NumTelephone { get; set; }
     }
 }
