@@ -50,7 +50,7 @@ public class JwtTokenGenerator
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public string GetEmailFromToken(string token)
+    public string GetValueFromToken(string token)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var jwtToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
@@ -58,8 +58,6 @@ public class JwtTokenGenerator
         // Récupère le claim pour l'email (par exemple, stocké sous "email" ou "sub")
         return jwtToken?.Claims.FirstOrDefault(claim => claim.Type == "email" || claim.Type == JwtRegisteredClaimNames.Sub)?.Value;
     }
-
-
 }
 
 public class JwtTokenGeneratorOptions

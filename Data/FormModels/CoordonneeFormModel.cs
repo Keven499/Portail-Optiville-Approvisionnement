@@ -5,7 +5,6 @@ namespace Portail_OptiVille.Data.FormModels
 {
     public class CoordonneeFormModel
     {
-
         public int IdCoordonnee { get; set; }
         public CoordonneeFormModel() {
             PhoneList = new List<TelephoneFormModel>();
