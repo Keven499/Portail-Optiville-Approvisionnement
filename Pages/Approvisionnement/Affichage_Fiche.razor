@@ -1,4 +1,4 @@
-@page "/affichagee"
+@page "/affichage/{Id:int?}"
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.EntityFrameworkCore
 @using Portail_OptiVille.Data.Models
@@ -631,7 +631,8 @@
 
 @code{
     private bool isLoading = true;
-    private static int FournisseurID = 63;
+    [Parameter]
+    public int? Id { get; set; }
     private bool modificationFinances = true;
     private string popperScript = "https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js";
     private bool modificationInfo = true;
@@ -919,11 +920,12 @@
     }
     protected override async Task OnInitializedAsync()
     {
+        
         editContext = new EditContext(financeFormModel);
         editContext.OnValidationStateChanged += (sender, args) => StateHasChanged();
         try
         {
-            selectedFournisseur = await _context.Fournisseurs.FindAsync(FournisseurID);
+            selectedFournisseur = await _context.Fournisseurs.FindAsync(Id);
             selectedContacts = await _context.Contacts.Where(c => c.Fournisseur == selectedFournisseur.IdFournisseur).ToListAsync();
 
             foreach (var contact in selectedContacts)
@@ -966,7 +968,7 @@
             pieceJointeFormModel = new PieceJointeFormModel{
                 ListFichiers = selectedFichiers
             };
-            selectedHistoriques = await _context.Historiques.Where(c => c.Fournisseur == FournisseurID).ToListAsync();
+            selectedHistoriques = await _context.Historiques.Where(c => c.Fournisseur == Id).ToListAsync();
             closestHistorique = selectedHistoriques.Where(h => h.DateEtatChanged.HasValue).OrderBy(h => Math.Abs((h.DateEtatChanged.Value - DateTime.UtcNow).TotalDays)).FirstOrDefault();
             //closestHistorique = await _context.Historiques.Where(h => h.Fournisseur == selectedFournisseur.IdFournisseur && h.DateEtatChanged.HasValue).OrderBy(h => Math.Abs((h.DateEtatChanged.Value - DateTime.UtcNow).TotalDays)).FirstOrDefaultAsync();
             if(identification.Neq != null)

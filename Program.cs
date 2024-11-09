@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Portail_OptiVille.Data.Attributes;
 using Portail_OptiVille.Data.Services;
+using Portail_OptiVille.Data.FormModels;
+using Portail_OptiVille.Pages.Approvisionnement;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
@@ -31,6 +33,8 @@ builder.Services.AddScoped<FinanceService>();
 builder.Services.AddScoped<IdentificationService>();
 builder.Services.AddScoped<LicenceRBQService>();
 builder.Services.AddScoped<ProduitServiceService>();
+builder.Services.AddScoped<PieceJointeFormModel>();
+builder.Services.AddScoped<LicenceService>();
 #endregion
 
 #region Load Config from Setting.json
