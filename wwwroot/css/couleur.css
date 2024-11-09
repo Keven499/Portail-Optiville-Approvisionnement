@@ -1,3 +1,7 @@
+﻿/*
+    REVOIR LE .CSS POUR RETIRER TOUTES LES CLASSES QUI NE SONT PAS UTILISÉES POUR LE CÔTÉ APPROVISIONNEMENT
+*/
+
 @font-face {
     font-family: 'Alumni Extra Bold';
     src: url('/fonts/AlumniSans-ExtraBold.ttf');
@@ -24,83 +28,71 @@
     src: url('/fonts/TT Hoves Pro Trial Bold.ttf');
 }
 
-body 
-{
-    background-color: #eee;       
-    background-size: cover; 
-    background-position: center;        
-    background-repeat: no-repeat; 
+body {
+    background-color: #eee;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     background-attachment: fixed;
-}  
+}
 
-.body-pad
-{
+.body-pad {
     padding-top: 30px;
 }
 
-#btnBleu:hover{
+#btnBleu:hover {
     background-color: rgb(0, 118, 213, 0.6);
-    color: white;    
+    color: white;
     cursor: pointer;
 }
 
-#btnVert:hover{
+#btnVert:hover {
     background-color: rgb(99, 188, 85, 0.6);
-    color: white;    
+    color: white;
     cursor: pointer;
 }
 
-#btnSupp:hover{
+#btnSupp:hover {
     background-color: rgba(160, 17, 17);
-    color: white;    
+    color: white;
     cursor: pointer;
 }
 
-/* Bleu pâle */
-.bleuPale
-{
+.bleuPale {
     color: rgb(120, 198, 224);
 }
 
-.bg-bleuPale
-{
+.bg-bleuPale {
     background-color: rgb(120, 198, 224);
 }
 
-.border-bleuPale
-{
+.border-bleuPale {
     border: 2px solid rgb(120, 198, 224);
 }
 
 /* Bleu */
-.bleu
-{
+.bleu {
     color: rgb(0, 118, 213);
 }
 
-.bg-bleu
-{
+.bg-bleu {
     background-color: rgb(0, 118, 213);
 }
 
-.border-bleu
-{
+.border-bleu {
     border: 2px solid rgb(0, 118, 213);
 }
 
-.input-bleu
-{
+.input-bleu {
     background-color: rgb(0, 118, 213, 0.2);
     border-bottom: 2px solid rgb(11, 35, 65);
 }
 
-.border-vert
-{
+.border-vert {
     border: 2px solid rgb(0, 118, 213);
 }
 
-.input-vert
-{
+.input-vert {
     background-color: rgb(197, 216, 0, 0.2);
     border-bottom: 2px solid rgb(30, 73, 45);
 }
@@ -109,26 +101,22 @@ body
     background-color: rgb(197, 216, 0, 0.2);
 }
 
-.box-bleu 
-{
-    background-color: rgb(0, 118, 213, 0.2); 
+.box-bleu {
+    background-color: rgb(0, 118, 213, 0.2);
     border: 2px solid rgb(11, 35, 65);
 }
 
-.box-vert 
-{
-    background-color: rgb(197, 216, 0, 0.2); 
+.box-vert {
+    background-color: rgb(197, 216, 0, 0.2);
     border: 2px solid rgb(11, 35, 65);
 }
 
-.table-bleu
-{
-    background-color: rgb(0, 118, 213, 0.2) !important; 
+.table-bleu {
+    background-color: rgb(0, 118, 213, 0.2) !important;
     border: 2px solid rgb(11, 35, 65);
 }
 
-.check-blanc
-{
+.check-blanc {
     background-color: white;
     border: 1px solid rgb(11, 35, 65);
     display: block;
@@ -141,21 +129,20 @@ body
     cursor: pointer;
 }
 
-.check-blanc:before {
-    content: '';
-    position: absolute;
-    left: 6px;
-    top: 2px;
-    width: 6px;
-    height: 12px;
-    border: 1px solid rgb(11, 35, 65);
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-    opacity: 0;
-}
+    .check-blanc:before {
+        content: '';
+        position: absolute;
+        left: 6px;
+        top: 2px;
+        width: 6px;
+        height: 12px;
+        border: 1px solid rgb(11, 35, 65);
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+        opacity: 0;
+    }
 
-.check-vert
-{
+.check-vert {
     background-color: white;
     border: 1px solid rgb(30, 73, 45);
     width: 20px;
@@ -166,75 +153,65 @@ body
     cursor: pointer;
 }
 
-.check-vert:before {
-    content: '';
-    position: absolute;
-    left: 6px;
-    top: 2px;
-    width: 6px;
-    height: 12px;
-    border: 1px solid rgb(30, 73, 45);
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-    opacity: 0;
-}
+    .check-vert:before {
+        content: '';
+        position: absolute;
+        left: 6px;
+        top: 2px;
+        width: 6px;
+        height: 12px;
+        border: 1px solid rgb(30, 73, 45);
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+        opacity: 0;
+    }
 
-input[type="checkbox"]:checked+.check-blanc:before {
+input[type="checkbox"]:checked + .check-blanc:before {
     opacity: 1;
 }
 
-.border-Tel
-{
+.border-Tel {
     border-top: 2px solid rgb(0, 118, 213);
 }
 
 /* Bleu foncé */
-.bleuFonce
-{
+.bleuFonce {
     color: rgb(11, 35, 65);
 }
 
-.bg-bleuFonce
-{
+.bg-bleuFonce {
     background-color: rgb(11, 35, 65);
 }
 
-.mini-border-bleuFonce
-{
+.mini-border-bleuFonce {
     border: 1px solid rgb(11, 35, 65);
 }
 
-.border-bleuFonce
-{
+.border-bleuFonce {
     border: 2px solid rgb(11, 35, 65);
 }
 
-.borderTX-bleuFonce
-{
+.borderTX-bleuFonce {
     border-top: 2px solid rgb(11, 35, 65);
     border-left: 2px solid rgb(11, 35, 65);
     border-right: 2px solid rgb(11, 35, 65);
 }
 
 /* Vert pâle */
-.vertPale
-{
+.vertPale {
     color: rgb(197, 216, 0);
 }
 
-.bg-vertPale
-{
+.bg-vertPale {
     background-color: rgb(197, 216, 0);
 }
 
-.border-vertPale
-{
+.border-vertPale {
     border: 2px solid rgb(197, 216, 0);
 }
 
 /* Vert */
-.vert
-{
+.vert {
     color: rgb(99, 188, 85);
 }
 
@@ -242,84 +219,69 @@ input[type="checkbox"]:checked+.check-blanc:before {
     color: rgb(30, 73, 45);
 }
 
-.bg-vert
-{
+.bg-vert {
     background-color: rgb(99, 188, 85);
 }
 
-.border-vert
-{
+.border-vert {
     border: 2px solid rgb(99, 188, 85);
 }
 
 /* Vert foncé */
-.vertFonce
-{
+.vertFonce {
     color: rgb(30, 73, 45);
 }
 
-.bg-vertFonce
-{
+.bg-vertFonce {
     background-color: rgb(30, 73, 45);
 }
 
-.border-vertFonce
-{
+.border-vertFonce {
     border: 2px solid rgb(30, 73, 45);
 }
 
 /* Fonts */
-.titre-bold
-{
+.titre-bold {
     font-family: 'Alumni Extra Bold';
 }
 
-.titre-90bold
-{
+.titre-90bold {
     font-family: 'Alumni Extra Bold';
     font-size: 85px;
 }
 
-.titre-30bold
-{
+.titre-30bold {
     font-family: 'Alumni Extra Bold';
     font-size: 30px;
 }
 
-.titre-medium
-{
+.titre-medium {
     font-family: 'Alumni Medium';
 }
 
-.texte-light
-{
+.texte-light {
     font-family: 'TT Hoves Light';
 }
 
-.texte-medium
-{
+.texte-medium {
     font-family: 'TT Hoves Medium';
 }
 
-.texte-13medium
-{
+.texte-13medium {
     font-family: 'TT Hoves Medium';
     font-size: 13px;
 }
 
-.texte-bold
-{
+.texte-bold {
     font-family: 'TT Hoves Bold';
 }
 
-.texte-14bold
-{
+.texte-14bold {
     font-family: 'TT Hoves Bold';
     font-size: 14px;
 }
 
-.texte-validation
-{
+.texte-validation {
     font-family: 'TT Hoves Medium';
     font-size: 13px;
 }
