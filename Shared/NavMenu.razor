@@ -76,7 +76,7 @@
             var token = await cookie.GetValue("SToken");
             if(!string.IsNullOrEmpty(token))
             {
-                email = tokenGenerator.GetEmailFromToken(token);
+                email = tokenGenerator.GetValueFromToken(token);
                 usersessions = _context.Usersessions.Where(u => u.OwnerEmail == email).ToArray();
                 foreach (var usersession in usersessions)
                 {

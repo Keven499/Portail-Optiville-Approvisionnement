@@ -29,7 +29,7 @@ Welcome to your new app.
             {
                 // Récupération du token depuis les cookies et extraction de l'email
                 string token = await cookie.GetValue("SToken") ?? throw new UserNotAuthenticatedException("Session expirée ou non connectée.");
-                string email = tokenGenerator.GetEmailFromToken(token);
+                string email = tokenGenerator.GetValueFromToken(token);
 
                 // Vérification de la validité de l'email
                 if (!Regex.IsMatch(email, @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"))
