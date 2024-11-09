@@ -31,7 +31,6 @@
 <link rel="icon" type="image/x-icon" href="images/fiche.png">
 
 <PageTitle>Fiche</PageTitle>
-
 <div class="container-fluid">
     <div class="row d-flex justify-content-center">
         <div class="col-xl-11">
@@ -235,7 +234,7 @@
                         </div>
                         <div class="card-body border-bleuFonce">
                             <div class="row">
-                                @for (int i = 0; i < contactHosterFormModel.ContactList!.Count; i++)
+                                @for (int i = 1; i < contactHosterFormModel.ContactList!.Count; i++)
                                 {
                                     var contact = contactHosterFormModel.ContactList[i];
                                     <div class="col-xl-6 col-lg-6 col-sm-12 col-12">
