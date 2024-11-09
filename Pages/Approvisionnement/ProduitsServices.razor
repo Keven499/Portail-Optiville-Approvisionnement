@@ -1,0 +1,207 @@
+@using Microsoft.EntityFrameworkCore
+@using Portail_OptiVille.Data.Models
+@using Portail_OptiVille.Data.FormModels
+@using System.Linq.Expressions
+@inject A2024420517riGr1Eq6Context _context
+@if (ShowTitle)
+{
+    <PageTitle>Étape 4 Produits et services</PageTitle>
+}
+<EditForm EditContext="@editContext">
+    <DataAnnotationsValidator />
+    <div class="card-header py-2 bg-bleuFonce">
+        <h3 class="py-2 p-0 my-0 text-white titre-bold">Produits et services</h3>
+    </div>
+    <div class="card-body border-bleuFonce py-1">
+        <div class="col-xl-9 col-lg-9 col-12 col-sm-12 py-2">
+            <label class="texte-bold">Chercher un produit ou un service</label>
+            <div class="input-group">
+                <input @bind="searchBarValue" type="text" class="form-control input-bleu texte-light" placeholder="Recherchez">
+                <button class="btn bg-bleu text-white" type="button" @onclick="OnSearch">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </div>
+        <div class="col-xl-9 col-lg-9 col-12 col-sm-12 py-2">
+            <label class="texte-bold" for="statut">Catégorie</label>
+            <select class="form-select input-bleu texte-light" @onchange="OnCategorieChange">
+                <option>Toutes les catégories</option>
+                    @foreach (var categorie in CategorieUNSPSC) {
+                    <option>@categorie.CategoUnsid - @categorie.Categorie</option>
+                    }
+            </select>
+        </div>
+        <div class="col-xl-9 col-lg-9 col-12 col-sm-12 py-2">
+            <label class="texte-bold">Produits et services <i class="bi bi-braces-asterisk text-danger"></i></label>
+            <div class="@GetInputClass(() => ProduitServiceFormModel.SousProduitSelected) overflow-auto box-bleu card">
+                @{
+                    int i = 0;
+                    foreach (var produitServiceLine in produitServiceCatego)
+                    {
+                        <div class="row m-0 mb-1">
+                            <div class="col-auto p-0">
+                                <label for="categorie@(i)" class="d-flex">
+                                    <input type="checkbox" id="categorie@(i)"
+                                        checked="@ProduitServiceFormModel.SousProduitSelected[produitServiceLine.CodeUnspsc]" 
+                                        @onchange="(e) => OnCheckboxChange(produitServiceLine.CodeUnspsc, e)" />
+                                    <span class="check-blanc" />
+                                    <span class="texte-14bold">@produitServiceLine.CodeUnspsc - @produitServiceLine.Description</span>
+                                </label>
+                            </div>
+                        </div>
+                        i++;
+                    }
+                }
+            </div>
+            @((MarkupString)GetValidationHTML(() => ProduitServiceFormModel.SousProduitSelected))
+        </div>
+        <div class="col-xl-9 col-lg-9 col-12 col-sm-12 py-2">
+            <label for="details" class="texte-bold" form="message">Détails et spécifications <i class="bi bi-braces-asterisk text-danger"></i> </label>
+            <textarea id="message" oninput="countCharacters(this)" class="form-control @GetInputClass(() => ProduitServiceFormModel.Message) texte-light box-bleu" rows="6" placeholder="Entrez les détails ici.." style="resize: none;" @bind="ProduitServiceFormModel.Message" />
+            @((MarkupString)GetValidationHTML(() => ProduitServiceFormModel.Message))
+            <span style="display:none;" class="texte-bold" id="charCount">500 caractères restant.</span>
+        </div>
+    </div>
+</EditForm>
+
+<script>
+    function countCharacters(textarea) {
+        const maxLength = 500;
+        const currentLength = textarea.value.length;
+        const remaining = maxLength - currentLength;
+        const charCountElement = document.getElementById("charCount");
+        if (currentLength > 0) {
+            charCountElement.style.display = "block";
+            charCountElement.innerText = remaining < 0 
+                ? "Limite dépassée de " + Math.abs(remaining) + " caractères" 
+                : remaining + " caractères restants";
+        } else {
+            charCountElement.style.display = "none";
+        }
+    }
+</script>
+
+@code{
+    [Parameter]
+    public Action<ProduitsServices>? AssignReference { get; set; }
+    [Parameter]
+    public List<Produitservice> AllProduitServices { get; set; } = new List<Produitservice>();
+
+    [Parameter]
+    public ProduitServiceFormModel ProduitServiceFormModel { get; set; }
+    [Parameter]
+    public List<Categorieunspsc> CategorieUNSPSC { get; set; }
+    private EditContext editContext { get; set; }
+    [Parameter] public bool ShowTitle { get; set; } = true;
+    private List<Produitservice> produitServiceCatego = new List<Produitservice>();
+    private bool isSubmit = false;
+    private string? searchBarValue;
+    private string? selectedCategorie = "Toutes les catégories"; 
+    protected override void OnParametersSet()
+    {   
+        try
+        {
+            produitServiceCatego = AllProduitServices.Take(500).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erreur lors de la récupération des produits et services: {ex.Message}");
+        }
+    }
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(ProduitServiceFormModel);
+        editContext.OnValidationStateChanged += (sender, args) => StateHasChanged();
+        AssignReference?.Invoke(this);
+    }
+
+    private string GetInputClass<TField> (Expression<Func<TField>> fieldExpression)
+    {
+        if (!isSubmit) {
+            return "";
+        }
+        var fieldIdentifier = FieldIdentifier.Create(fieldExpression);
+        var isValid = !editContext.GetValidationMessages(fieldIdentifier).Any();
+        return isValid ? "valid" : "invalid";
+    }
+
+    private string GetValidationHTML<TField> (Expression<Func<TField>> fieldExpression) 
+    {
+        if (!isSubmit) {
+            return "";
+        }
+        var fieldIdentifier = FieldIdentifier.Create(fieldExpression);
+        var isValid = !editContext.GetValidationMessages(fieldIdentifier).Any();
+        return isValid ? "<span class=\"input-group-text text-success\"><i class=\"bi bi-check-circle me-2\"></i><span class=\"texte-validation\">Valide</span></span>" 
+                       : "<span class=\"input-group-text text-danger\"><i class=\"bi bi-x-circle me-2\"></i><span class=\"texte-validation\">" + editContext.GetValidationMessages(fieldIdentifier).FirstOrDefault() + "</span></span>";  
+    }
+
+    public bool TriggerValidation() 
+    {
+        isSubmit = true;
+        StateHasChanged();
+        return editContext.Validate();
+    }
+
+    private void OnCheckboxChange(string codeUNSPSC, ChangeEventArgs e)
+    {
+        if (e.Value is bool isChecked)
+        {
+            ProduitServiceFormModel.SousProduitSelected[codeUNSPSC] = isChecked;
+
+            if (isChecked)
+            {
+                ProduitServiceFormModel.CodeUNSPSC.Add(codeUNSPSC);
+            }
+            else
+            {
+                ProduitServiceFormModel.CodeUNSPSC.Remove(codeUNSPSC);
+            }
+        }
+    }
+
+
+    private void OnCategorieChange(ChangeEventArgs e) {
+        if (e.Value != null) {
+            selectedCategorie = e.Value.ToString();
+        }
+        if (selectedCategorie != null && !selectedCategorie.Equals("Toutes les catégories")) {
+            produitServiceCatego = AllProduitServices
+                .Where(c => c.CategorieUnspsc == selectedCategorie.Substring(0, selectedCategorie.IndexOf(" - ")))
+                .ToList();
+        }
+        else {
+            produitServiceCatego = AllProduitServices.Take(500).ToList();
+        }
+    }
+
+    private void OnSearch() {
+        if (!string.IsNullOrEmpty(searchBarValue) && char.IsDigit(searchBarValue[0]) && selectedCategorie != null)
+        {
+            if (!selectedCategorie.Equals("Toutes les catégories")) {
+                produitServiceCatego = produitServiceCatego
+                    .Where(c => c.CodeUnspsc != null && c.CodeUnspsc.Contains(searchBarValue))
+                    .ToList();
+            }   
+            else {
+                produitServiceCatego = AllProduitServices
+                    .Where(c => c.CodeUnspsc != null && c.CodeUnspsc.Contains(searchBarValue))
+                    .ToList();
+            }
+        }
+        else {
+            if (!string.IsNullOrEmpty(searchBarValue) && selectedCategorie != null) {
+                if (!selectedCategorie.Equals("Toutes les catégories")) {
+                    produitServiceCatego = produitServiceCatego
+                        .Where(c => c.Description != null && c.Description.Contains(searchBarValue))
+                        .ToList();
+                }
+                else {
+                    produitServiceCatego = AllProduitServices
+                        .Where(c => c.Description != null && c.Description.Contains(searchBarValue))
+                        .ToList();
+                }
+            }
+        }
+    }     
+}

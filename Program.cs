@@ -24,6 +24,13 @@ builder.Services.AddScoped<ListeVillesAPI>();
 #region Add services for DB management
 builder.Services.AddScoped<HistoriqueService>();
 builder.Services.AddScoped<GestionUserService>();
+builder.Services.AddScoped<ContactsService>();
+builder.Services.AddScoped<CoordonneeService>();
+builder.Services.AddScoped<FichierService>();
+builder.Services.AddScoped<FinanceService>();
+builder.Services.AddScoped<IdentificationService>();
+builder.Services.AddScoped<LicenceRBQService>();
+builder.Services.AddScoped<ProduitServiceService>();
 #endregion
 
 #region Load Config from Setting.json

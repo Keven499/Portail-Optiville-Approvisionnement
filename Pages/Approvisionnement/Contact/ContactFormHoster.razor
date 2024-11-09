@@ -1,0 +1,155 @@
+@using Portail_OptiVille.Data.FormModels
+@using System.Linq.Expressions
+@inject IJSRuntime JSRuntime
+
+@if (ShowTitle)
+{
+    <PageTitle>Étape 3 Contacts</PageTitle>
+}
+<div class="card-header p-3 bg-bleuFonce">
+    <h3 class="my-0 text-white titre-bold">Contacts</h3>
+</div>
+<div class="card-body px-3 border-bleuFonce bg-blanc py-1">
+    @{
+        var contactNo = 1;
+        @foreach (var contactModel in ContactHosterFormModel.ContactList)
+        {
+            <Contact ContactNumber="@contactNo" contactFormModel="contactModel" @ref="contactComponents[contactModel]" />
+            if (!(ContactHosterFormModel.ContactList.Count == contactNo)) {
+                    <div class="">
+                        <hr class="m-0 mb-2">  
+                    </div> 
+                }    
+            contactNo++;        
+        }
+    }
+    <div class="row d-flex justify-content-center pb-2">
+        <div class="col-xl-6 col-12 d-flex justify-content-xl-end justify-content-center mb-xl-0 mb-1">
+            <button type="button" class="btn bg-bleu text-white texte-bold" id="btnBleu" @onclick="AddContact" style="width: 200px;"><i class="bi bi-plus-circle me-1"></i>Ajout</button>
+        </div>
+        <div class="col-xl-6 col-12 d-flex justify-content-xl-start justify-content-center">
+            <button type="button" class="btn bg-danger text-white texte-bold" id="btnSupp" data-bs-target="#ModalConfirmation" @onclick="ShowConfirmationModalAsync" style="width: 200px;" disabled="@(!(ContactHosterFormModel.ContactList.Count > 1))"><i class="bi bi-trash me-1"></i>Retirer</button>
+        </div>
+        <div class="modal fade confirmModal" id="ModalConfirmation" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header border-0 text-center w-100 bg-bleu">
+                        <h1 class="modal-title fs-5 mx-auto texte-medium text-white" id="exampleModalLabel">Êtes-vous sûr de vouloir retirer le dernier contact?</h1>
+                    </div>
+                    <div class="modal-footer border-0 d-flex justify-content-center">
+                        <button type="button" id="btnBleu" class="btn bg-bleu texte-bold text-white" data-bs-dismiss="modal"><i class="bi bi-x-circle me-1"></i>Annuler</button>
+                        <button type="button" id="btnBleu" class="btn bg-bleu text-white texte-bold" data-bs-dismiss="modal" @onclick="RemoveContact"><i class="bi bi-check-circle me-1"></i>Confirmer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .valid {
+        outline: 1px solid #26b050;
+    }
+    .confirmModal {
+        z-index: 2;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+    .modal-backdrop.show {
+        z-index: 1;
+    }
+</style>
+
+<script>
+    window.showBootstrapModal = (modalId) => {
+    var modalElement = document.getElementById(modalId);
+    if (modalElement) {
+        var modalInstance = new bootstrap.Modal(modalElement);
+        modalInstance.show();
+    }
+};
+</script>
+
+@code {
+    [Parameter]
+    public Action<ContactFormHoster>? AssignReference { get; set; }
+    [Parameter]
+    public ContactHosterFormModel ContactHosterFormModel { get; set; }
+    private Dictionary<ContactFormModel, Contact> contactComponents = new Dictionary<ContactFormModel, Contact>();
+    private EditContext editContext { get; set; }
+    private bool isSubmit = false;
+    [Parameter] public bool ShowTitle { get; set; } = true;
+    
+
+
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(ContactHosterFormModel);
+        editContext.OnValidationStateChanged += (sender, args) => StateHasChanged();
+        AssignReference?.Invoke(this);
+        if (!ContactHosterFormModel.ContactList.Any()) {
+            ContactHosterFormModel.ContactList.Add(new ContactFormModel());
+        }
+    }
+
+    private string GetInputClass<TField> (Expression<Func<TField>> fieldExpression)
+    {
+        if (!isSubmit) {
+           return "";
+        }
+        var fieldIdentifier = FieldIdentifier.Create(fieldExpression);
+        var isValid = !editContext.GetValidationMessages(fieldIdentifier).Any();
+        return isValid ? "valid" : "invalid";
+    }
+
+    private string GetValidationHTML<TField> (Expression<Func<TField>> fieldExpression) 
+    {
+        if (!isSubmit) {
+           return "";
+        }
+        var fieldIdentifier = FieldIdentifier.Create(fieldExpression);
+        var isValid = !editContext.GetValidationMessages(fieldIdentifier).Any();
+        return isValid ? "<span class=\"input-group-text text-success\"><i class=\"bi bi-check-circle me-2\"></i><span class=\"texte-medium\">Valide</span></span>" 
+                       : "<span class=\"input-group-text text-danger\"><i class=\"bi bi-x-circle me-2\"></i><span class=\"texte-medium\">" + editContext.GetValidationMessages(fieldIdentifier).FirstOrDefault() + "</span></span>";  
+    }
+
+    public bool TriggerValidation() 
+    {
+        isSubmit = true;
+        StateHasChanged();
+        var isAllContactsValid = ValidateContacts();
+        if (editContext.Validate() && isAllContactsValid)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    private async Task ShowConfirmationModalAsync()
+    {
+        await JSRuntime.InvokeVoidAsync("showBootstrapModal", "ModalConfirmation");
+    }
+
+    private void AddContact()
+    {
+        ContactHosterFormModel.ContactList.Add(new ContactFormModel());
+    }
+
+     private void RemoveContact()
+    {
+        if (ContactHosterFormModel.ContactList.Count > 1) {
+            ContactHosterFormModel.ContactList.RemoveAt(ContactHosterFormModel.ContactList.Count - 1);
+        }
+    }
+
+    public bool ValidateContacts()
+    {
+        bool isValid = true;
+        foreach (var component in contactComponents.Values) {
+            var contactState = component.TriggerValidation();
+            if (!contactState) {
+                isValid = false;
+            }
+        }
+        return isValid;
+    }    
+}

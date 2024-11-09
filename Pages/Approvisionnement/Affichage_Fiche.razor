@@ -1,0 +1,1215 @@
+@page "/affichagee"
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.EntityFrameworkCore
+@using Portail_OptiVille.Data.Models
+@using System.Text.RegularExpressions;
+@inject A2024420517riGr1Eq6Context _context
+@using Portail_OptiVille.Data.FormModels
+@using Portail_OptiVille.Data.Exceptions
+@using Portail_OptiVille.Data.Services
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Portail_OptiVille.Data.Utilities
+@using Portail_OptiVille.Pages.Approvisionnement.Contact
+@using System.Linq.Expressions
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject NavigationManager navigationManager
+@inject FichierService fichierService
+@inject HistoriqueService historiqueService
+@inject CoordonneeService coordonneeService
+@inject IdentificationService identificationService
+@inject FinanceService financeService
+@inject ProduitServiceService produitServiceService
+@inject LicenceRBQService licenceRBQService
+@inject ContactsService contactsService
+@inject IJSRuntime JSRuntime
+@inject PieceJointeFormModel pieceJointeFormModel
+@inject ProtectedSessionStorage protectedSessionStorage
+@inject NavigationManager NavigationManager
+@inject ICookie cookie
+@inject A2024420517riGr1Eq6Context _context
+@inject JwtTokenGenerator tokenGenerator
+<link rel="icon" type="image/x-icon" href="images/fiche.png">
+
+<PageTitle>Fiche</PageTitle>
+
+<div class="container-fluid">
+    <div class="row d-flex justify-content-center">
+        <div class="col-xl-11">
+            <div class="d-flex justify-content-end pb-3">
+                <button id="btnBleu" class="btn bg-bleu text-white texte-bold" style="width: 200px" @onclick="Deconnexion"><i class="bi bi-box-arrow-left me-1"></i>Déconnexion</button>
+            </div> 
+            <div class="card">
+@*Demande*@
+                <div class="card-header py-2 bg-bleuFonce d-flex justify-content-between align-items-center">
+                    <h3 class="text-white titre-bold m-0">Demande</h3>
+                    <button type="button" style="height: 40px; width: 200px;" class="btn bg-danger text-white texte-bold" data-bs-target="#ModalConfirmationDeleteFiche" data-bs-toggle="modal"><i class="bi bi-trash me-1"></i>Supprimer la fiche</button>
+                </div>
+@*Bouton confirmation suppression*@
+                <div class="modal fade" id="ModalConfirmationDeleteFiche" tabindex="-1" aria-labelledby="ModalConfirmationDeleteFiche" aria-hidden="true" data-bs-backdrop="static">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header border-0 text-center w-100 bg-bleu">
+                                <h1 class="modal-title fs-5 mx-auto texte-bold text-white" id="ModalConfirmationDeleteFiche">Êtes-vous sûre de vouloir effacer la fiche?</h1>
+                            </div>
+                            <div class="modal-footer border-0 d-flex justify-content-center bg-bleuPale">
+                                <button type="button" id="btnBleu" class="btn bg-bleu texte-bold text-white" data-bs-dismiss="modal" @onclick="DeleteFiche"><i class="bi bi-check-circle me-1"></i>Confirmer</button>
+                                <button type="button" id="btnBleu" class="btn bg-bleu texte-bold text-white" data-bs-dismiss="modal"><i class="bi bi-x-circle me-1"></i>Annuler</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body border-bleuFonce">
+                    <div class="row d-flex align-items-start">
+                        <div class="col-xl-6 col-lg-6 col-sm-12 col-12">                      
+                            <div class="row mb-3">
+                                <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                    <label class="bleuFonce texte-bold mb-0 mb-md-0 me-md-3" for="selectEtat">État</label>       
+                                    <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                    <div class="bleuFonce texte-medium">@((closestHistorique != null) ? closestHistorique.EtatDemande : "N/A")</div>
+<!-- À AFFICHER POUR LE RESPONSABLE SURTOUT NE PAS ENLEVER -->
+                                        @* <select class="form-select input-bleu texte-light rounded-0 py-1" style="width: 200px;" id="selectEtat">
+                                            <option value="Accepté">Accepté</option>
+                                            <option value="Refusé">Refusé</option>
+                                            <option value="En attente">En attente</option>
+                                            <option value="À réviser">À réviser</option>
+                                        </select> *@   
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                    <div class="bleuFonce texte-bold mb-0 mb-md-0 me-md-3">Dernière modification</div>
+                                    <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                    <div class="bleuFonce texte-medium">@((closestHistorique != null && closestHistorique.DateEtatChanged.HasValue) ? closestHistorique.DateEtatChanged.Value.ToString("yyyy-MM-dd") : "N/A")</div>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                    <div class="bleuFonce texte-bold mb-0 mb-md-0 me-md-3">Création</div>
+                                    <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                    <div class="bleuFonce texte-medium">@((selectedFournisseur.DateCreation.HasValue) ? selectedFournisseur.DateCreation.Value.ToString("yyyy-MM-dd") : "N/A")</div>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                    <div class="bleuFonce texte-bold mb-0 mb-md-0 me-md-3">Modification</div>
+                                    <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                    <div class="bleuFonce texte-medium">@((selectedFournisseur.DateLastChanged.HasValue) ? selectedFournisseur.DateLastChanged.Value.ToString("yyyy-MM-dd") : "N/A")</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-6 col-lg-6 col-sm-12 col-12">
+                            <div class="row mb-3">
+                                <div class="col-xl-11 col-lg-11 col-sm-12 col-12 d-flex flex-column align-items-start">
+                                    <label class="bleuFonce texte-bold" for="reason">Raison du refus</label>
+                                    <textarea id="reason" class="form-control w-100 input-bleu texte-light" rows="4" style="resize: none; height: 100%;"></textarea>
+                                </div>  
+                            </div>                
+                        </div>
+                    </div> 
+                    @if (FinanceInfoNull)
+                    {
+                        <div class="alert alert-warning alert-dismissible fade show text-center d-flex justify-content-center align-items-center" role="alert">
+                            <strong>Veuillez entrer vos informations financières! <a href="/affichage#FinanceDest">(Cliquez ici)</a></strong>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }                   
+                </div>
+@* Informations générales*@
+                <EditForm Model="combinedFormModel" OnValidSubmit="SaveModifcationInfo">
+                    <DataAnnotationsValidator />
+                        <div class="card-header py-2 bg-bleuFonce d-flex justify-content-between align-items-center">
+                            <h3 class="text-white titre-bold m-0">Informations générales</h3>
+                                @if(modificationInfo)
+                                {
+                                    <button type="button" id="btnBleu" class="btn bg-bleu texte-bold text-white" style="height: 40px; width: 200px;" @onclick="ModifcationInfo"><i class="bi bi-pencil me-1"></i>Modifier</button>
+                                }
+                                else
+                                {
+                                    <button type="submit" id="btnBleu" class="btn bg-bleu texte-bold text-white" style="height: 40px; width: 200px;"><i class="bi bi-floppy me-1"></i>Sauvegarder</button> 
+                                }                
+                        </div>
+                        <div class="card-body border-bleuFonce">
+                            <div class="row">
+                                <div class="col-xl-6 col-12 col-lg-6 col-sm-12">                      
+                                    <div class="row mb-3">
+                                        <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                            <label for="inputEmail4" class="bleuFonce texte-bold mb-0 mb-md-0 me-md-3">NEQ</label>
+                                            <div class="flex-grow-1 d-none d-md-block ligneTxt"></div> <!-- Barre entre label et input -->
+                                            <input type="text" style="width: 325px;" class="form-control input-bleu texte-light py-1" id="inputEmail4" @bind="@combinedFormModel.IdentificationFormModel.NEQ" readonly="@modificationInfo">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                            <label for="inputEmail4" class="bleuFonce texte-bold mb-0 mb-md-0 me-md-3">Nom de l'entreprise</label>
+                                            <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                            <input type="text" style="width: 325px;" class="form-control input-bleu texte-light py-1" id="inputEmail4" @bind="@combinedFormModel.IdentificationFormModel.NomEntreprise" readonly="@modificationInfo">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                            <label for="inputEmail4" class="bleuFonce texte-bold mb-0 mb-md-0 me-md-3">Adresse courriel</label>
+                                            <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                            <input type="text" style="width: 325px;" class="form-control input-bleu texte-light py-1" id="inputEmail4" @bind="@combinedFormModel.IdentificationFormModel.CourrielEntreprise" readonly="@modificationInfo">
+                                        </div>
+                                    </div>
+
+                                    @foreach(var telephone in combinedFormModel.CoordonneeFormModel.PhoneList!)
+                                    {
+                                        <div class="row mb-3">
+                                            <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                                <label for="inputPassword4" class="bleuFonce texte-bold mb-0 mb-md-0 me-md-3">Numéro de téléphone</label>
+                                                <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                                <select class="form-select input-bleu texte-light py-1" id="telephoneType" @bind="@telephone.TypeTelEntreprise" style="width: 325px; @(modificationInfo ? "pointer-events: none;" : null)">
+                                                        <option value="Bureau">Bureau</option>
+                                                        <option value="Télécopieur">Télécopieur</option>
+                                                        <option value="Cellulaire">Cellulaire</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3 pb-1">
+                                            <div class="col-xl-12 d-xl-flex justify-content-xl-end col-lg-12 d-lg-flex justify-content-lg-end col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                                <input type="text" style="width: 325px;" class="form-control input-bleu texte-light py-1" id="inputEmail4" @bind="telephone.NoTelEntreprise">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                                <label for="inputPassword4" class="bleuFonce texte-bold mb-0 mb-md-0 me-md-3">Poste</label>
+                                                <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                                <input type="text" style="width: 325px;" class="form-control input-bleu texte-light py-1" id="inputEmail4" @bind="telephone.PosteTelEntreprise">                                </div>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-sm-12 col-12">
+                                    <div class="row mb-3">
+                                        <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                            <label for="inputPassword4" class="bleuFonce texte-bold mb-0 mb-md-0 me-md-3">No Civique</label>
+                                            <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                            <input type="text" style="width: 325px;" class="form-control input-bleu texte-light py-1" id="inputPassword4" @bind="@combinedFormModel.CoordonneeFormModel.NoEntreprise" readonly="@modificationInfo">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                            <label for="inputPassword4" class="bleuFonce texte-bold mb-0 mb-md-0 me-md-3">Rue</label>
+                                            <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                            <input type="text" style="width: 325px;" class="form-control input-bleu texte-light py-1" id="inputPassword4" @bind="@combinedFormModel.CoordonneeFormModel.RueEntreprise" readonly="@modificationInfo">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                            <label for="inputPassword4" class="bleuFonce texte-bold mb-0 mb-md-0 me-md-3">Bureau</label>
+                                            <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                            <input type="text" style="width: 325px;" class="form-control input-bleu texte-light py-1" id="inputPassword4" @bind="@combinedFormModel.CoordonneeFormModel.BureauEntreprise" readonly="@modificationInfo">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                            <label for="inputPassword4" class="bleuFonce texte-bold mb-0 mb-md-0 me-md-3">Ville</label>
+                                            <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                            <input type="text" style="width: 325px;" class="form-control input-bleu texte-light py-1" id="inputPassword4" @bind="@combinedFormModel.CoordonneeFormModel.VilleEntreprise" readonly="@modificationInfo">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                            <label for="inputPassword4" class="bleuFonce texte-bold mb-0 mb-md-0 me-md-3">Code Postal</label>
+                                            <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                            <input type="text" style="width: 325px;" class="form-control input-bleu texte-light py-1" id="inputPassword4" @bind="@combinedFormModel.CoordonneeFormModel.CodePostalEntreprise" readonly="@modificationInfo">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                            <label for="inputPassword4" class="bleuFonce texte-bold mb-0 mb-md-0 me-md-3">Province</label>
+                                            <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                            <input type="text" style="width: 325px;" class="form-control input-bleu texte-light py-1" id="inputPassword4" @bind="@combinedFormModel.CoordonneeFormModel.ProvinceEntreprise" readonly="@modificationInfo">
+                                        </div>
+                                    </div>
+                                </div>                    
+                            </div>                    
+                        </div> 
+                </EditForm>
+@* Contacts*@
+                <EditForm Model="contactHosterFormModel">
+                    <DataAnnotationsValidator />
+                        <div class="card-header py-2 bg-bleuFonce d-flex justify-content-between align-items-center">
+                            <h3 class="text-white titre-bold m-0">Contacts</h3>
+                            <button type="button" id="btnBleu" class="btn bg-bleu texte-bold text-white" style="height: 40px; width: 200px;" @onclick="ShowContactModalAsync"><i class="bi bi-pencil me-1"></i>Modifier</button>              
+                        </div>
+                        <div class="card-body border-bleuFonce">
+                            <div class="row">
+                                @for (int i = 0; i < contactHosterFormModel.ContactList!.Count; i++)
+                                {
+                                    var contact = contactHosterFormModel.ContactList[i];
+                                    <div class="col-xl-6 col-lg-6 col-sm-12 col-12">
+                                        <div class="row mb-3">
+                                            <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                                <label for="prenomInput" class="bleuFonce texte-bold">Prénom</label>
+                                                <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                                <InputText id="prenomInput" style="width: 325px; outline: none;" class="form-control input-bleu texte-light py-1" @bind-Value="contact.Prenom" readonly="@modificationContact" />
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                                <label for="nomInput" class="bleuFonce texte-bold">Nom</label>
+                                                <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                                <InputText id="prenomInput" style="width: 325px; outline: none;" class="form-control input-bleu texte-light py-1" @bind-Value="contact.Nom" readonly="@modificationContact" />
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                                <label for="fonctionInput" class="bleuFonce texte-bold">Fonction</label>
+                                                <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                                <InputText id="prenomInput" style="width: 325px; outline: none;" class="form-control input-bleu texte-light py-1" @bind-Value="contact.Fonction" readonly="@modificationContact" />
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                                <label for="courrielInput" class="bleuFonce texte-bold">Adresse courriel</label>
+                                                <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                                <InputText id="prenomInput" style="width: 325px; outline: none;" class="form-control input-bleu texte-light py-1" @bind-Value="contact.AdresseCourriel" readonly="@modificationContact" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-sm-12 col-12">
+                                        <div class="row mb-3">
+                                            <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                                <label for="telephoneType" class="me-2 bleuFonce texte-bold">Numéro de téléphone</label>
+                                                <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                                <select id="telephoneType" style="width: 325px; @(modificationContact ? "pointer-events: none;" : null)" class="form-select input-bleu texte-light py-1" @bind="contact.TypeTelephone" readonly="@modificationContact">
+                                                        <option value="Bureau">Bureau</option>
+                                                        <option value="Télécopieur">Télécopieur</option>
+                                                        <option value="Cellulaire">Cellulaire</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-xl-12 d-xl-flex justify-content-xl-end col-lg-12 d-lg-flex justify-content-lg-end col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">                                                
+                                                <InputText id="prenomInput" style="width: 325px; outline: none;" class="form-control input-bleu texte-light py-1" @bind-Value="contact.Telephone" readonly="@modificationContact" />
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                                <label for="posteInput" class="bleuFonce texte-bold">Poste</label>
+                                                <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                                <InputText id="prenomInput" style="width: 325px; outline: none;" class="form-control input-bleu texte-light py-1" @bind-Value="contact.Poste" readonly="@modificationContact" />
+                                            </div>
+                                        </div>
+                                    </div>  
+@* ligne de séparation*@
+                                    @if (i < contactHosterFormModel.ContactList.Count - 1) 
+                                    {
+                                        <div class="col-12">
+                                            <hr class="py-1 bg-bleuFonce" style="height: 3px;"/> 
+                                        </div>
+                                    }                                                               
+                                }
+                            </div>
+                        </div>
+@* Modification*@
+                        <div class="row">
+                            <div class="modal fade" tabindex="-1" role="dialog" id="ContactModal" data-bs-backdrop="static">
+                                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+                                    <div class="modal-content">
+                                        <div class="modal-body p-0">
+                                            <ContactFormHoster AssignReference="AssignReferenceContactFormHoster" ContactHosterFormModel="contactHosterFormModel" ShowTitle="false"></ContactFormHoster>
+                                        </div>
+                                        <div class="modal-footer d-flex justify-content-center bg-bleuFonce">
+                                            <button type="button" id="btnBleu" class="btn bg-bleu text-white texte-bold" data-bs-dismiss="modal"><i class="bi bi-x-circle me-1"></i>Annuler</button>
+                                            <button type="submit" id="btnBleu" class="btn bg-bleu text-white texte-bold" @onclick="SaveContact"><i class="bi bi-floppy me-1"></i>Sauvegarder</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </EditForm>
+@* Produits et services*@
+
+                <div class="card-header py-2 bg-bleuFonce d-flex justify-content-between align-items-center">
+                    <h3 class="text-white titre-bold m-0">Produits et services</h3>
+                    <button type="button" id="btnBleu" class="btn bg-bleu texte-bold text-white" style="height: 40px; width: 200px;" onclick="showModal('exampleModal')"><i class="bi bi-pencil me-1"></i>Modifier</button>              
+                </div>  
+                <div class="card-body border-bleuFonce">
+                    <div class="row">
+                        <div class="col-xl-6 col-lg-6 col-sm-12 col-12">
+                            @if (groupedServices != null && groupedServices.Count > 0)
+                                {
+                                    string currentCategory = null;
+                                    string currentNature = null;
+
+                                    foreach (var group in groupedServices)
+                                    {
+                                        if (currentCategory != group.Key.CodeCategorie || currentNature != group.Key.Nature)
+                                        {                                               
+                                            if (currentCategory != null)
+                                            {
+                                            <hr />
+                                            }
+                                            <div>
+                                                <div class="bleuFonce texte-bold">@group.Key.CodeCategorie - @group.Key.Nature</div>
+                                            </div>
+                                            currentCategory = group.Key.CodeCategorie;
+                                            currentNature = group.Key.Nature;
+                                        }
+                                        foreach (var produitservice in group)
+                                        {
+                                            <div class="ms-4 mb-1">@produitservice.CodeUnspsc - @produitservice.Description</div>
+                                        }
+                                    }
+                                }
+                        </div>
+                        <div class="col-xl-6 col-lg-6 col-sm-12 col-12">
+                            <div class="row mb-3">
+                                <div class="col-xl-11 col-lg-11 col-sm-12 col-12 d-flex flex-column align-items-start">
+                                    <label for="TextAreaProduitService" class="bleuFonce texte-bold">Détails et spécifications</label>
+                                    <textarea id="TextAreaProduitService" class="form-control w-100 input-bleu texte-light" rows="4" style="resize: none; height: 100%;" readonly="true">@selectedFournisseur.DetailSpecification</textarea>
+                                </div>  
+                            </div>
+                        </div>
+@* Modification*@
+                        <div class="row">
+                            <div class="modal fade" tabindex="-1" role="dialog" id="exampleModal" data-bs-backdrop="static">
+                                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+                                    <div class="modal-content">
+                                        <div class="modal-body p-0">
+                                            <ProduitsServices AssignReference="AssignReferenceProduitsServices" AllProduitServices="allProduitService" ProduitServiceFormModel="produitServiceFormModel" CategorieUNSPSC="categorieUNSPSC" ShowTitle="false"></ProduitsServices>
+                                        </div>
+                                        <div class="modal-footer d-flex justify-content-center bg-bleuFonce">
+                                            <button type="button" id="btnBleu" class="btn bg-bleu text-white texte-bold" data-bs-dismiss="modal"><i class="bi bi-x-circle me-1"></i>Annuler</button>
+                                            <button type="submit" id="btnBleu" class="btn bg-bleu text-white texte-bold" @onclick="SaveModifcationProduitServices"><i class="bi bi-floppy me-1"></i>Sauvegarder</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                                
+                    </div>
+                </div>
+@* Licence RBQ*@
+                <div class="card-header py-2 bg-bleuFonce d-flex justify-content-between align-items-center">
+                    <h3 class="text-white titre-bold m-0">Licence RBQ</h3>
+                    <button type="button" id="btnBleu" class="btn bg-bleu texte-bold text-white" style="height: 40px; width: 200px;" onclick="showModal('ModifierModalLicence')"><i class="bi bi-pencil me-1"></i>Modifier</button>             
+                </div> 
+                <div class="card-body border-bleuFonce">
+                    <div class="row">
+                        <div class="col-xl-6 col-lg-6 col-sm-12 col-12">
+                            <div class="row mb-3">
+                                <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                        <label for="posteInput" class="bleuFonce texte-bold">Statut</label>
+                                        <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                        <div class="bleuFonce texte-medium">@licencerbqs.Statut</div>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                    <label for="IdLicenceRbq" class="me-3 bleuFonce texte-bold">Numéro</label>
+                                    <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                    <input type="text" style="width: 325px;" class="form-control input-bleu texte-light py-1" id="IdLicenceRbq" value="@licencerbqs.IdLicenceRbq">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                    <label for="TypeLicencerbq" class="me-3 bleuFonce texte-bold">Type de licence</label>
+                                    <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                    <input type="text" style="width: 325px;" class="form-control input-bleu texte-light py-1" id="TypeLicencerbq" value="@licencerbqs.Type">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-6 col-lg-6 col-sm-12 col-12">
+                            @if (selectedCategorieRBQ != null)
+                            {
+                                if (groupedCategories == null)
+                                {
+                                    groupedCategories = GroupCategoriesByType();
+                                }
+                                <div class="row">
+                                    <div class="col-xl-6 col-lg-6 col-sm-12 col-12">
+                                        <div class="bleuFonce texte-bold">Général</div>
+                                            @if (groupedCategories.ContainsKey("Général") && groupedCategories["Général"].Count > 0)
+                                            {
+                                                <div class="row">
+                                                    <div class="col-xl-12 col-lg-12 col-12 col-sm-12">
+                                                        @foreach (var categorie in groupedCategories["Général"])
+                                                        {
+                                                            <div class="ms-4 mb-1 texte-light">@categorie.CodeSousCategorie - @categorie.TravauxPermis</div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="d-flex justify-content-center align-items-center">
+                                                    <p>Aucune Catégorie</p>
+                                                </div>
+                                            }
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-sm-12 col-12">
+                                        <div class="bleuFonce texte-bold">Spécialisé</div>
+                                            @if (groupedCategories.ContainsKey("Spécialisé") && groupedCategories["Spécialisé"].Count > 0)
+                                            {
+                                                <div class="row">
+                                                    <div class="col-xl-12 col-lg-12 col-12 col-sm-12">
+                                                        @foreach (var categorie in groupedCategories["Spécialisé"])
+                                                        {
+                                                            <div class="ms-4 mb-1 texte-light">@categorie.CodeSousCategorie - @categorie.TravauxPermis</div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="d-flex justify-content-center align-items-center">
+                                                    <p>Aucune Catégorie</p>
+                                                </div>
+                                            }
+                                    </div>
+                                </div>
+                                }
+                                else
+                                {
+                                    <p>Chargement...</p>
+                                }
+                                </div>
+@* Modification*@
+                        <div class="row">
+                            <div class="modal fade" id="ModifierModalLicence" tabindex="-1" role="dialog" data-bs-backdrop="static">
+                                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+                                    <div class="modal-content">
+                                        <div class="modal-body p-0">
+                                            <LicenceRBQ AssignReference="AssignReferenceLicenceRBQ" LicenceRBQFormModel="licenceRBQFormModel" AllCategories="allCategories" ShowTitle="false"></LicenceRBQ>
+                                        </div>
+                                        <div class="modal-footer d-flex justify-content-center bg-bleuFonce">
+                                            <button type="button" id="btnBleu" class="btn bg-bleu text-white texte-bold" data-bs-dismiss="modal"><i class="bi bi-x-circle me-1"></i>Annuler</button>
+                                            <button type="submit" id="btnBleu" class="btn bg-bleu text-white texte-bold" @onclick="SaveModifcationLicenceRBQ"><i class="bi bi-floppy me-1"></i>Sauvegarder</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+@* Pièces jointes*@
+                <div class="card-header py-2 bg-bleuFonce d-flex justify-content-between align-items-center">
+                    <h3 class="text-white titre-bold m-0">Brochures et cartes d'affaires</h3>            
+                    @if(modificationPieceJointes)
+                    {
+                        <div class="col-xxl-6 col-xl-5 col-lg-3 p-0 d-flex justify-content-end align-items-center">
+                            <button type="button" id="btnBleu" class="btn bg-bleu texte-bold text-white" style="height: 40px; width: 200px;" @onclick="ModifcationPieceJointes"><i class="bi bi-pencil me-1"></i>Modifier</button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-xxl-6 col-xl-5 col-lg-3 p-0 d-flex justify-content-end align-items-center">
+                            <button type="button" id="btnBleu" class="btn bg-bleu texte-bold text-white" style="height: 40px; width: 200px;" @onclick="SaveModifcationPieceJointes"><i class="bi bi-floppy me-1"></i>Sauvegarder</button>
+                        </div>
+                    }
+                </div> 
+                <div class="card-body border-bleuFonce">
+                    <div class="row">
+                        <div class="col-xl-12 col-lg-12 col-sm-12 col-12">    
+                            <h3 class="texte-20bold">Total: @GetFormatSize()</h3>                                            
+                            <PiecesJointes PieceJointeFormModel="pieceJointeFormModel" ActivationModification="ModifcationPieceJointesActivation" ModifcationPieceJointesActivationONState="ModifcationPieceJointesActivationONState" ShowTitle="false"></PiecesJointes>                
+                        </div>
+                    </div>
+                </div>
+@* Finances*@
+                @if(financeFormModel != null){
+                    <EditForm EditContext="@editContext">
+                        <DataAnnotationsValidator />
+                            <div class="card-header py-2 bg-bleuFonce d-flex justify-content-between align-items-center">
+                                <h3 class="text-white titre-bold m-0">Finances</h3>                                
+                                @if (modificationFinances)
+                                {
+                                    <button type="button" id="btnBleu" class="btn bg-bleu texte-bold text-white" style="height: 40px; width: 200px;" @onclick="ModifcationFinances"><i class="bi bi-pencil me-1"></i>Modifier</button>
+                                }
+                                else
+                                {
+                                    <button type="button" style="height: 40px; width: 200px;" @onclick="SaveModifcationFinances" id="btnBleu" class="btn bg-bleu texte-bold text-white"><i class="bi bi-floppy me-1"></i>Sauvegarder</button>
+                                }          
+                            </div>
+                            <div class="card-body border-bleuFonce">
+                                <div class="row">
+                                    <div class="col-xl-6 col-lg-6 col-sm-12 col-12"> 
+                                        <div class="row mb-3">                                            
+                                            <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                                <label for="inputTPS" class="bleuFonce texte-bold">TPS</label>
+                                                <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                                <input type="text" style="width: 325px;" class="form-control @GetInputClass(() => financeFormModel.NumeroTps) input-bleu texte-light py-1" id="inputTPS" @bind="@financeFormModel.NumeroTps" readonly="@modificationFinances">                                                                                               
+                                            </div>                                                                                      
+                                            <div class="col-xl-11 d-xl-flex justify-content-xl-end col-lg-11 d-lg-flex justify-content-lg-end col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12 mt-1">
+                                                @((MarkupString)GetValidationHTML(() => financeFormModel.NumeroTps))
+                                            </div>                                            
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                                <label for="inputTVQ" class="bleuFonce texte-bold">TVQ</label>
+                                                <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                                <input type="text" style="width: 325px;" class="form-control @GetInputClass(() => financeFormModel.NumeroTvq) input-bleu texte-light py-1" id="inputTVQ" @bind="@financeFormModel.NumeroTvq" readonly="@modificationFinances">                                                                                               
+                                            </div>
+                                            <div class="col-xl-11 d-xl-flex justify-content-xl-end col-lg-11 d-lg-flex justify-content-lg-end col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12 mt-1">
+                                                @((MarkupString)GetValidationHTML(() => financeFormModel.NumeroTvq))
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-sm-12 col-12"> 
+                                        <div class="row mb-3">
+                                            <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                                <label for="inputModeComm" class="bleuFonce texte-bold">Mode de communication</label>
+                                                <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                                <select class="form-select @GetInputClass(() => financeFormModel.ModeCommunication) input-bleu texte-light py-1" id="inputModeComm" @bind="@financeFormModel.ModeCommunication"
+                                                        style="@(modificationFinances ? "pointer-events: none;" : null) width: 325px; ">
+                                                    <option value="Courriel">Courriel</option>
+                                                    <option value="Courrier régulier">Courrier régulier</option>
+                                                </select>                                            
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                                <label for="inputDevise" class="bleuFonce texte-bold">Devise</label>
+                                                <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                                <select class="form-select @GetInputClass(() => financeFormModel.Devise) input-bleu texte-light py-1" id="inputDevise" @bind="@financeFormModel.Devise"
+                                                        style="@(modificationFinances ? "pointer-events: none;" : null) width: 325px;">
+                                                    <option value="CAD">CAD</option>
+                                                    <option value="USD">USD</option>
+                                                </select>                                            
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                                <label for="inputCondPaiement" class="bleuFonce texte-bold">Conditions de paiement</label>
+                                                <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                                <select class="form-select @GetInputClass(() => financeFormModel.ConditionPaiement) input-bleu texte-light py-1" id="inputCondPaiement" @bind="@financeFormModel.ConditionPaiement" readonly="@modificationFinances"
+                                                    style="@(modificationFinances ? "pointer-events: none;" : null)width: 325px;">
+                                                    @foreach (var item in listConditionPaiement)
+                                                    {
+                                                        <option value="item">@item</option>
+                                                    }
+                                                </select>                                           
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                    </EditForm>
+                }
+    
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="@popperScript"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+<script>
+    function showModal(modalId) {
+        const existingBackdrop = document.querySelector('.modal-backdrop');
+        if (existingBackdrop) {
+            existingBackdrop.remove();
+        }
+
+        var modalElement = document.getElementById(modalId);
+        if (modalElement) {
+            var modal = new bootstrap.Modal(modalElement, {
+                backdrop: 'static',
+                keyboard: false
+            });
+
+            modal.show();
+        }
+    }
+
+    function hideModal(modalId) {
+        var modalElement = document.getElementById(modalId);
+        if (modalElement) {
+            var modalInstance = bootstrap.Modal.getInstance(modalElement);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
+        }
+    }
+</script>
+
+@code{
+    private bool isLoading = true;
+    private static int FournisseurID = 63;
+    private bool modificationFinances = true;
+    private string popperScript = "https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js";
+    private bool modificationInfo = true;
+    private bool modificationPieceJointes = true;
+    private bool FinanceInfoNull = false;
+    private bool LicenceRBQInfoNull = false;
+    private bool modificationContact = true;
+    public int sizeTotal { get; set; } = 0;
+    private CombinedFormModel combinedFormModel = new CombinedFormModel();
+    private FinanceFormModel financeFormModel = new FinanceFormModel();
+    private ContactHosterFormModel contactHosterFormModel = new ContactHosterFormModel();
+    Produitservice produitService = new Produitservice();
+    public int MaxSize = 75;
+    private bool ModifcationPieceJointesActivation = true;
+    private bool ModifcationPieceJointesActivationONState;
+    private void ModifcationPieceJointesActivationONStateMethod()
+    {
+        ModifcationPieceJointesActivationONState = !modificationPieceJointes;
+    }
+    private Fichier? selectedFile;
+    List<Portail_OptiVille.Data.Models.Contact> selectedContacts = new List<Portail_OptiVille.Data.Models.Contact>();
+    List<Fichier> selectedFichiers = new List<Fichier>();
+    List<Historique> selectedHistoriques = new List<Historique>();
+    private Historique? closestHistorique;
+    List<Licencerbq> selectedLicencerbqs = new List<Licencerbq>();
+    List<Coordonnee> selectedCoordonnes = new List<Coordonnee>();
+    List<Telephone> selectedTelephones = new List<Telephone>();
+    List<Telephone> selectedTelephonesContacts = new List<Telephone>();
+    Fournisseur selectedFournisseur = new Fournisseur();
+    Identification identification = new Identification();
+    List<Categorierbq> selectedCategorieRBQ = new List<Categorierbq>();
+    Finance finance = new Finance();
+    Dictionary<string, List<Categorierbq>>? groupedCategories;
+    Coordonnee coordonnee = new Coordonnee();
+    Licencerbq licencerbqs = new Licencerbq();
+    List<ContactPhoneInfo> contactPhoneInfo = new List<ContactPhoneInfo>();
+    private List<Categorierbq> allCategories = new List<Categorierbq>();
+    private List<Categorierbq> allCategoriesForm = new List<Categorierbq>();
+    private LicenceRBQFormModel licenceRBQFormModel = new LicenceRBQFormModel();
+    private List<string> listConditionPaiement = new List<string>{
+        "Payable immédiatement sans déduction",
+        "Payable immédiatement sans déduction, Date de base au 15 du mois suivant",
+        "Dans les 15 jours 2% escompte, dans les 30 jours sans déduction",
+        "Après entrée facture jusqu'au 15 du mois, jusqu'au 15 du mois suivant 2% escompte",
+        "Dans les 10 jours 2% escompte, dans les 30 jours sans déduction",
+        "Dans les 15 jours sans déduction",
+        "Dans les 30 jours sans déduction",
+        "Dans les 45 jours sans déduction",
+        "Dans les 60 jours sans déduction"
+        };
+    private LicenceRBQ LicenceRBQRef;   
+    private ContactFormHoster ContactFormHosterRef; 
+    public Action<ContactFormHoster>? AssignReferenceContactFormHoster => (contactFormHoster) => ContactFormHosterRef = contactFormHoster;
+    private Action<LicenceRBQ> AssignReferenceLicenceRBQ => (licenceRBQ) => LicenceRBQRef = licenceRBQ;
+    List<IGrouping<GroupKey, Produitservice>>? groupedServices;
+    private Dictionary<string, bool> selectedCurrentCategorieRBQ = new Dictionary<string, bool>();
+    private EditContext editContext;
+    private bool isSubmit = false;
+    public class CombinedFormModel
+    {
+        public CoordonneeFormModel CoordonneeFormModel { get; set; }
+        public IdenticationFormModel IdentificationFormModel { get; set; }
+
+        public void FillData(Coordonnee coordonnee, Identification identification, List<Telephone> telephones)
+        {
+            CoordonneeFormModel.IdCoordonnee = coordonnee.IdCoordonnee;
+            CoordonneeFormModel.NoEntreprise = coordonnee.NoCivique;
+            CoordonneeFormModel.RueEntreprise = coordonnee.Rue;
+            CoordonneeFormModel.BureauEntreprise = coordonnee.Bureau;
+            CoordonneeFormModel.VilleEntreprise = coordonnee.Ville;
+            CoordonneeFormModel.ProvinceEntreprise = coordonnee.Province;
+            CoordonneeFormModel.CodePostalEntreprise = coordonnee.CodePostal;
+            CoordonneeFormModel.RegionAdmEntreprise = coordonnee.RegionAdministrative;
+            CoordonneeFormModel.SiteWebEntreprise = coordonnee.SiteInternet;
+            CoordonneeFormModel.PhoneList = telephones.Select(t => new TelephoneFormModel
+            {
+                IdTelephone = t.IdTelephone,
+                NoTelEntreprise = t.NumTelephone,
+                TypeTelEntreprise = t.Type,
+                PosteTelEntreprise = t.Poste
+            }).ToList();
+            IdentificationFormModel.IdIdentification = identification.IdIdentification;
+            IdentificationFormModel.NEQ = identification.Neq;
+            IdentificationFormModel.NomEntreprise = identification.NomEntreprise;
+            IdentificationFormModel.CourrielEntreprise = identification.AdresseCourriel;
+            IdentificationFormModel.MotDePasse = identification.MotDePasse;
+        }
+        public CombinedFormModel()
+        {
+            CoordonneeFormModel = new CoordonneeFormModel();
+            IdentificationFormModel = new IdenticationFormModel();
+        }
+    }
+    private async Task ShowContactModalAsync()
+    {
+        await JSRuntime.InvokeVoidAsync("showBootstrapModal", "ContactModal");
+    }
+    private async Task ShowPieceJointesModalAsync()
+    {
+        await JSRuntime.InvokeVoidAsync("showBootstrapModal", "ModifierModalPieceJointe");
+    }
+    private void ModifcationFinances()
+    {
+        modificationFinances = false;
+    }
+    private void ModificationContact()
+    {
+        modificationContact = false;
+    }
+
+    private void ModifcationInfo()
+    {
+        modificationInfo = false;
+    }
+    private void ModifcationPieceJointes()
+    {
+        modificationPieceJointes = false;
+        ModifcationPieceJointesActivationONStateMethod();
+    }
+    private async Task SaveModifcationPieceJointes()
+    {
+        modificationPieceJointes = true;
+        ModifcationPieceJointesActivationONStateMethod();
+        await fichierService.UpdateFichierData(pieceJointeFormModel, selectedFournisseur.IdFournisseur);
+    }
+    private async Task SaveModifcationLicenceRBQ()
+    {
+
+        await licenceRBQService.SaveLicenceRBQData(licenceRBQFormModel);
+        selectedCategorieRBQ = await _context.Categorierbqs.Where(c => c.IdLicenceRbqs.Any(l => l.IdLicenceRbq == licencerbqs.IdLicenceRbq)).ToListAsync();
+        groupedCategories = GroupCategoriesByType();
+        
+        await JSRuntime.InvokeVoidAsync("hideModal", "ModifierModalLicence");
+    }
+
+    private async Task SaveModifcationProduitServices()
+    {
+        await produitServiceService.UpdateProduitServiceData(produitServiceFormModel, selectedFournisseur.IdFournisseur);
+
+        selectedProduitservices = allProduitService
+        .Where(p => produitServiceFormModel.SousProduitSelected.ContainsKey(p.CodeUnspsc) &&
+                    produitServiceFormModel.SousProduitSelected[p.CodeUnspsc])
+        .ToList();
+        GetGroupProduitService();
+        await JSRuntime.InvokeVoidAsync("hideModal", "exampleModal");
+    }
+
+    private async Task SaveModifcationFinances()
+    {
+        bool isValid = TriggerValidation();
+        if (isValid)
+        {
+            await financeService.UpdateFinanceData(financeFormModel, selectedFournisseur.IdFournisseur);
+            modificationFinances = true;
+        }
+    }
+
+    private async Task SaveContact()
+    {
+        await contactsService.UpdateContactsData(contactHosterFormModel);
+
+        modificationContact = true;
+        await JSRuntime.InvokeVoidAsync("hideModal", "ContactModal");
+    }
+
+    private async Task SaveModifcationInfo()
+    {
+        await identificationService.UpdateIdentificationData(combinedFormModel.IdentificationFormModel);
+        await coordonneeService.UpdateCoordonneeData(combinedFormModel.CoordonneeFormModel);
+
+        modificationInfo = true;
+    }
+
+    public class GroupKey
+    {
+        public string? CodeCategorie { get; set; }
+        public string? Nature { get; set; }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is GroupKey other)
+            {
+                return CodeCategorie == other.CodeCategorie && Nature == other.Nature;
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(CodeCategorie, Nature);
+        }
+    }
+
+    private Dictionary<string, List<Categorierbq>> GroupCategoriesByType()
+    {
+        var groupedCategories = new Dictionary<string, List<Categorierbq>>();
+        foreach (var categorie in selectedCategorieRBQ)
+        {
+            if (!groupedCategories.ContainsKey(categorie.NomCategorie!))
+            {
+                groupedCategories[categorie.NomCategorie!] = new List<Categorierbq>();
+            }
+            groupedCategories[categorie.NomCategorie!].Add(categorie);
+        }
+
+        return groupedCategories;
+    }
+
+    @* protected override async Task OnAfterRenderAsync(bool firstRender){
+        try{
+            var result = await ProtectedSessionStore.GetAsync<string>("Email");
+            if (!result.Success || string.IsNullOrEmpty(result.Value))
+            {
+                throw new UserNotAuthenticatedException("Employé non connecté ou session expirée.");
+            }
+        }catch(UserNotAuthenticatedException ex)
+        {
+            Console.WriteLine($"Erreur lors de la récupération de l'adresse courriel: {ex.Message}");
+            //navigationManager.NavigateTo("/Connexion",true);
+        }
+
+    } *@
+
+    public class ContactPhoneInfo
+    {
+        public Portail_OptiVille.Data.Models.Contact Contact { get; set; }
+        public List<Telephone> PhoneNumbers { get; set; }
+    }
+    private ProduitServiceFormModel produitServiceFormModel = new ProduitServiceFormModel();
+    private List<Produitservice> allProduitService = new List<Produitservice>();
+    private List<Produitservice>? selectedProduitservices = new List<Produitservice>();
+    private List<Categorieunspsc> categorieUNSPSC = new List<Categorieunspsc>();
+    private List<string> AllCodeSousCategorie = new List<string>();
+    private ProduitsServices produitServiceRef;    
+    ContactFormModel contactFormModel = new ContactFormModel();
+    List<string>? fournisseurProduitIds = new List<string>();
+    private Action<ProduitsServices> AssignReferenceProduitsServices => (produitsServices) => produitServiceRef = produitsServices;
+    List<IBrowserFile> browserFiles = new List<IBrowserFile>();
+    public class MyBrowserFile : IBrowserFile
+    {
+        private readonly Fichier _fichier;
+
+        public MyBrowserFile(Fichier fichier)
+        {
+            _fichier = fichier ?? throw new ArgumentNullException(nameof(fichier));
+        }
+
+        public string Name => _fichier.Nom ?? "Unnamed"; // Fallback if Nom is null
+        public long Size => _fichier.Taille ?? 0; // Fallback if Taille is null
+        public string ContentType => _fichier.Type ?? "application/octet-stream"; // Default content type
+        public DateTimeOffset LastModified => _fichier.DateCreation ?? DateTime.Now;
+        public async Task<Stream> OpenReadAsync()
+        {
+            // Simulate getting a stream from the file path
+            // Ensure that the file path exists and is accessible in your application context
+            if (string.IsNullOrEmpty(_fichier.Path))
+            {
+                throw new InvalidOperationException("File path is not set.");
+            }
+
+            return await Task.FromResult(new FileStream(_fichier.Path, FileMode.Open, FileAccess.Read));
+        }
+
+        public async Task<Stream> OpenReadStream(long maxAllowedSize, CancellationToken cancellationToken)
+        {
+            // Validate file size
+            if (Size > maxAllowedSize)
+            {
+                throw new InvalidOperationException($"File size exceeds the allowed limit of {maxAllowedSize} bytes.");
+            }
+
+            if (string.IsNullOrEmpty(_fichier.Path))
+            {
+                throw new InvalidOperationException("File path is not set.");
+            }
+
+            // Return a FileStream for reading the file
+            return await Task.FromResult(new FileStream(_fichier.Path, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous));
+        }
+
+        Stream IBrowserFile.OpenReadStream(long maxAllowedSize, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        editContext = new EditContext(financeFormModel);
+        editContext.OnValidationStateChanged += (sender, args) => StateHasChanged();
+        try
+        {
+            selectedFournisseur = await _context.Fournisseurs.FindAsync(FournisseurID);
+            selectedContacts = await _context.Contacts.Where(c => c.Fournisseur == selectedFournisseur.IdFournisseur).ToListAsync();
+
+            foreach (var contact in selectedContacts)
+            {
+                var phoneNumber = await _context.Telephones.Where(t => t.Contact == contact.IdContact).FirstAsync();
+
+                contactFormModel = new ContactFormModel
+                {
+                    IdContact = contact.IdContact,
+                    Prenom = contact.Prenom,
+                    Nom = contact.Nom,
+                    Fonction = contact.Fonction,
+                    AdresseCourriel = contact.AdresseCourriel,
+                    TypeTelephone = phoneNumber.Type, 
+                    Telephone = phoneNumber.NumTelephone,
+                    Poste = phoneNumber.Poste
+                };
+                contactHosterFormModel.ContactList.Add(contactFormModel);
+            }
+            //contactHosterFormModel.ContactList.RemoveAt(0);
+            coordonnee = await _context.Coordonnees.SingleAsync(c => c.Fournisseur == selectedFournisseur.IdFournisseur);
+            selectedTelephones = await _context.Telephones.Where(t => t.Coordonnee == coordonnee.IdCoordonnee).ToListAsync();
+            try
+            {
+                finance = await _context.Finances.SingleAsync(c => c.Fournisseur == selectedFournisseur.IdFournisseur);
+                financeFormModel.FillData(finance);
+                if(finance == null)
+                {
+                    FinanceInfoNull = true;
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"Erreur lors de la récupération des informations: {ex.Message}"); 
+            }
+            identification = await _context.Identifications.SingleAsync(c => c.Fournisseur == selectedFournisseur.IdFournisseur);
+            selectedFichiers = await _context.Fichiers.Where(c => c.Fournisseur == selectedFournisseur.IdFournisseur).ToListAsync();
+            var browserfiles = TransformFichierToBrowserFile(selectedFichiers);
+            // Pt que lister la liste des fichiers sur le serv comme sa deja en ibrowserfile ** A voir**
+            pieceJointeFormModel = new PieceJointeFormModel{
+                ListFichiers = selectedFichiers
+            };
+            selectedHistoriques = await _context.Historiques.Where(c => c.Fournisseur == FournisseurID).ToListAsync();
+            closestHistorique = selectedHistoriques.Where(h => h.DateEtatChanged.HasValue).OrderBy(h => Math.Abs((h.DateEtatChanged.Value - DateTime.UtcNow).TotalDays)).FirstOrDefault();
+            //closestHistorique = await _context.Historiques.Where(h => h.Fournisseur == selectedFournisseur.IdFournisseur && h.DateEtatChanged.HasValue).OrderBy(h => Math.Abs((h.DateEtatChanged.Value - DateTime.UtcNow).TotalDays)).FirstOrDefaultAsync();
+            if(identification.Neq != null)
+            {
+                licencerbqs = await _context.Licencerbqs.SingleAsync(c => c.Fournisseur == selectedFournisseur.IdFournisseur);
+                selectedCategorieRBQ = await _context.Categorierbqs.Where(c => c.IdLicenceRbqs.Any(l => l.IdLicenceRbq == licencerbqs.IdLicenceRbq)).ToListAsync();
+                selectedLicencerbqs = await _context.Licencerbqs.Where(l => l.Fournisseur == selectedFournisseur.IdFournisseur).Include(l => l.IdCategorieRbqs).ToListAsync();
+                allCategoriesForm = await _context.Categorierbqs.ToListAsync();
+                selectedCurrentCategorieRBQ = allCategoriesForm.ToDictionary(c => c.CodeSousCategorie, c => false);
+            
+                allCategories = await _context.Categorierbqs.ToListAsync(); 
+                foreach(var categorie in allCategoriesForm)
+                {
+                    AllCodeSousCategorie.Add(categorie.CodeSousCategorie);
+                }
+                licenceRBQFormModel = new LicenceRBQFormModel
+                {
+                    NumeroLicence = licencerbqs.IdLicenceRbq,
+                    StatutLicence = licencerbqs.Statut,
+                    TypeLicence = licencerbqs.Type,
+                    CodeSousCategorie = AllCodeSousCategorie,
+                    SousCategoSelected = allCategories.ToDictionary(c => c.CodeSousCategorie, c => false)
+                };
+                foreach(var item in selectedCurrentCategorieRBQ)
+                {
+                    foreach(var cate in selectedCategorieRBQ)
+                    {
+                        if (cate.CodeSousCategorie == item.Key)
+                        {
+                            licenceRBQFormModel.SousCategoSelected[item.Key] = true;
+                        }
+                    }
+                }
+
+                if(licencerbqs == null && selectedCategorieRBQ == null)
+                {
+                    LicenceRBQInfoNull = true;
+                }
+            }
+                //allCategories = await _context.Categorierbqs.ToListAsync();
+            Console.WriteLine("allCategoriesRBQ.count:" + allCategories.Count);
+            fournisseurProduitIds = await _context.Database
+            .SqlQueryRaw<string>(@"
+                SELECT idProduitService 
+                FROM FournisseurProduitService 
+                WHERE idFournisseur = {0}", selectedFournisseur.IdFournisseur)
+            .ToListAsync();
+            produitServiceFormModel = new ProduitServiceFormModel
+            {
+                Message = selectedFournisseur.DetailSpecification
+            };
+            allProduitService = await _context.Produitservices.ToListAsync();
+            Console.WriteLine($"allProduitService count in parent: {allProduitService.Count}");
+            if (allProduitService != null && allProduitService.Any())
+            {
+                produitServiceFormModel.SousProduitSelected = allProduitService.ToDictionary(c => c.CodeUnspsc, c => false);
+            }
+            categorieUNSPSC = await _context.Categorieunspscs.ToListAsync();
+
+            selectedProduitservices = await _context.Produitservices
+                .Where(p => fournisseurProduitIds.Contains(p.CodeUnspsc))
+                .ToListAsync();
+            foreach(var item in selectedProduitservices)
+            {
+                if (produitServiceFormModel.SousProduitSelected.ContainsKey(item.CodeUnspsc))
+                {
+                    produitServiceFormModel.SousProduitSelected[item.CodeUnspsc] = true;
+                }
+            }
+            GetGroupProduitService();
+            groupedCategories = GroupCategoriesByType();
+            combinedFormModel.FillData(coordonnee, identification, selectedTelephones);
+            Console.WriteLine("Fin Fetch Data");
+            ModifcationPieceJointesActivationONStateMethod();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erreur lors de la récupération des informations(Fetch Crash): {ex.Message}");
+        }
+        isLoading = false;
+    }
+
+    private string GetInputClass<TField> (Expression<Func<TField>> fieldExpression)
+    {
+        if (!isSubmit) {
+            return "";
+        }
+        var fieldIdentifier = FieldIdentifier.Create(fieldExpression);
+        var isValid = !editContext.GetValidationMessages(fieldIdentifier).Any();
+        return isValid ? "valid" : "invalid";
+    }
+
+    private string GetValidationHTML<TField> (Expression<Func<TField>> fieldExpression) 
+    {
+        if (!isSubmit) {
+            return "";
+        }
+        var fieldIdentifier = FieldIdentifier.Create(fieldExpression);
+        var isValid = !editContext.GetValidationMessages(fieldIdentifier).Any();
+        return isValid ? "<span class=\"input-group-text text-success\" style=\"width: 200px;\"><i class=\"bi bi-check-circle me-2\"></i><span class=\"texte-validation\">Valide</span></span>" 
+                       : "<span class=\"input-group-text text-danger\" style=\"width: 200px;\"><i class=\"bi bi-x-circle me-2\"></i><span class=\"texte-validation\">" + editContext.GetValidationMessages(fieldIdentifier).FirstOrDefault() + "</span></span>";  
+    }
+
+    public bool TriggerValidation() 
+    {
+        isSubmit = true;
+        bool isValid = false;
+        isValid = editContext.Validate();
+        StateHasChanged();
+        return isValid;
+    }
+
+    private void GetGroupProduitService()
+    {
+        groupedServices = selectedProduitservices.GroupBy(p => new GroupKey 
+            { 
+                CodeCategorie = p.CategorieUnspsc, 
+                Nature = p.Nature 
+            }).ToList(); 
+    }
+
+    private string GetFormatSizeFile(int? size)
+    {
+        if (size >= 1048576)
+        {
+            return $"{(size / 1048576.0):F2} MB";
+        }
+        else
+        {
+            return $"{(size / 1024.0):F2} KB";
+        }
+    }
+ 
+    private string GetFormatSize()
+    {
+        sizeTotal = pieceJointeFormModel.ListFichiers.Sum(file => (int)(file.Taille));
+        if (sizeTotal >= 1048576) // 1 MB = 1048576 bytes (1 * 1024 * 1024)
+        {
+            return $"{(sizeTotal / 1048576.0):F2} MB / {MaxSize}MB";
+        }
+        else
+        {
+            return $"{(sizeTotal / 1024.0):F2} KB / {MaxSize}MB";
+        }
+    }
+
+    private async Task ChangementDemande()
+    {
+        if(closestHistorique.EtatDemande == "Refusé")
+        {
+            var newHistorique = new Historique
+            {
+                EtatDemande = "En attente",
+                DateEtatChanged = DateTime.UtcNow,
+                Fournisseur = closestHistorique.Fournisseur
+            };
+            _context.Historiques.Add(newHistorique);
+            closestHistorique.EtatDemande = "En attente";
+            closestHistorique.DateEtatChanged = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    private async Task DeleteFiche()
+    {
+        await historiqueService.AddHistoriqueRefuser(selectedFournisseur.IdFournisseur, "Vous avez supprimé votre fiche");//A mettre un message que l'admin peut changer
+        await fichierService.DeleteAllFichiersData(selectedFichiers);
+        //closestHistorique.EtatDemande = "Refusé";
+        //closestHistorique.DateEtatChanged = DateTime.UtcNow;
+        selectedFichiers.Clear();// A enlever si on peut changer les donnnes sans refresh la page
+    }
+
+    public class CustomBrowserFile : IBrowserFile
+    {
+        public string Name { get; set; }
+        public DateTimeOffset LastModified { get; set; }
+        public long Size { get; set; }
+        public string ContentType { get; set; }
+
+        // Example method to simulate getting a Stream for the file content
+        public Stream OpenReadStream(long maxAllowedSize = 512000, CancellationToken cancellationToken = default)
+        {
+            // Implement this method as needed
+            return new MemoryStream();
+        }
+    }
+    public List<IBrowserFile> TransformFichierToBrowserFile(List<Fichier> fichiers)
+    {
+        return fichiers.Select(f => new CustomBrowserFile
+        {
+            Name = f.Nom,
+            LastModified = f.DateCreation.HasValue ? new DateTimeOffset(f.DateCreation.Value) : DateTimeOffset.Now, // Handle null DateTime
+            Size = f.Taille ?? 0, // Handle null int
+            ContentType = f.Type
+        }).ToList<IBrowserFile>();
+    }
+
+        private async Task Deconnexion()
+    {
+        Usersession[] usersessions;
+        string email;
+
+        var result = await protectedSessionStorage.GetAsync<string>("Email"); // Je vais chercher le mail dans le protectedSessionStorage
+
+        email = result.Value;
+        usersessions = _context.Usersessions.Where(u => u.OwnerEmail == email).ToArray();
+        if(usersessions.Length > 0)
+        {
+            foreach (var usersession in usersessions)
+            {
+                _context.Usersessions.Remove(usersession);
+            }
+            await _context.SaveChangesAsync();    
+
+            await protectedSessionStorage.DeleteAsync("Email");
+            await cookie.destroy("SToken");
+        }
+        else
+        {
+            var token = await cookie.GetValue("SToken");
+            if(!string.IsNullOrEmpty(token))
+            {
+                email = tokenGenerator.GetValueFromToken(token).Split(":")[0];
+                usersessions = _context.Usersessions.Where(u => u.OwnerEmail == email).ToArray();
+                foreach (var usersession in usersessions)
+                {
+                    _context.Usersessions.Remove(usersession);
+                }
+                await _context.SaveChangesAsync();
+            }
+            
+            await protectedSessionStorage.DeleteAsync("Email");
+            await cookie.destroy("SToken");
+        } 
+
+
+        // usersessions = _context.Usersessions.Where(u => u.OwnerEmail == email).ToArray();
+        // foreach (var usersession in usersessions)
+        // {
+        //     _context.Usersessions.Remove(usersession);
+        // }
+        // await _context.SaveChangesAsync();
+        
+        NavigationManager.NavigateTo("/", true);
+    }
+}

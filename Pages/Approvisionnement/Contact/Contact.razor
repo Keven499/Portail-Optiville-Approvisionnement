@@ -1,0 +1,109 @@
+@using System.ComponentModel.DataAnnotations
+@using Portail_OptiVille.Data.FormModels
+@using System.Linq.Expressions
+
+<EditForm EditContext="@editContext">
+    <DataAnnotationsValidator />
+    <h4 class="titre-bold">Contact @ContactNumber <i class="bi bi-braces-asterisk text-danger"></i></h4>
+    <div class="row d-flex align-items-center">
+        <div class="col-lg-6 col-xl-6 col-sm-6 col-12">
+            <label class="bleuFonce texte-bold" for="Prenom">Prénom <i class="bi bi-braces-asterisk text-danger"></i></label>
+            <input type="text" @bind="contactFormModel.Prenom" maxlength="32" class="form-control @GetInputClass(() => contactFormModel.Prenom) input-bleu texte-light" id="Prenom" />                                                                                                                                                                 
+            @((MarkupString)GetValidationHTML(() => contactFormModel.Prenom))
+        </div>
+        <div class="col-lg-6 col-xl-6 col-sm-6 col-12 py-xl-0 py-2">
+            <label class="bleuFonce texte-bold" for="Nom">Nom <i class="bi bi-braces-asterisk text-danger"></i></label>
+            <input type="text" @bind="contactFormModel.Nom" maxlength="32" class="form-control @GetInputClass(() => contactFormModel.Nom) input-bleu texte-light" id="Nom" />                                                                                                                                                         
+            @((MarkupString)GetValidationHTML(() => contactFormModel.Nom))
+        </div>            
+    </div>
+    <div class="row d-flex align-baseline p-0">
+        <div class="col-lg-6 col-xl-6 col-sm-8 col-12 py-2">
+            <label class="bleuFonce texte-bold" for="Fonction1">Fonction <i class="bi bi-braces-asterisk text-danger"></i></label>
+            <input type="text" @bind="contactFormModel.Fonction" max="32" class="form-control @GetInputClass(() => contactFormModel.Fonction) input-bleu texte-light" id="Fonction1" />
+            @((MarkupString)GetValidationHTML(() => contactFormModel.Fonction))
+        </div>
+        <div class="col-lg-6 col-xl-6 col-12 col-sm-12 py-2">
+            <label class="bleuFonce texte-bold" for="Courriel">Courriel du contact <i class="bi bi-braces-asterisk text-danger"></i></label>
+            <input type="email" @bind="contactFormModel.AdresseCourriel" maxlength="64" placeholder="courriel@votre-entreprise.extension" class="form-control @GetInputClass(() => contactFormModel.AdresseCourriel) input-bleu texte-light" id="Courriel" />
+            @((MarkupString)GetValidationHTML(() => contactFormModel.AdresseCourriel))
+        </div>
+    </div>
+    <div class="row d-flex align-baseline p-0">
+        <div class="col-lg-3 col-xl-3 col-sm-6 col-6 py-2">
+            <label class="bleuFonce texte-bold" for="typeTel1">Type <i class="bi bi-braces-asterisk text-danger"></i></label>
+            <select class="form-control @GetInputClass(() => contactFormModel.TypeTelephone) input-bleu texte-light" id="typeTel1" @bind="contactFormModel.TypeTelephone">
+                <option value="" disabled selected>Veuillez choisir un type</option>
+                <option value="Bureau">Bureau</option>
+                <option value="Télécopieur">Télécopieur</option>
+                <option value="Cellulaire">Cellulaire</option>
+            </select>                                                                                                                                                                                                                         
+            @((MarkupString)GetValidationHTML(() => contactFormModel.TypeTelephone))
+        </div>
+        <div class="col-lg-5 col-xl-5 col-sm-6 col-6 py-2">
+            <label class="bleuFonce texte-bold" for="NoTel1">Numéro <i class="bi bi-braces-asterisk text-danger"></i></label>
+            <input type="text" @bind="contactFormModel.Telephone" placeholder="0000000000" maxlength="10" class="form-control @GetInputClass(() => contactFormModel.Telephone) input-bleu texte-light" id="NoTel1" />                                                                                                                    
+            @((MarkupString)GetValidationHTML(() => contactFormModel.Telephone))
+        </div>
+        <div class="col-lg-4 col-xl-4 col-6 col-sm-6 py-2 mb-2">
+            <label class="bleuFonce texte-bold" for="Poste1Contact">Poste</label>
+            <input type="text" @bind="contactFormModel.Poste" maxlength="6" class="form-control @GetInputClass(() => contactFormModel.Poste) input-bleu texte-light" id="Poste1Contact" />
+            @((MarkupString)GetValidationHTML(() => contactFormModel.Poste))
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int ContactNumber { get; set; } = 1;
+    [Parameter]
+    public ContactFormModel contactFormModel { get; set; }
+    private EditContext editContext { get; set; }
+    private bool isSubmit = false;
+
+    protected override void OnInitialized() 
+    {
+        editContext = new EditContext(contactFormModel);
+        editContext.OnValidationStateChanged += (sender, args) => StateHasChanged();
+    }
+
+    private string GetInputClass<TField> (Expression<Func<TField>> fieldExpression)
+    {
+        if (!isSubmit) {
+           return "";
+        }
+        var fieldIdentifier = FieldIdentifier.Create(fieldExpression);
+        var isValid = !editContext.GetValidationMessages(fieldIdentifier).Any();
+
+        // THERE'S PROBABLY A BETTER WAY TO DO THIS.
+        if (fieldIdentifier.FieldName.Equals("Poste")) {
+            return isValid ? "" : "invalid";
+        }
+
+        return isValid ? "valid" : "invalid";
+    }
+
+    private string GetValidationHTML<TField> (Expression<Func<TField>> fieldExpression) 
+    {
+        if (!isSubmit) {
+           return "";
+        }
+        var fieldIdentifier = FieldIdentifier.Create(fieldExpression);
+        var isValid = !editContext.GetValidationMessages(fieldIdentifier).Any();
+
+         // THERE'S PROBABLY A BETTER WAY TO DO THIS.
+        if (fieldIdentifier.FieldName.Equals("Poste")) {
+            return isValid ? "" : "<span class=\"input-group-text text-danger\"><i class=\"bi bi-x-circle me-2\"></i><span class=\"texte-validation\">" + editContext.GetValidationMessages(fieldIdentifier).FirstOrDefault() + "</span></span>";
+        }
+
+        return isValid ? "<span class=\"input-group-text text-success\"><i class=\"bi bi-check-circle me-2\"></i><span class=\"texte-validation\">Valide</span></span>" 
+                       : "<span class=\"input-group-text text-danger\"><i class=\"bi bi-x-circle me-2\"></i><span class=\"texte-validation\">" + editContext.GetValidationMessages(fieldIdentifier).FirstOrDefault() + "</span></span>";  
+    }
+
+     public bool TriggerValidation() 
+    {
+        isSubmit = true;
+        StateHasChanged();
+        return editContext.Validate();
+    }
+}
