@@ -51,9 +51,7 @@
                                 <i class="bi @passwordIconClass me-1"></i><ValidationMessage For="@(() => logInModel.MotDePasse)" />
                             </div>
                         </div>
-                        <div class="py-1">
-                            <a href="/motdepasse" class="texte-medium">Mot de passe oublié</a>
-                        </div>
+
                     </div>
 
                     <div class="card-footer py-2 bg-bleuFonce d-flex justify-content-center">
@@ -181,7 +179,7 @@
 
     public class LogInModel
     {
-        [Required(ErrorMessage = "Le courriel/NEQ est requis")]
+        [Required(ErrorMessage = "Le courriel est requis")]
         [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage =
         "Le courriel")]
         public string Username { get; set; }
