@@ -129,18 +129,18 @@ body {
     cursor: pointer;
 }
 
-    .check-blanc:before {
-        content: '';
-        position: absolute;
-        left: 6px;
-        top: 2px;
-        width: 6px;
-        height: 12px;
-        border: 1px solid rgb(11, 35, 65);
-        border-width: 0 2px 2px 0;
-        transform: rotate(45deg);
-        opacity: 0;
-    }
+.check-blanc:before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 6px;
+    height: 12px;
+    border: 1px solid rgb(11, 35, 65);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    opacity: 0;
+}
 
 .check-vert {
     background-color: white;
@@ -153,18 +153,18 @@ body {
     cursor: pointer;
 }
 
-    .check-vert:before {
-        content: '';
-        position: absolute;
-        left: 6px;
-        top: 2px;
-        width: 6px;
-        height: 12px;
-        border: 1px solid rgb(30, 73, 45);
-        border-width: 0 2px 2px 0;
-        transform: rotate(45deg);
-        opacity: 0;
-    }
+.check-vert:before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 6px;
+    height: 12px;
+    border: 1px solid rgb(30, 73, 45);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    opacity: 0;
+}
 
 input[type="checkbox"]:checked + .check-blanc:before {
     opacity: 1;
@@ -238,6 +238,15 @@ input[type="checkbox"]:checked + .check-blanc:before {
 
 .border-vertFonce {
     border: 2px solid rgb(30, 73, 45);
+}
+
+.ligneTxt {
+    border-bottom: 1px solid rgb(30, 73, 45, 0.6);
+    align-self: center; 
+    margin-bottom: -10px; 
+    margin-left: 5px;
+    margin-right: 5px;
+    height: 1px; 
 }
 
 /* Fonts */
