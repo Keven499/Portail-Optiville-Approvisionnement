@@ -25,45 +25,41 @@
                 DÉSACTIVER  <i class="bi bi-slash-circle"></i>    
                 MODIFIER    <i class="bi bi-pencil me-1"></i>
             *@
-            @{
-                if (historiqueFiche.Any())
-                {
-                    @foreach (var historiqueChange in historiqueFiche)
-                    {
-                        <div class="row">
-                            <div class="col-4">@historiqueChange.DateEtatChanged</div>
-                            <div class="col-4">
-                                @switch (historiqueChange.EtatDemande)
-                                {
-                                    case "Accepté": <i class="bi bi-check-circle me-2"></i>
-                                        break;
-                                    case "Refusé": <i class="bi bi-x-circle me-2"></i>
-                                        break;
-                                    case "En attente": <i class="bi bi-dash-circle me-2"></i>
-                                        break;
-                                    case "À reviser": <i class="bi bi-exclamation-circle me-2"></i>  
-                                        break;
-                                }
-                                @historiqueChange.EtatDemande
-                                </div>
-                            <div class="col-4">NA</div>
+            @foreach (var historiqueChange in historiqueFiche)
+            {
+                <div class="row">
+                    <div class="col-4">@historiqueChange.DateEtatChanged</div>
+                    <div class="col-4">
+                        @switch (historiqueChange.EtatDemande)
+                        {
+                            case "Accepté": <i class="bi bi-check-circle me-2"></i>
+                                break;
+                            case "Refusé": <i class="bi bi-x-circle me-2"></i>
+                                break;
+                            case "En attente": <i class="bi bi-dash-circle me-2"></i>
+                                break;
+                            case "À réviser": <i class="bi bi-exclamation-circle me-2"></i>  
+                                break;
+                        }
+                        @historiqueChange.EtatDemande
                         </div>
-                    }
-                }
+                    <div class="col-4">NA</div>
+                </div>
             }
         </div>
     </div>
 </div>
 
 @code{
-    [Parameter]
-    public int idFournisseur { get; set; } = 63;
-    private List<Historique> historiqueFiche; 
+    @* [Parameter]
+    public int idFournisseur { get; set; } = 63; *@
+    private int idFournisseur = 74;
+    private List<Historique> historiqueFiche = new List<Historique>();
 
     protected override async Task OnInitializedAsync()
     {
         historiqueFiche = await _context.Historiques
-                                         .Where(h => h.IdHistorique == idFournisseur)
+                                         .Where(h => h.Fournisseur == idFournisseur)
                                          .ToListAsync();
     }
 }    
