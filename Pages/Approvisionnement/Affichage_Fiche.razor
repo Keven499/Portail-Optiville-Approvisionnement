@@ -503,7 +503,7 @@
                     <div class="row">
                         <div class="col-xl-12 col-lg-12 col-sm-12 col-12">    
                             <h3 class="texte-20bold">Total: @GetFormatSize()</h3>                                            
-                            <PiecesJointes PieceJointeFormModel="pieceJointeFormModel" ActivationModification="ModifcationPieceJointesActivation" ModifcationPieceJointesActivationONState="ModifcationPieceJointesActivationONState" ShowTitle="false"></PiecesJointes>                
+                            <PiecesJointes PieceJointeFormModel="pieceJointeFormModel" ActivationModification="ModifcationPieceJointesActivation" ModifcationPieceJointesActivationONState="ModifcationPieceJointesActivationONState" MaxSize="configappro.TailleMaxFichiers" ShowTitle="false"></PiecesJointes>                
                         </div>
                     </div>
                 </div>
@@ -644,7 +644,8 @@
     private FinanceFormModel financeFormModel = new FinanceFormModel();
     private ContactHosterFormModel contactHosterFormModel = new ContactHosterFormModel();
     Produitservice produitService = new Produitservice();
-    public int MaxSize = 75;
+    public int MaxSize = 0;
+    Configappro configappro = new Configappro();
     private bool ModifcationPieceJointesActivation = true;
     private bool ModifcationPieceJointesActivationONState;
     private void ModifcationPieceJointesActivationONStateMethod()
@@ -1026,7 +1027,8 @@
                 produitServiceFormModel.SousProduitSelected = allProduitService.ToDictionary(c => c.CodeUnspsc, c => false);
             }
             categorieUNSPSC = await _context.Categorieunspscs.ToListAsync();
-
+            configappro = await _context.Configappros.SingleAsync();
+            MaxSize = configappro.TailleMaxFichiers;
             selectedProduitservices = await _context.Produitservices
                 .Where(p => fournisseurProduitIds.Contains(p.CodeUnspsc))
                 .ToListAsync();

@@ -31,12 +31,12 @@
                 </div>
                     @foreach (var employe in allEmployes)
                     {
-                        <div class="row d-flex align-baseline">
+                        <div class="row d-flex align-items-center">
                             <div class="col-xl-5 col-lg-5 col-12 col-sm-12">
                                 <div class="texte-light fs-6 fw-bold">@employe.Courriel</div>
                             </div>
                             <div class="col-xl-5 col-lg-5 col-4 col-sm-4">
-                                <select class="form-select input-vert texte-light" @onchange="(e) => OnRoleChange(employe, e.Value!.ToString()!)">
+                                <select class="form-select input-vert texte-light " @onchange="(e) => OnRoleChange(employe, e.Value!.ToString()!)">
                                     @foreach (var value in Roles)
                                     {
                                         <option value="@value" selected="@((employe.Role == value))">@value</option>
@@ -46,7 +46,7 @@
                             <div class="col-xl-1 col-lg-1 col-4 col-sm-4">
                                 <button type="button" class="btn btn-danger w-100" id="btnSupp" @onclick="() => OnDeleteUser(employe)"><i class="bi bi-trash"></i></button>
                             </div>
-                            <hr class="mt-2 mb-0"/>
+                            <hr class="mt-2 mb-2"/>
                         </div>
                     }
                 <div class="">
