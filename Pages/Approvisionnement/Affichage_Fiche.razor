@@ -69,7 +69,6 @@
                             </div>
                         </div>
                     </div>
-<<<<<<< Updated upstream
                     <div class="card-body border-vertFonce">
                         <div class="row d-flex align-items-start">
                             <div class="col-xl-6 col-lg-6 col-sm-12 col-12">                      
@@ -77,14 +76,13 @@
                                     <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
                                         <label class="vertFonce texte-bold mb-0 mb-md-0 me-md-3" for="selectEtat">État</label>       
                                         <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
-                                        <div class="vertFonce texte-medium">@((closestHistorique != null) ? closestHistorique.EtatDemande : "N/A")</div>
-<!-- À AFFICHER POUR LE RESPONSABLE SURTOUT NE PAS ENLEVER -->
-                                            @* <select class="form-select input-vert texte-light rounded-0 py-1" style="width: 200px;" id="selectEtat">
-                                                <option value="Accepté">Accepté</option>
-                                                <option value="Refusé">Refusé</option>
-                                                <option value="En attente">En attente</option>
-                                                <option value="À réviser">À réviser</option>
-                                            </select> *@   
+                                        <select value="@currentValue" @onchange="ConfirmChange" class="form-select input-vert texte-light rounded-0 py-1" style="width: 200px;" id="selectEtat">
+                                            <option value="0" disabled>Choisir un état</option>
+                                            <option value="Accepté">Accepté</option>
+                                            <option value="Refusé">Refusé</option>
+                                            <option value="En attente">En attente</option>
+                                            <option value="À réviser">À réviser</option>
+                                        </select> 
                                     </div>
                                 </div>
                                 <div class="row mb-3">
@@ -107,13 +105,6 @@
                                         <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
                                         <div class="vertFonce texte-medium">@((selectedFournisseur.DateLastChanged.HasValue) ? selectedFournisseur.DateLastChanged.Value.ToString("yyyy-MM-dd") : "N/A")</div>
                                     </div>
-                                    <select value="@currentValue" @onchange="ConfirmChange" class="form-select input-bleu texte-light rounded-0 py-1" style="width: 200px;" id="selectEtat">
-                                        <option value="0" disabled>Choisir un état</option>
-                                        <option value="Accepté">Accepté</option>
-                                        <option value="Refusé">Refusé</option>
-                                        <option value="En attente">En attente</option>
-                                        <option value="À réviser">À réviser</option>
-                                    </select>
                                 </div>
                             </div>
                             <div class="col-xl-6 col-lg-6 col-sm-12 col-12">
