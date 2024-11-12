@@ -37,9 +37,10 @@ else
                 </div>
                 <!-- FILTRE NE S'APPLIQUANT QU'AU RESPONSABLE -->
                 <div class="row border-vertFonce box-vert my-2 m-0">
+                @{
+                    int p = 0;
                     @foreach (var checkBox in cbxDicState)
                     {
-                        int p = 0;
                         <div class="col-6 my-1 d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center justify-content-between">
                                 @switch (p)
@@ -61,7 +62,9 @@ else
                                     @onchange="(e) => OnCheckboxChangeState(checkBox.Key, e)" />
                             </div>
                         </div>
+                        p++;
                     } 
+                }
                 </div>
                 <div class="row my-2">
                     <div class="col-6 pe-1">
@@ -267,7 +270,7 @@ else
                                                     @(fiche.EtatDemande == "En attente" ? "bg-yellowEtat" :
                                                     fiche.EtatDemande == "Accepté" ? "bg-vert" :
                                                     fiche.EtatDemande == "Refusé" ? "bg-redEtat" : 
-                                                    fiche.EtatDemande == "À reviser" ? "bg-grayEtat" : "")">
+                                                    fiche.EtatDemande == "À réviser" ? "bg-grayEtat" : "")">
                                                     @fiche.EtatDemande
                                                 </div>
                                             </div>
