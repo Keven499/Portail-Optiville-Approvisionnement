@@ -1,4 +1,7 @@
 @page "/historiqueFiche"
+@using Microsoft.EntityFrameworkCore
+@using Portail_OptiVille.Data.Models
+@inject A2024420517riGr1Eq6Context _context
 
 @*
     HISTORIQUE
@@ -12,47 +15,55 @@
         </div>
         <div class="card-body">
             <div class="row">
-                <div class="col-xxl-4 col-xl-4 col-lg-4 col-sm-4 col-12">
-                    <div>Date et heure</div>
-                </div>
-                <div class="col-xxl-4 col-xl-4 col-lg-4 col-sm-4 col-12">
-                    <div>État de la demande</div>
-                </div>
-                <div class="col-xxl-4 col-xl-4 col-lg-4 col-sm-4 col-12">
-                    <div>Modifié par</div>
-                </div>
+                <div class="col-4">Date et heure</div>
+                <div class="col-4">État de la demande</div>
+                <div class="col-4">Modifié par</div>
             </div>
             @*
                 BOUCLE LISTANT LES CHANGEMENTS
-                foreach (var x in x)
-                {
-
-                }
-
                 ICÔNES:
-                ACCEPTER    <i class="bi bi-check-circle me-2"></i>
-                À RÉVISER   <i class="bi bi-exclamation-circle me-2"></i>
-                REFUSER     <i class="bi bi-x-circle me-2"></i>
-                EN ATTENTE  <i class="bi bi-dash-circle me-2"></i>
                 DÉSACTIVER  <i class="bi bi-slash-circle"></i>    
                 MODIFIER    <i class="bi bi-pencil me-1"></i>
             *@
-            <div class="row">
-                <div class="col-xxl-4 col-xl-4 col-lg-4 col-sm-4 col-12">
-                    <div>9 juin 2024 10:04:38</div>
-                </div>
-                <div class="col-xxl-4 col-xl-4 col-lg-4 col-sm-4 col-12">
-                    <div>En attente</div>
-                </div>
-                <div class="col-xxl-4 col-xl-4 col-lg-4 col-sm-4 col-12">
-                    <div>info@iceberglounge.com</div>
-                </div>
-            </div>
-
+            @{
+                if (historiqueFiche.Any())
+                {
+                    @foreach (var historiqueChange in historiqueFiche)
+                    {
+                        <div class="row">
+                            <div class="col-4">@historiqueChange.DateEtatChanged</div>
+                            <div class="col-4">
+                                @switch (historiqueChange.EtatDemande)
+                                {
+                                    case "Accepté": <i class="bi bi-check-circle me-2"></i>
+                                        break;
+                                    case "Refusé": <i class="bi bi-x-circle me-2"></i>
+                                        break;
+                                    case "En attente": <i class="bi bi-dash-circle me-2"></i>
+                                        break;
+                                    case "À reviser": <i class="bi bi-exclamation-circle me-2"></i>  
+                                        break;
+                                }
+                                @historiqueChange.EtatDemande
+                                </div>
+                            <div class="col-4">NA</div>
+                        </div>
+                    }
+                }
+            }
         </div>
     </div>
 </div>
 
 @code{
-    
-}
+    [Parameter]
+    public int idFournisseur { get; set; } = 63;
+    private List<Historique> historiqueFiche; 
+
+    protected override async Task OnInitializedAsync()
+    {
+        historiqueFiche = await _context.Historiques
+                                         .Where(h => h.IdHistorique == idFournisseur)
+                                         .ToListAsync();
+    }
+}    
