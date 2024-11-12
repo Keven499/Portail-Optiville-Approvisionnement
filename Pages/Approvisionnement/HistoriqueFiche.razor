@@ -1,0 +1,58 @@
+@page "/historiqueFiche"
+
+@*
+    HISTORIQUE
+*@
+
+<PageTitle>Historique de {fournisseur}</PageTitle>
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header d-flex justify-content-center">
+            <div class="fw-bold fs-4">Historique</div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-xxl-4 col-xl-4 col-lg-4 col-sm-4 col-12">
+                    <div>Date et heure</div>
+                </div>
+                <div class="col-xxl-4 col-xl-4 col-lg-4 col-sm-4 col-12">
+                    <div>État de la demande</div>
+                </div>
+                <div class="col-xxl-4 col-xl-4 col-lg-4 col-sm-4 col-12">
+                    <div>Modifié par</div>
+                </div>
+            </div>
+            @*
+                BOUCLE LISTANT LES CHANGEMENTS
+                foreach (var x in x)
+                {
+
+                }
+
+                ICÔNES:
+                ACCEPTER    <i class="bi bi-check-circle me-2"></i>
+                À RÉVISER   <i class="bi bi-exclamation-circle me-2"></i>
+                REFUSER     <i class="bi bi-x-circle me-2"></i>
+                EN ATTENTE  <i class="bi bi-dash-circle me-2"></i>
+                DÉSACTIVER  <i class="bi bi-slash-circle"></i>    
+                MODIFIER    <i class="bi bi-pencil me-1"></i>
+            *@
+            <div class="row">
+                <div class="col-xxl-4 col-xl-4 col-lg-4 col-sm-4 col-12">
+                    <div>9 juin 2024 10:04:38</div>
+                </div>
+                <div class="col-xxl-4 col-xl-4 col-lg-4 col-sm-4 col-12">
+                    <div>En attente</div>
+                </div>
+                <div class="col-xxl-4 col-xl-4 col-lg-4 col-sm-4 col-12">
+                    <div>info@iceberglounge.com</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@code{
+    
+}

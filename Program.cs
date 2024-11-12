@@ -35,6 +35,7 @@ builder.Services.AddScoped<LicenceRBQService>();
 builder.Services.AddScoped<ProduitServiceService>();
 builder.Services.AddScoped<PieceJointeFormModel>();
 builder.Services.AddScoped<LicenceService>();
+builder.Services.AddScoped<ConfigService>();
 #endregion
 
 #region Load Config from Setting.json

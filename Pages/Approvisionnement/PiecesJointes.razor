@@ -1,0 +1,312 @@
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Linq.Expressions
+@using Portail_OptiVille.Data.FormModels
+@using Microsoft.EntityFrameworkCore
+@inject A2024420517riGr1Eq6Context _context
+@using System.IO
+@using Portail_OptiVille.Data.Models
+@inject IJSRuntime _jsRuntime
+
+@if (ShowTitle)
+{
+    <PageTitle>Étape 6 Pièces jointes</PageTitle>
+}
+<EditForm Model="PieceJointeFormModel">
+    @if(ActivationModification)
+    {
+        @if(ModifcationPieceJointesActivationONState)
+        {
+            <div class="card-body py-1 d-flex justify-content-center @(!ModifcationPieceJointesActivationONState ? "border-bleuFonce": "borderTX-bleuFonce ")">
+                <div class="d-flex flex-column text-center">
+                <div class="texte-medium">.doc .docx .pdf .xls .xlsx .jpg .jpeg .png</div>
+                    <label for="fileInput">
+                        <div id="dropArea" class="drag-drop-area p-4 pt-5 pb-5 @GetInputClass()">
+                                <h4 class="texte-bold">Faites glisser et déposez les fichiers ici</h4>
+                                <p class="texte-medium">ou cliquez pour sélectionner les fichiers</p>
+                        </div>
+                    </label>
+                    <InputFile id="fileInput" OnChange="HandleFileChange" accept=".doc,.docx,.pdf,.xls,.xlsx,.jpg,.jpeg,.png" style="display: none;" />
+                </div>
+            </div>
+        }
+    }
+    else 
+    {
+        <div class="card-header py-2 bg-bleuFonce">
+                <h3 class="py-2 p-0 my-0 text-white titre-bold">Carte d'affaires et brochures</h3>
+            </div>
+        <div class="card-body py-1 d-flex justify-content-center @(!ModifcationPieceJointesActivationONState ? "border-bleuFonce": "borderTX-bleuFonce ")">
+            <div class="d-flex flex-column text-center">
+                <div class="texte-medium">.doc .docx .pdf .xls .xlsx .jpg .jpeg .png</div>
+                <label for="fileInput">
+                    <div id="dropArea" class="drag-drop-area p-4 pt-5 pb-5 @GetInputClass()">
+                        <h4 class="texte-bold">Faites glisser et déposez les fichiers ici</h4>
+                        <p class="texte-medium">ou cliquez pour sélectionner les fichiers</p>
+                </div>
+            </label>
+            <InputFile id="fileInput" OnChange="HandleFileChange" accept=".doc,.docx,.pdf,.xls,.xlsx,.jpg,.jpeg,.png" style="display: none;" />
+            </div>
+        </div>
+    }
+
+    @foreach (var error in errorTable)
+    {
+        int index = 0;
+    @((MarkupString)GetValidationHTML((index++)))
+    }
+
+    @if(!ActivationModification)
+    {
+        <div class="card-header py-2 bg-bleuFonce titre-bold">
+            <h3 class="py-2 p-0 my-0 text-white">Fichiers téléversés</h3>
+        </div>
+    }
+    <div class="card-body table-bleu table-responsive">
+        <table class="table mini-border-bleuFonce table-bordered my-0 col-12 col-sm-12">
+            <thead>
+                <tr>
+                    <th scope="col" class="col-1 texte-bold text-center">Fichier</th>
+                    <th scope="col" class="texte-bold">Nom</th>
+                    <th scope="col" class="col-1 texte-bold text-center">Taille</th>
+                    @if(ActivationModification)
+                    {
+                        @if(ModifcationPieceJointesActivationONState)
+                        {
+                            <th scope="col" class="col-2 texte-bold">Action</th>
+                        }
+                    }
+                    else {
+                        <th scope="col" class="col-2 texte-bold">Action</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var file in PieceJointeFormModel.ListFichiers)
+            {
+                <tr>
+                <th scope="row" class="texte-bold text-center">@(PieceJointeFormModel.ListFichiers.IndexOf(file) + 1)</th>
+                    <td class="texte-light">@file.Nom</td>
+                    <td class="texte-light text-center">@GetFormatSizeFile((long)file.Taille)</td>
+                    @if(ActivationModification)
+                    {
+                        @if(ModifcationPieceJointesActivationONState)
+                        {
+                            <td><button class="btn btn-danger texte-bold" type="button" @onclick="() => RemoveFile(file)"><i class="bi bi-trash me-1"></i>Effacer</button></td>
+                        }  
+                    }
+                    else {
+                        <td><button class="btn btn-danger texte-bold" type="button" @onclick="() => RemoveFile(file)"><i class="bi bi-trash me-1"></i>Effacer</button></td>
+                    }
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</EditForm>
+
+<style>
+    ul {
+        list-style-type: none;
+    }
+    li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    label:hover {
+        cursor: pointer;
+    }
+    input[type="file"]::file-selector-button {
+        background-color: rgb(11, 35, 65);
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .drag-drop-area {
+        border: 2px dashed rgb(11, 35, 65);
+        background-color: rgb(0, 118, 213, 0.2);
+        border-radius: 10px;
+        padding: 50px;
+        text-align: center;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        width: 100%;
+        max-width: 500px;
+    }
+    .drag-drop-area:hover {
+        background-color: rgba(11, 35, 65, 0.132);
+    }
+    .dragging {
+        background-color: #e9f5e9;
+        border-color: #4CAF50;
+    }
+    .invalid {
+        outline: 1px solid red;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
+@code{
+    [Parameter]
+    public PieceJointeFormModel PieceJointeFormModel { get; set; }
+    [Parameter]
+    public bool ActivationModification { get; set; } = false; 
+    [Parameter]
+    public bool ModifcationPieceJointesActivationONState { get; set; } = true;
+    private string[] allowedExtensions = new[] { ".doc", ".docx", ".pdf", ".xls", ".xlsx", ".jpg", ".jpeg", ".png" };
+    private bool isFileInputTouched = false;
+    private List<String> errorTable = new List<String>();
+    private long sizeTotal { get; set; } = 0;
+    [Parameter]
+    public long MaxSize { get; set; } = 0;
+    [Parameter] public bool ShowTitle { get; set; } = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            bool initialized = false;
+            int retries = 5;
+            while (!initialized && retries > 0)
+            {
+                try
+                {
+                    await _jsRuntime.InvokeVoidAsync("dragAndDrop.initialize", "dropArea", "fileInput");
+                    Console.WriteLine("drag and drop initialisé");
+                    initialized = true;
+                }
+                catch (JSException ex)
+                {
+                    retries--;
+                    await Task.Delay(200);
+                }
+            }
+            if (!initialized)
+            {
+                Console.WriteLine("N'a pu initialisé drag and drop");
+            }
+        }
+    }
+    private string GetFormatSizeFile(long size)
+    {
+        if (size >= 1048576)
+        {
+            return $"{(size / 1048576.0):F2} MB";
+        }
+        else
+        {
+            return $"{(size / 1024.0):F2} KB";
+        }
+    }
+
+    private string GetFormatSize()
+    {
+        if (sizeTotal >= 1048576)
+        {
+            return $"{(sizeTotal / 1048576.0):F2} MB / {MaxSize}MB";
+        }
+        else
+        {
+            return $"{(sizeTotal / 1024.0):F2} KB / {MaxSize}MB";
+        }
+    }
+
+    private void CalculTotalSize()
+    {
+        sizeTotal = (long)PieceJointeFormModel.ListFichiers.Sum(file => file.Taille);
+    }
+    private Dictionary<string, Stream> fileStreams = new Dictionary<string, Stream>();
+    private async void HandleFileChange(InputFileChangeEventArgs e)
+    {
+        var fileList = e.GetMultipleFiles();
+        if (!fileList.Any())
+        {
+            return;
+        }
+
+        errorTable.Clear();
+
+        long newSizeTotal = sizeTotal;
+        foreach (var file in fileList)
+        {
+            try
+            {
+                var fileExtension = Path.GetExtension(file.Name).ToLower();
+                if (!allowedExtensions.Contains(fileExtension))
+                {
+                    errorTable.Add($"L'extension {fileExtension} n'est pas autorisée");
+                    continue;
+                }
+
+                newSizeTotal += file.Size;
+                if (newSizeTotal > MaxSize * 1024 * 1024)
+                {
+                    errorTable.Add($"En ajoutant {file.Name}, vous dépassez la taille maximale autorisée");
+                    continue;
+                }
+
+                var fichier = new Fichier
+                    {
+                        Nom = file.Name,
+                        Type = file.ContentType,
+                        Taille = (int)file.Size,
+                        DateCreation = DateTime.Now
+                    };
+
+
+                if (!PieceJointeFormModel.ListFichiers.Any(f => f.Nom == fichier.Nom && f.Taille == fichier.Taille))
+                {
+                    PieceJointeFormModel.ListFichiers.Add(fichier);
+                    isFileInputTouched = true;
+
+
+                    using var fileStream = file.OpenReadStream(maxAllowedSize: 75 * 1024 * 1024);
+                    var memoryStream = new MemoryStream();
+                    await fileStream.CopyToAsync(memoryStream);
+                    memoryStream.Position = 0;
+
+                    PieceJointeFormModel.FileStreams[file.Name] = memoryStream;
+                }
+            }
+            catch (Exception ex)
+            {
+                errorTable.Add($"Une erreur est survenue lors du traitement de {file.Name}: {ex.Message}");
+            }
+        }
+        sizeTotal = newSizeTotal;
+        CalculTotalSize();
+    }
+    
+    private void RemoveFile(Fichier file)
+    {
+        PieceJointeFormModel.ListFichiers.Remove(file);
+        CalculTotalSize();
+    }
+
+    private string GetInputClass()
+    {
+        if (!isFileInputTouched)
+        {
+            return "";
+        }
+        var isValid = !errorTable.Any();
+        return isValid ? "" : "invalid";
+    }
+
+    private string GetValidationHTML(int indexTable)
+    {
+        var isValid = !errorTable.Any();
+        return isValid
+        ? ""
+        : "<div style=\"display: flex; justify-content: center;\">" +  
+          "<span style=\"display: flex; align-items: center; border-radius: 0; background: none; border: none;\" class=\"input-group-text text-danger\">" +
+          "<i class=\"bi bi-x-circle me-2\"></i>" +
+          $"<span class=\"text-wrap\" style=\"letter-spacing: 1px;\">{errorTable[indexTable]}</span>" +
+          "</span>" +
+          "</div>";
+    }
+}
