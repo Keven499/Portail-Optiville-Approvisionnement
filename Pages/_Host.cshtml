@@ -8,6 +8,13 @@
             document.title = title;
         }
     </script>
+    <!-- Dans le fichier _Host.cshtml, sous <script src="_framework/blazor.server.js"></script> -->
+    <script>
+        function confirmSelectionChange() {
+            return confirm("Êtes-vous sûr de vouloir effectuer ce changement ?");
+        }
+    </script>
+
 
     <link rel="stylesheet" href="css/couleur.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">

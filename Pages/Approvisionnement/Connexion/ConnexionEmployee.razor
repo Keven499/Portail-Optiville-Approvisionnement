@@ -94,7 +94,8 @@
                                 Token = token,
                                 OwnerEmail = employe.Courriel,
                                 ExpirationDate =
-                            DateTime.Now.AddHours(COOKIE_EXPIRATION)
+                            DateTime.Now.AddHours(COOKIE_EXPIRATION),
+                            Role = employe.Role
                             };
                         _context.Usersessions.Add(usersession);
                         await _context.SaveChangesAsync();

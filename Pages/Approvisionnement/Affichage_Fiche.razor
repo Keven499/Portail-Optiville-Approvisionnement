@@ -69,6 +69,7 @@
                             </div>
                         </div>
                     </div>
+<<<<<<< Updated upstream
                     <div class="card-body border-vertFonce">
                         <div class="row d-flex align-items-start">
                             <div class="col-xl-6 col-lg-6 col-sm-12 col-12">                      
@@ -106,6 +107,13 @@
                                         <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
                                         <div class="vertFonce texte-medium">@((selectedFournisseur.DateLastChanged.HasValue) ? selectedFournisseur.DateLastChanged.Value.ToString("yyyy-MM-dd") : "N/A")</div>
                                     </div>
+                                    <select value="@currentValue" @onchange="ConfirmChange" class="form-select input-bleu texte-light rounded-0 py-1" style="width: 200px;" id="selectEtat">
+                                        <option value="0" disabled>Choisir un état</option>
+                                        <option value="Accepté">Accepté</option>
+                                        <option value="Refusé">Refusé</option>
+                                        <option value="En attente">En attente</option>
+                                        <option value="À réviser">À réviser</option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-xl-6 col-lg-6 col-sm-12 col-12">
@@ -1059,6 +1067,10 @@
             Console.WriteLine($"Erreur lors de la récupération des informations(Fetch Crash): {ex.Message}");
         }
         isLoading = false;
+        
+        // Initialise `currentValue` avec l'état de la demande actuelle
+        currentValue = closestHistorique?.EtatDemande ?? "En Attente";
+        previousValue = currentValue;
     }
 
     private string GetInputClass<TField> (Expression<Func<TField>> fieldExpression)
@@ -1223,5 +1235,50 @@
         // await _context.SaveChangesAsync();
         
         NavigationManager.NavigateTo("/", true);
+    }
+
+        private string previousValue;
+    private string currentValue;
+
+
+private async Task ConfirmChange(ChangeEventArgs e)
+    {
+        string? newValue = e.Value?.ToString();
+        // Appel de la fonction JavaScript pour confirmer le changement
+        var isConfirmed = await JSRuntime.InvokeAsync<bool>("confirmSelectionChange");
+
+        if (isConfirmed)
+        {
+            // Si confirmé, on met à jour `previousValue` avec `newValue`
+            previousValue = newValue;
+            currentValue = newValue;
+            await MyConfirmedMethod();
+        }
+        else
+        {
+            // Si non confirmé, réinitialise temporairement `currentValue` pour forcer la synchronisation
+            currentValue = "0";  // Valeur temporaire pour "désélectionner" l'élément
+            StateHasChanged();   // Forcer l'interface à mettre à jour
+            await Task.Delay(1); // Pause rapide pour garantir la prise en compte du changement
+            currentValue = previousValue;  // Retourne à la valeur précédente
+            StateHasChanged();
+        }
+    }
+
+    private Task MyConfirmedMethod()
+    {
+
+        Historique? historique = _context.Historiques.FirstOrDefault(h => h.Fournisseur == selectedFournisseur.IdFournisseur);
+        if(historique != null)
+        {
+            historique.DateEtatChanged = DateTime.Now;
+            historique.EtatDemande = currentValue;
+            _context.SaveChanges();
+        }
+        else{
+            Console.WriteLine("Historique introuvable");
+        }
+        // Logique à implémenter plus tard
+        return Task.CompletedTask;
     }
 }
