@@ -4,7 +4,7 @@
 }
 
 .navbar-toggler {
-    background-color: rgb(120, 198, 224, 0.5);
+    background-color: rgb(30, 73, 45, 0.2);
 }
 
 .top-row-nav {
@@ -46,25 +46,24 @@
 }
 
 .nav-item ::deep a.active {
-    background-color: rgb(0, 118, 213, 0.2);
+    background-color: rgb(99, 188, 85, 0.2);
     color: white;
 }
 
 .nav-item ::deep a:hover {
-    background-color: rgb(0, 118, 213, 0.3);
+    background-color: rgb(99, 188, 85, 0.3);
     color: white;
 }
 
 .navbar {
-
     position: relative;
     padding: 10px 15px;
     height: 80px; 
 }
 
-.navbar-bleu
+.navbar-vert
 {
-    background-color: rgb(0, 118, 213) !important; 
+    background-color: rgb(99, 188, 85) !important; 
 }
 
 .navbar-brand {
@@ -77,7 +76,7 @@
     width: 100%;
     z-index: 1030;
     height: 80px;
-    background-color: rgb(0, 118, 213) !important; 
+    background-color: rgb(99, 188, 85) !important; 
 }
 
 .navbar-brand img {
@@ -95,7 +94,7 @@
 }
 
 .nav-item ::deep button:hover {
-    background-color: rgb(0, 118, 213, 0.6);
+    background-color: rgb(99, 188, 85, 0.6);
     color: white;    
 }
 

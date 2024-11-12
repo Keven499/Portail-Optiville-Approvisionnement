@@ -9,7 +9,7 @@ main {
 }
 
 .sidebar {
-    background-image: linear-gradient(180deg, rgb(11, 35, 65) 100%, rgb(11, 35, 65) 100%);
+    background-image: linear-gradient(180deg, rgb(30, 73, 45) 100%, rgb(30, 73, 45) 100%);
 }
 
 .top-row-barre {
@@ -17,7 +17,7 @@ main {
     width: 100%;
     z-index: 1030;
     height: 80px;
-    background-color: rgb(0, 118, 213) !important; 
+    background-color: rgb(99, 188, 85) !important; 
 }
 
 .top-row {

@@ -30,13 +30,13 @@
                 <div class="card">
 
                     @* Identification *@
-                    <div class="card-header py-2 bg-bleuFonce">
+                    <div class="card-header py-2 bg-vertFonce">
                         <h3 class="py-2 p-0 my-0 text-white titre-bold">Identification</h3>
                     </div>
-                    <div class="card-body border-bleuFonce py-1">
+                    <div class="card-body border-vertFonce py-1">
                         <div class="col-xl-8 col-lg-8 col-12 col-sm-12 py-2">
-                            <label class="bleuFonce texte-bold" for="Courriel">Courriel <i class="bi bi-braces-asterisk text-danger"></i></label>
-                            <InputText class="form-control input-bleu texte-light" id="Courriel" @bind-Value="logInModel.Username" />
+                            <label class="vertFonce texte-bold" for="Courriel">Courriel <i class="bi bi-braces-asterisk text-danger"></i></label>
+                            <InputText class="form-control input-vert texte-light" id="Courriel" @bind-Value="logInModel.Username" />
                             @*Affichage de l'erreur*@
                             <div class="d-flex align-baseline">
                                 <i class="bi @GetEmailIcon() me-1"></i><ValidationMessage For="@(() => logInModel.Username)" />
@@ -44,8 +44,8 @@
                         </div>
 
                         <div class="col-xl-8 col-lg-8 col-12 col-sm-12 py-2">
-                            <label class="bleuFonce texte-bold" for="MotDePasse">Mot de passe <i class="bi bi-braces-asterisk text-danger"></i></label>
-                            <InputText type="password" class="form-control input-bleu texte-light" id="MotDePasse" @bind-Value="logInModel.MotDePasse" />
+                            <label class="vertFonce texte-bold" for="MotDePasse">Mot de passe <i class="bi bi-braces-asterisk text-danger"></i></label>
+                            <InputText type="password" class="form-control input-vert texte-light" id="MotDePasse" @bind-Value="logInModel.MotDePasse" />
                             @*Affichage de l'erreur*@
                             <div class="d-flex align-baseline">
                                 <i class="bi @passwordIconClass me-1"></i><ValidationMessage For="@(() => logInModel.MotDePasse)" />
@@ -54,8 +54,8 @@
 
                     </div>
 
-                    <div class="card-footer py-2 bg-bleuFonce d-flex justify-content-center">
-                        <button type="submit" id="btnBleu" class="btn bg-bleu texte-bold text-white" style="width: 200px;">Connexion</button>
+                    <div class="card-footer py-2 bg-vertFonce d-flex justify-content-center">
+                        <button type="submit" id="btnVert" class="btn bg-vert texte-bold text-white" style="width: 200px;">Connexion</button>
                     </div>
                 </div>
 
