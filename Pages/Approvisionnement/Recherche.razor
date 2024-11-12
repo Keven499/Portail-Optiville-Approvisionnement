@@ -286,6 +286,7 @@ else
                                                 <button type="button"
                                                         style="font-size: 14px; height: 30px;"
                                                         class="btn bg-vert d-flex align-items-center texte-light fw-bold"
+                                                        id="btnVert"
                                                         @onclick="() => NavigateToTargetPage(fiche.IdFournisseur)">
                                                     Fiche
                                                 </button>
@@ -303,7 +304,7 @@ else
                 </div>
             </div>
             <div class="card-footer bg-vertFonce d-flex justify-content-center">
-                <button class="btn bg-vert text-white texte-medium d-flex justify-content-evenly" style="width: 200px;"
+                <button class="btn bg-vert text-white texte-medium d-flex justify-content-evenly" id="btnVert" style="width: 200px;"
                     @onclick="OpenSelection">
                     <i class="bi bi-arrow-up-right-circle"></i>
                     <div>Ouvrir les sélections</div>
