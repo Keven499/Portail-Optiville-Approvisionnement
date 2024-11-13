@@ -17,7 +17,7 @@
     {
         @if(ModifcationPieceJointesActivationONState)
         {
-            <div class="card-body py-1 d-flex justify-content-center @(!ModifcationPieceJointesActivationONState ? "border-bleuFonce": "borderTX-bleuFonce ")">
+            <div class="card-body py-1 d-flex justify-content-center @(!ModifcationPieceJointesActivationONState ? "border-vertFonce": "borderTX-vertFonce ")">
                 <div class="d-flex flex-column text-center">
                 <div class="texte-medium">.doc .docx .pdf .xls .xlsx .jpg .jpeg .png</div>
                     <label for="fileInput">
@@ -33,10 +33,10 @@
     }
     else 
     {
-        <div class="card-header py-2 bg-bleuFonce">
+        <div class="card-header py-2 bg-vertFonce">
                 <h3 class="py-2 p-0 my-0 text-white titre-bold">Carte d'affaires et brochures</h3>
             </div>
-        <div class="card-body py-1 d-flex justify-content-center @(!ModifcationPieceJointesActivationONState ? "border-bleuFonce": "borderTX-bleuFonce ")">
+        <div class="card-body py-1 d-flex justify-content-center @(!ModifcationPieceJointesActivationONState ? "border-vertFonce": "borderTX-vertFonce ")">
             <div class="d-flex flex-column text-center">
                 <div class="texte-medium">.doc .docx .pdf .xls .xlsx .jpg .jpeg .png</div>
                 <label for="fileInput">
@@ -58,12 +58,12 @@
 
     @if(!ActivationModification)
     {
-        <div class="card-header py-2 bg-bleuFonce titre-bold">
+        <div class="card-header py-2 bg-vertFonce titre-bold">
             <h3 class="py-2 p-0 my-0 text-white">Fichiers téléversés</h3>
         </div>
     }
-    <div class="card-body table-bleu table-responsive">
-        <table class="table mini-border-bleuFonce table-bordered my-0 col-12 col-sm-12">
+    <div class="card-body table-vert table-responsive">
+        <table class="table mini-border-vertFonce table-bordered my-0 col-12 col-sm-12">
             <thead>
                 <tr>
                     <th scope="col" class="col-1 texte-bold text-center">Fichier</th>
@@ -118,7 +118,7 @@
         cursor: pointer;
     }
     input[type="file"]::file-selector-button {
-        background-color: rgb(11, 35, 65);
+        background-color: rgb(30, 73, 45);
         color: white;
         padding: 10px 20px;
         border: none;
@@ -126,8 +126,8 @@
         cursor: pointer;
     }
     .drag-drop-area {
-        border: 2px dashed rgb(11, 35, 65);
-        background-color: rgb(0, 118, 213, 0.2);
+        border: 2px dashed rgb(30, 73, 45);
+        background-color: rgb(99, 188, 85, 0.2);
         border-radius: 10px;
         padding: 50px;
         text-align: center;
@@ -137,7 +137,7 @@
         max-width: 500px;
     }
     .drag-drop-area:hover {
-        background-color: rgba(11, 35, 65, 0.132);
+        background-color: rgba(30, 73, 45, 0.132);
     }
     .dragging {
         background-color: #e9f5e9;

@@ -7,9 +7,21 @@
 @inject A2024420517riGr1Eq6Context _context
 @inject GestionUserService GestionUserService
 
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Portail_OptiVille.Data.Utilities
+@using Portail_OptiVille.Data.Models
+@inject ProtectedSessionStorage protectedSessionStorage
+@inject NavigationManager NavigationManager
+@inject ICookie cookie
+@inject A2024420517riGr1Eq6Context _context
+@inject JwtTokenGenerator tokenGenerator
+
 <PageTitle>Gestion des rôles</PageTitle>
     <div class="row d-flex justify-content-center">
         <div class="col-xl-11 col-lg-11 col-sm-12 col-12 p-0">
+            <div class="d-flex justify-content-end pb-3">
+                <button id="btnVert" class="btn bg-vert text-white texte-bold" style="width: 200px" @onclick="Deconnexion"><i class="bi bi-box-arrow-left me-1"></i>Déconnexion</button>
+            </div> 
             <div class="card">
                 <div class="card-header py-2 bg-vertFonce d-flex align-items-center">
                     <h3 class="py-2 my-0 text-white titre-bold">Gestion des utilisateurs</h3>
@@ -323,5 +335,54 @@
         isValid = editContext.Validate();
         StateHasChanged();
         return isValid;
+    }
+
+    private async Task Deconnexion()
+    {
+        Usersession[] usersessions;
+        string email;
+
+        var result = await protectedSessionStorage.GetAsync<string>("Email"); // Je vais chercher le mail dans le protectedSessionStorage
+
+        email = result.Value;
+        usersessions = _context.Usersessions.Where(u => u.OwnerEmail == email).ToArray();
+        if(usersessions.Length > 0)
+        {
+            foreach (var usersession in usersessions)
+            {
+                _context.Usersessions.Remove(usersession);
+            }
+            await _context.SaveChangesAsync();    
+
+            await protectedSessionStorage.DeleteAsync("Email");
+            await cookie.destroy("SToken");
+        }
+        else
+        {
+            var token = await cookie.GetValue("SToken");
+            if(!string.IsNullOrEmpty(token))
+            {
+                email = tokenGenerator.GetValueFromToken(token).Split(":")[0];
+                usersessions = _context.Usersessions.Where(u => u.OwnerEmail == email).ToArray();
+                foreach (var usersession in usersessions)
+                {
+                    _context.Usersessions.Remove(usersession);
+                }
+                await _context.SaveChangesAsync();
+            }
+            
+            await protectedSessionStorage.DeleteAsync("Email");
+            await cookie.destroy("SToken");
+        } 
+
+
+        // usersessions = _context.Usersessions.Where(u => u.OwnerEmail == email).ToArray();
+        // foreach (var usersession in usersessions)
+        // {
+        //     _context.Usersessions.Remove(usersession);
+        // }
+        // await _context.SaveChangesAsync();
+        
+        NavigationManager.NavigateTo("/", true);
     }
 }

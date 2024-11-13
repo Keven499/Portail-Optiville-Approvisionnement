@@ -6,10 +6,10 @@
 {
     <PageTitle>Étape 3 Contacts</PageTitle>
 }
-<div class="card-header p-3 bg-bleuFonce">
+<div class="card-header p-3 bg-vertFonce">
     <h3 class="my-0 text-white titre-bold">Contacts</h3>
 </div>
-<div class="card-body px-3 border-bleuFonce bg-blanc py-1">
+<div class="card-body px-3 border-vertFonce bg-blanc py-1">
     @{
         var contactNo = 1;
         @foreach (var contactModel in ContactHosterFormModel.ContactList)
@@ -25,7 +25,7 @@
     }
     <div class="row d-flex justify-content-center pb-2">
         <div class="col-xl-6 col-12 d-flex justify-content-xl-end justify-content-center mb-xl-0 mb-1">
-            <button type="button" class="btn bg-bleu text-white texte-bold" id="btnBleu" @onclick="AddContact" style="width: 200px;"><i class="bi bi-plus-circle me-1"></i>Ajout</button>
+            <button type="button" class="btn bg-vert text-white texte-bold" id="btnVert" @onclick="AddContact" style="width: 200px;"><i class="bi bi-plus-circle me-1"></i>Ajout</button>
         </div>
         <div class="col-xl-6 col-12 d-flex justify-content-xl-start justify-content-center">
             <button type="button" class="btn bg-danger text-white texte-bold" id="btnSupp" data-bs-target="#ModalConfirmation" @onclick="ShowConfirmationModalAsync" style="width: 200px;" disabled="@(!(ContactHosterFormModel.ContactList.Count > 1))"><i class="bi bi-trash me-1"></i>Retirer</button>
@@ -33,12 +33,12 @@
         <div class="modal fade confirmModal" id="ModalConfirmation" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
-                    <div class="modal-header border-0 text-center w-100 bg-bleu">
+                    <div class="modal-header border-0 text-center w-100 bg-vert">
                         <h1 class="modal-title fs-5 mx-auto texte-medium text-white" id="exampleModalLabel">Êtes-vous sûr de vouloir retirer le dernier contact?</h1>
                     </div>
                     <div class="modal-footer border-0 d-flex justify-content-center">
-                        <button type="button" id="btnBleu" class="btn bg-bleu texte-bold text-white" data-bs-dismiss="modal"><i class="bi bi-x-circle me-1"></i>Annuler</button>
-                        <button type="button" id="btnBleu" class="btn bg-bleu text-white texte-bold" data-bs-dismiss="modal" @onclick="RemoveContact"><i class="bi bi-check-circle me-1"></i>Confirmer</button>
+                        <button type="button" id="btnVert" class="btn bg-vert texte-bold text-white" data-bs-dismiss="modal"><i class="bi bi-x-circle me-1"></i>Annuler</button>
+                        <button type="button" id="btnVert" class="btn bg-vert text-white texte-bold" data-bs-dismiss="modal" @onclick="RemoveContact"><i class="bi bi-check-circle me-1"></i>Confirmer</button>
                     </div>
                 </div>
             </div>

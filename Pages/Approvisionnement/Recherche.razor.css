@@ -1,3 +1,15 @@
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+    background: rgb(99, 188, 85);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgb(30, 73, 45);
+}
 .no-focus-white-thick-border:focus,
     .no-focus-white-thick-border:focus:active {
         background-color: rgb(99, 188, 85);
@@ -28,7 +40,7 @@
         position: relative;
         cursor: pointer;
         appearance: none;
-        background-color: rgb(99 188 85);
+        background-color: white;
         border: 1px solid rgb(30 73 45);
         border-radius: 4px;
         transition: background-color 0.3s;
@@ -68,3 +80,5 @@
     .bg-grayEtat {
         background-color: gray;
     }
+
+    

@@ -9,22 +9,22 @@
 }
 <EditForm EditContext="@editContext">
     <DataAnnotationsValidator />
-    <div class="card-header py-2 bg-bleuFonce">
+    <div class="card-header py-2 bg-vertFonce">
         <h3 class="py-2 p-0 my-0 text-white titre-bold">Produits et services</h3>
     </div>
-    <div class="card-body border-bleuFonce py-1">
+    <div class="card-body border-vertFonce py-1">
         <div class="col-xl-9 col-lg-9 col-12 col-sm-12 py-2">
             <label class="texte-bold">Chercher un produit ou un service</label>
             <div class="input-group">
-                <input @bind="searchBarValue" type="text" class="form-control input-bleu texte-light" placeholder="Recherchez">
-                <button class="btn bg-bleu text-white" type="button" @onclick="OnSearch">
+                <input @bind="searchBarValue" type="text" class="form-control input-vert texte-light" placeholder="Recherchez">
+                <button class="btn bg-vert text-white" type="button" @onclick="OnSearch">
                     <i class="bi bi-search"></i>
                 </button>
             </div>
         </div>
         <div class="col-xl-9 col-lg-9 col-12 col-sm-12 py-2">
             <label class="texte-bold" for="statut">Catégorie</label>
-            <select class="form-select input-bleu texte-light" @onchange="OnCategorieChange">
+            <select class="form-select input-vert texte-light" @onchange="OnCategorieChange">
                 <option>Toutes les catégories</option>
                     @foreach (var categorie in CategorieUNSPSC) {
                     <option>@categorie.CategoUnsid - @categorie.Categorie</option>
@@ -33,7 +33,7 @@
         </div>
         <div class="col-xl-9 col-lg-9 col-12 col-sm-12 py-2">
             <label class="texte-bold">Produits et services <i class="bi bi-braces-asterisk text-danger"></i></label>
-            <div class="@GetInputClass(() => ProduitServiceFormModel.SousProduitSelected) overflow-auto box-bleu card">
+            <div class="@GetInputClass(() => ProduitServiceFormModel.SousProduitSelected) overflow-auto box-vert card">
                 @{
                     int i = 0;
                     foreach (var produitServiceLine in produitServiceCatego)
@@ -57,7 +57,7 @@
         </div>
         <div class="col-xl-9 col-lg-9 col-12 col-sm-12 py-2">
             <label for="details" class="texte-bold" form="message">Détails et spécifications <i class="bi bi-braces-asterisk text-danger"></i> </label>
-            <textarea id="message" oninput="countCharacters(this)" class="form-control @GetInputClass(() => ProduitServiceFormModel.Message) texte-light box-bleu" rows="6" placeholder="Entrez les détails ici.." style="resize: none;" @bind="ProduitServiceFormModel.Message" />
+            <textarea id="message" oninput="countCharacters(this)" class="form-control @GetInputClass(() => ProduitServiceFormModel.Message) texte-light box-vert" rows="6" placeholder="Entrez les détails ici.." style="resize: none;" @bind="ProduitServiceFormModel.Message" />
             @((MarkupString)GetValidationHTML(() => ProduitServiceFormModel.Message))
             <span style="display:none;" class="texte-bold" id="charCount">500 caractères restant.</span>
         </div>

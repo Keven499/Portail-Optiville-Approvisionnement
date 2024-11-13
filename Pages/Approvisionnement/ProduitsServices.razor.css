@@ -5,10 +5,10 @@
     background: #f1f1f1;
 }
 ::-webkit-scrollbar-thumb {
-    background: rgb(120, 198, 224);
+    background: rgb(99, 188, 85);
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: rgb(11, 35, 65);
+    background: rgb(30, 73, 45);
 }
 .custom-checkbox:before {
     content: '';
@@ -26,7 +26,7 @@ input[type="checkbox"]:checked+.custom-checkbox:before {
     opacity: 1;
 }
 input[type="checkbox"]:checked+.custom-checkbox {
-    background-color: rgb(11, 35, 65);
+    background-color: rgb(30, 73, 45);
 }
 .custom-checkbox {
     display: block;
@@ -34,8 +34,8 @@ input[type="checkbox"]:checked+.custom-checkbox {
     flex-shrink: 0;
     margin-right: 3px;
     height: 20px;
-    background-color: rgb(120, 198, 224);
-    border: 1px solid rgb(11, 35, 65);
+    background-color: rgb(197, 216, 0);
+    border: 1px solid rgb(30, 73, 45);
     border-radius: 3px;
     position: relative;
     cursor: pointer;

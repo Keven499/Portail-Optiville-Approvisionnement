@@ -24,6 +24,7 @@
 @inject ContactsService contactsService
 @inject IJSRuntime JSRuntime
 @inject PieceJointeFormModel pieceJointeFormModel
+
 @inject ProtectedSessionStorage protectedSessionStorage
 @inject NavigationManager NavigationManager
 @inject ICookie cookie
@@ -36,7 +37,7 @@
     @if (isLoading)
     {
         <div class="d-flex justify-content-center align-items-center" style="height: 80vh; position: relative;">
-            <div class="spinner-border text-primary me-2" role="status"></div>
+            <div class="spinner-border text-success me-2" role="status"></div>
             <div class="d-flex flex-column">
                 <span class="titre-medium fs-3">Chargement en cours..</span>
             </div>
@@ -1178,7 +1179,7 @@
         }).ToList<IBrowserFile>();
     }
 
-        private async Task Deconnexion()
+    private async Task Deconnexion()
     {
         Usersession[] usersessions;
         string email;

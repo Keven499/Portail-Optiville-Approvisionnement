@@ -32,15 +32,20 @@
             </div>
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="config">
-                    <span class="bi bi-file-text me-2" aria-hidden="true"></span>Admin
+                    <span class="bi bi-file-text me-2" aria-hidden="true"></span>Paramètres
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="modele">
+                    <span class="bi bi-file-text me-2" aria-hidden="true"></span>Modèle de courriels
                 </NavLink>
             </div>
         </div>
-        <div>
+        @* <div>
             <div class="nav-item px-3">
                 <button class="btn bg-vert text-white texte-bold" style="width: 200px" @onclick="Deconnexion">Déconnexion</button>
             </div> 
-        </div>
+        </div> *@
     </nav>
 </div>
 
@@ -51,7 +56,7 @@
     {
         collapseNavMenu = !collapseNavMenu;
     }
-    private async Task Deconnexion()
+    @* private async Task Deconnexion()
     {
         Usersession[] usersessions;
         string email;
@@ -98,5 +103,5 @@
         // await _context.SaveChangesAsync();
         
         NavigationManager.NavigateTo("/", true);
-    } 
+    }  *@
 }

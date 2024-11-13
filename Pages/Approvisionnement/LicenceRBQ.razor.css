@@ -5,10 +5,10 @@
     background: #f1f1f1;
 }
 ::-webkit-scrollbar-thumb {
-    background: rgb(120, 198, 224);
+    background: rgb(99, 188, 85);
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: rgb(11, 35, 65);
+    background: rgb(30, 73, 45);
 }
 .overflow-auto {
     height: 192px;
