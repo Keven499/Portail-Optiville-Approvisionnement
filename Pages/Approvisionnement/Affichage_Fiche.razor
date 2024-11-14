@@ -69,7 +69,15 @@
                             </div>
                         </div>
                     </div>
+@*Apparait lorsqu'on change l'état de la fiche*@
                     <div class="card-body border-vertFonce">
+                    @if(isConfirmed)
+                    {
+                        <div class="alert alert-success m-1" role="alert">
+                            <h5 class="alert-heading">Le statut de la fiche a été changé!</h5>
+                            <p class="mb-0">L'entreprise sera avisée par courriel.</p>
+                        </div>
+                    }
                         <div class="row d-flex align-items-start">
                             <div class="col-xl-6 col-lg-6 col-sm-12 col-12">                      
                                 <div class="row mb-3">
@@ -77,11 +85,10 @@
                                         <label class="vertFonce texte-bold mb-0 mb-md-0 me-md-3" for="selectEtat">État</label>       
                                         <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
                                         <select value="@currentValue" @onchange="ConfirmChange" class="form-select input-vert texte-light rounded-0 py-1" style="width: 200px;" id="selectEtat">
-                                            <option value="0" disabled>Choisir un état</option>
+                                            <option value="En attente" disabled>En attente</option>
+                                            <option value="À réviser" disabled>À réviser</option>
                                             <option value="Accepté">Accepté</option>
                                             <option value="Refusé">Refusé</option>
-                                            <option value="En attente">En attente</option>
-                                            <option value="À réviser">À réviser</option>
                                         </select> 
                                     </div>
                                 </div>
@@ -643,6 +650,7 @@
 #region Variables
     private bool isRefused = false;
     private string strRaisonRefus = "";
+    private bool isConfirmed = false;
     private bool isLoading = true;
     [Parameter]
     public int? Id { get; set; }
@@ -1070,7 +1078,13 @@
         isLoading = false;
         
         // Initialise `currentValue` avec l'état de la demande actuelle
-        currentValue = closestHistorique?.EtatDemande ?? "En Attente";
+        var lastHistorique = await _context.Historiques
+            .Where(h => h.Fournisseur == Id)
+            .OrderByDescending(h => h.DateEtatChanged)
+            .FirstOrDefaultAsync();
+
+        currentValue = lastHistorique?.EtatDemande ?? "En attente";
+        Console.WriteLine("currentValue: " + currentValue);
         previousValue = currentValue;
     }
 
@@ -1278,7 +1292,7 @@ private async Task ConfirmChange(ChangeEventArgs e)
             else
             {
                 // Si non confirmé, réinitialise temporairement `currentValue` pour forcer la synchronisation
-                currentValue = "0";  // Valeur temporaire pour "désélectionner" l'élément
+                currentValue = "En attente";  // Valeur temporaire pour "désélectionner" l'élément
                 StateHasChanged();   // Forcer l'interface à mettre à jour
                 await Task.Delay(1); // Pause rapide pour garantir la prise en compte du changement
                 currentValue = previousValue;  // Retourne à la valeur précédente
@@ -1304,6 +1318,7 @@ private async Task ConfirmChange(ChangeEventArgs e)
                     };
                     _context.Historiques.Add(historique);
                     await _context.SaveChangesAsync();
+                    isConfirmed = true;
                 }
                 else
                 {
@@ -1312,28 +1327,36 @@ private async Task ConfirmChange(ChangeEventArgs e)
             }
             else
             {
-                var Token = await cookie.GetValue("SToken");
-                var Email = tokenGenerator.GetValueFromToken(Token).Split(":")[0];
-                var user = await _context.Usersessions.FirstOrDefaultAsync(u => u.OwnerEmail == Email);
-                if(user is not null)
-                {
-                    var historique = new Historique
+                try{
+
+                    var Token = await cookie.GetValue("SToken");
+                    var Email = tokenGenerator.GetValueFromToken(Token).Split(":")[0];
+                    var user = await _context.Usersessions.FirstOrDefaultAsync(u => u.OwnerEmail == Email);
+                    if(user is not null)
                     {
-                        EtatDemande = currentValue,
-                        DateEtatChanged = DateTime.Now,
-                        Fournisseur = Id,
-                        ModifiePar = user.OwnerEmail
-                    };
-                    _context.Historiques.Add(historique);
-                    await _context.SaveChangesAsync();
-                }
-                else
+                        var historique = new Historique
+                        {
+                            EtatDemande = currentValue,
+                            DateEtatChanged = DateTime.Now,
+                            Fournisseur = Id,
+                            ModifiePar = user.OwnerEmail
+                        };
+                        _context.Historiques.Add(historique);
+                        await _context.SaveChangesAsync();
+                        isConfirmed = true;
+                    }
+                    else
+                    {
+                        await JSRuntime.InvokeVoidAsync("alert", "Vous devez vous connecter pour modifier une fiche");
+                        Console.WriteLine("Utilisateur introuvable");
+                        navigationManager.NavigateTo("/",true);
+                    }
+                }catch
                 {
                     await JSRuntime.InvokeVoidAsync("alert", "Vous devez vous connecter pour modifier une fiche");
-                    Console.WriteLine("Utilisateur introuvable");
+                    Console.WriteLine("Erreur lors de la récupération de l'adresse courriel");
                     navigationManager.NavigateTo("/",true);
                 }
-                Console.WriteLine("Erreur lors de la récupération de l'adresse courriel");
             }
                 
     }
