@@ -545,4 +545,55 @@ public partial class A2024420517riGr1Eq6Context : DbContext
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+    public void ExecuteEvent(int _nbJour)
+    {
+        // Étape 1 : Suppression de l'événement s'il existe
+        DeleteEventIfExists();
+
+        // Étape 2 : Création de l'événement
+        string createEventQuery = @"
+            CREATE EVENT IF NOT EXISTS update_etat_to_a_reviser
+            ON SCHEDULE EVERY 1 DAY
+            DO
+            BEGIN
+                DECLARE dynamic_interval INT;
+                SET dynamic_interval = " + _nbJour + @";
+
+                INSERT INTO historique (etatDemande, dateEtatChanged, fournisseur)
+                SELECT 'À reviser', NOW(), fournisseur
+                FROM (
+                    SELECT fournisseur, MAX(dateEtatChanged) AS latest_date
+                    FROM historique 
+                    GROUP BY fournisseur
+                ) AS latest_dates
+                WHERE latest_dates.latest_date < NOW() - INTERVAL dynamic_interval MONTH;
+            END
+        ";
+
+        // Étape 3 : Exécution de l'événement
+        try
+        {
+            Database.ExecuteSqlRaw(createEventQuery);
+            Console.WriteLine("Événement créé avec succès.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erreur lors de la création de l'événement : {ex.Message}");
+        }
+    }
+    public void DeleteEventIfExists()
+{
+    // Commande SQL pour supprimer l'événement s'il existe
+    string dropEventQuery = "DROP EVENT IF EXISTS update_etat_to_a_reviser;";
+    
+    try
+    {
+        Database.ExecuteSqlRaw(dropEventQuery);
+        Console.WriteLine("Événement supprimé avec succès.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Erreur lors de la suppression de l'événement : {ex.Message}");
+    }
+}
 }

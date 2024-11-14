@@ -2,8 +2,7 @@
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.EntityFrameworkCore
 @using Portail_OptiVille.Data.Models
-@using System.Text.RegularExpressions;
-@inject A2024420517riGr1Eq6Context _context
+@using System.Text.RegularExpressions
 @using Portail_OptiVille.Data.FormModels
 @using Portail_OptiVille.Data.Exceptions
 @using Portail_OptiVille.Data.Services
@@ -12,6 +11,7 @@
 @using Portail_OptiVille.Pages.Approvisionnement.Contact
 @using System.Linq.Expressions
 @using System.Timers
+@inject A2024420517riGr1Eq6Context _context
 @inject ProtectedSessionStorage ProtectedSessionStore
 @inject NavigationManager navigationManager
 @inject FichierService fichierService
@@ -24,7 +24,6 @@
 @inject ContactsService contactsService
 @inject IJSRuntime JSRuntime
 @inject PieceJointeFormModel pieceJointeFormModel
-
 @inject ProtectedSessionStorage protectedSessionStorage
 @inject NavigationManager NavigationManager
 @inject ICookie cookie
@@ -1147,10 +1146,22 @@
 
     private async Task DeleteFiche()
     {
-        await historiqueService.AddHistoriqueRefuser(selectedFournisseur.IdFournisseur, "Vous avez supprimé votre fiche");//A mettre un message que l'admin peut changer
+        var result = await ProtectedSessionStore.GetAsync<string>("Email");
+        if(!result.Success)
+        {
+            var token = await cookie.GetValue("SToken");
+            if(!string.IsNullOrEmpty(token))
+            {
+                var email = tokenGenerator.GetValueFromToken(token).Split(":")[0];
+                await historiqueService.ModifyEtat("Désactivée",selectedFournisseur.IdFournisseur, email, null, null, null);//A mettre un message que l'admin peut changer
+            }
+        }
+        else
+        {
+            await historiqueService.ModifyEtat("Désactivée",selectedFournisseur.IdFournisseur, result.Value, null, null, null);//A mettre un message que l'admin peut changer
+            
+        }
         await fichierService.DeleteAllFichiersData(selectedFichiers);
-        //closestHistorique.EtatDemande = "Refusé";
-        //closestHistorique.DateEtatChanged = DateTime.UtcNow;
         selectedFichiers.Clear();// A enlever si on peut changer les donnnes sans refresh la page
     }
 

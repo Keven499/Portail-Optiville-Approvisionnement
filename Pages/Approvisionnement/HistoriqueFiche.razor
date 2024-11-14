@@ -21,28 +21,33 @@
             </div>
             @foreach (var historiqueChange in historiqueFiche)
             {
-                <div class="row">
+                <div class="row my-1">
                     <div class="col-4">@historiqueChange.DateEtatChanged</div>
                     <div class="col-4">
-                        @* ATTENTION, LES DONNÉES DE LA BD POUR LE ENUM NE REFLÈTENT PLUS LE CODE *@
-                        @switch (historiqueChange.EtatDemande)
-                        {
-                            case "Accepté": <i class="bi bi-check-circle me-2"></i>
-                                break;
-                            case "Refusé": <i class="bi bi-x-circle me-2"></i>
-                                break;
-                            case "En attente": <i class="bi bi-dash-circle me-2"></i>
-                                break;
-                            case "À réviser": <i class="bi bi-exclamation-circle me-2"></i>  
-                                break;
-                            case "Modifiée": <i class="bi bi-pencil me-1"></i>
-                                break;
-                            case "Désactivée": <i class="bi bi-slash-circle"></i>     
-                                break;
-                        }
-                        @historiqueChange.EtatDemande
-                        </div>
-                    <div class="col-4">NA</div>
+                        <button type="button"
+                            style="font-size: 14px; height: 30px;"
+                            class="btn bg-vert d-flex align-items-center texte-light fw-bold text-white"
+                            id="btnVert">
+                                @* ATTENTION, LES DONNÉES DE LA BD POUR LE ENUM NE REFLÈTENT PLUS LE CODE *@
+                                @switch (historiqueChange.EtatDemande)
+                                {
+                                    case "Accepté": <i class="bi bi-check-circle me-2"></i>
+                                        break;
+                                    case "Refusé": <i class="bi bi-x-circle me-2"></i>
+                                        break;
+                                    case "En attente": <i class="bi bi-dash-circle me-2"></i>
+                                        break;
+                                    case "À réviser": <i class="bi bi-exclamation-circle me-2"></i>  
+                                        break;
+                                    case "Modifiée": <i class="bi bi-pencil me-2"></i>
+                                        break;
+                                    case "Désactivée": <i class="bi bi-slash-circle me-2"></i>     
+                                        break;
+                                }    
+                                @historiqueChange.EtatDemande                  
+                        </button>
+                    </div>    
+                    <div class="col-4">@historiqueChange.ModifiePar</div>
                 </div>
             }
         </div>
@@ -52,7 +57,7 @@
 @code{
     @* [Parameter]
     public int idFournisseur { get; set; } = 63; *@
-    private int idFournisseur = 74;
+    private int idFournisseur = 63;
     private List<Historique> historiqueFiche = new List<Historique>();
 
     protected override async Task OnInitializedAsync()
