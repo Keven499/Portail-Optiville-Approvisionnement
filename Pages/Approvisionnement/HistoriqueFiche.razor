@@ -19,17 +19,12 @@
                 <div class="col-4">État de la demande</div>
                 <div class="col-4">Modifié par</div>
             </div>
-            @*
-                BOUCLE LISTANT LES CHANGEMENTS
-                ICÔNES:
-                DÉSACTIVER  <i class="bi bi-slash-circle"></i>    
-                MODIFIER    <i class="bi bi-pencil me-1"></i>
-            *@
             @foreach (var historiqueChange in historiqueFiche)
             {
                 <div class="row">
                     <div class="col-4">@historiqueChange.DateEtatChanged</div>
                     <div class="col-4">
+                        @* ATTENTION, LES DONNÉES DE LA BD POUR LE ENUM NE REFLÈTENT PLUS LE CODE *@
                         @switch (historiqueChange.EtatDemande)
                         {
                             case "Accepté": <i class="bi bi-check-circle me-2"></i>
@@ -39,6 +34,10 @@
                             case "En attente": <i class="bi bi-dash-circle me-2"></i>
                                 break;
                             case "À réviser": <i class="bi bi-exclamation-circle me-2"></i>  
+                                break;
+                            case "Modifiée": <i class="bi bi-pencil me-1"></i>
+                                break;
+                            case "Désactivée": <i class="bi bi-slash-circle"></i>     
                                 break;
                         }
                         @historiqueChange.EtatDemande
