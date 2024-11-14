@@ -12,6 +12,25 @@ namespace Portail_OptiVille.Data.Services
             _context = context;
         }
 
+        // CETTE MÉTHODE DOIT ÊTRE APPELER À CHAQUE MODIFICATION D'ÉTAT
+        public async Task ModifyEtat(string _etat, int _idFournisseur, string _raisonRefus, string? _modifiePar = null, string? _retirer = null, string? _modifier = null)
+        {
+            if (_idFournisseur == -1)
+            {
+                _idFournisseur = await _context.Fournisseurs.MaxAsync(f => (int)f.IdFournisseur);
+            }
+            var historique = new Historique
+            {
+                EtatDemande = _etat,
+                Fournisseur = _idFournisseur,
+                RaisonRefus = _raisonRefus,
+                DateEtatChanged = DateTime.UtcNow
+            };
+
+             _context.Historiques.Add(historique);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task AddHistoriqueRefuser(int _idFournisseur, string _raisonRefus)
         {
             var historique = new Historique
