@@ -107,14 +107,19 @@
                                     </div>
                                 </div>
                             </div>
+                            @if(isRefused)
+                            {
+
                             <div class="col-xl-6 col-lg-6 col-sm-12 col-12">
                                 <div class="row mb-3">
                                     <div class="col-xl-11 col-lg-11 col-sm-12 col-12 d-flex flex-column align-items-start">
                                         <label class="vertFonce texte-bold" for="reason">Raison du refus</label>
-                                        <textarea id="reason" class="form-control w-100 input-vert texte-light" rows="4" style="resize: none; height: 100%;"></textarea>
+                                        <textarea @bind=strRaisonRefus id="reason" class="form-control w-100 input-vert texte-light" rows="4" style="resize: none; height: 100%;"></textarea>
+                                        <button id="btnVert" class="btn bg-vert text-white texte-bold" style="width: 200px" @onclick="ConfirmRefus"><i class="bi bi-box-arrow-left me-1"></i>Soumettre</button>
                                     </div>  
                                 </div>                
                             </div>
+                            }
                         </div> 
                         @if (FinanceInfoNull)
                         {
@@ -603,7 +608,6 @@
     </div>
     }
 </div>
-
 <script src="@popperScript"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
 <script>
@@ -636,6 +640,9 @@
 </script>
 
 @code{
+#region Variables
+    private bool isRefused = false;
+    private string strRaisonRefus = "";
     private bool isLoading = true;
     [Parameter]
     public int? Id { get; set; }
@@ -698,6 +705,7 @@
     private Dictionary<string, bool> selectedCurrentCategorieRBQ = new Dictionary<string, bool>();
     private EditContext editContext;
     private bool isSubmit = false;
+#endregion
     public class CombinedFormModel
     {
         public CoordonneeFormModel CoordonneeFormModel { get; set; }
@@ -733,6 +741,7 @@
             IdentificationFormModel = new IdenticationFormModel();
         }
     }
+#region Modals
     private async Task ShowContactModalAsync()
     {
         await JSRuntime.InvokeVoidAsync("showBootstrapModal", "ContactModal");
@@ -741,6 +750,8 @@
     {
         await JSRuntime.InvokeVoidAsync("showBootstrapModal", "ModifierModalPieceJointe");
     }
+#endregion
+#region EditComponents+Save
     private void ModifcationFinances()
     {
         modificationFinances = false;
@@ -813,7 +824,7 @@
         modificationInfo = true;
         
     }
-
+#endregion
     public class GroupKey
     {
         public string? CodeCategorie { get; set; }
@@ -1247,17 +1258,22 @@ private async Task ConfirmChange(ChangeEventArgs e)
     {
         string? newValue = e.Value?.ToString();
         // Appel de la fonction JavaScript pour confirmer le changement
-        if(newValue != "Resusé")
-        {
             var isConfirmed = await JSRuntime.InvokeAsync<bool>("confirmSelectionChange");
 
             if (isConfirmed)
             {
-                // Si confirmé, on met à jour `previousValue` avec `newValue`
-                previousValue = newValue;
-                currentValue = newValue;
-                await MyConfirmedMethod();
-                _context.Database.ExecuteSqlRaw("}");
+                if(newValue != "Refusé")
+                {
+                    // Si confirmé, on met à jour `previousValue` avec `newValue`
+                    isRefused = false;
+                    previousValue = newValue;
+                    currentValue = newValue;
+                    await MyConfirmedMethod();
+                }
+                else
+                {
+                    isRefused = true;
+                }
             }
             else
             {
@@ -1268,23 +1284,78 @@ private async Task ConfirmChange(ChangeEventArgs e)
                 currentValue = previousValue;  // Retourne à la valeur précédente
                 StateHasChanged();
             }
-        }
     }
 
-    private Task MyConfirmedMethod()
+    private async Task MyConfirmedMethod()
     {
+            var result = await protectedSessionStorage.GetAsync<string>("Email");
+            if(result.Success)
+            {
+                var email = result.Value;
+                var user = await _context.Usersessions.FirstOrDefaultAsync(u => u.OwnerEmail == email);
+                if(user is not null)
+                {
+                    var historique = new Historique
+                    {
+                        EtatDemande = currentValue,
+                        DateEtatChanged = DateTime.Now,
+                        Fournisseur = Id,
+                        ModifiePar = user.OwnerEmail
+                    };
+                    _context.Historiques.Add(historique);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    Console.WriteLine("Utilisateur introuvable");
+                }
+            }
+            else
+            {
+                var Token = await cookie.GetValue("SToken");
+                var Email = tokenGenerator.GetValueFromToken(Token).Split(":")[0];
+                var user = await _context.Usersessions.FirstOrDefaultAsync(u => u.OwnerEmail == Email);
+                if(user is not null)
+                {
+                    var historique = new Historique
+                    {
+                        EtatDemande = currentValue,
+                        DateEtatChanged = DateTime.Now,
+                        Fournisseur = Id,
+                        ModifiePar = user.OwnerEmail
+                    };
+                    _context.Historiques.Add(historique);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    await JSRuntime.InvokeVoidAsync("alert", "Vous devez vous connecter pour modifier une fiche");
+                    Console.WriteLine("Utilisateur introuvable");
+                    navigationManager.NavigateTo("/",true);
+                }
+                Console.WriteLine("Erreur lors de la récupération de l'adresse courriel");
+            }
+                
+    }
 
-        Historique? historique = _context.Historiques.FirstOrDefault(h => h.Fournisseur == selectedFournisseur.IdFournisseur);
-        if(historique != null)
+    private async Task ConfirmRefus()
+    {
+        var isConfirmed = await JSRuntime.InvokeAsync<bool>("confirmRefus");
+
+        if (isConfirmed)
         {
-            historique.DateEtatChanged = DateTime.Now;
-            historique.EtatDemande = currentValue;
-            _context.SaveChanges();
+            Historique? historique = _context.Historiques.FirstOrDefault(h => h.Fournisseur == selectedFournisseur.IdFournisseur);
+            if(historique is not null)
+            {
+                historique.DateEtatChanged = DateTime.Now;
+                historique.EtatDemande = "Refusé";
+                historique.RaisonRefus = strRaisonRefus;
+                _context.SaveChanges();
+            }
+            else
+            {
+                Console.WriteLine("Historique introuvable");
+            }
         }
-        else{
-            Console.WriteLine("Historique introuvable");
-        }
-        // Logique à implémenter plus tard
-        return Task.CompletedTask;
     }
 }
