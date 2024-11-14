@@ -88,6 +88,7 @@
     private async Task SaveConfig()
     {
         await configService.ModifierConfig(allConfigs);
+        _context.ExecuteEvent(allConfigs.DelaiRevision);
         isEditing = false; 
         saveSuccess = true; 
         StateHasChanged();
