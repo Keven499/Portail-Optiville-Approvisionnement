@@ -830,6 +830,7 @@
         await coordonneeService.UpdateCoordonneeData(combinedFormModel.CoordonneeFormModel);
 
         modificationInfo = true;
+        
     }
 #endregion
     public class GroupKey
@@ -946,7 +947,6 @@
     }
     protected override async Task OnInitializedAsync()
     {
-        
         editContext = new EditContext(financeFormModel);
         editContext.OnValidationStateChanged += (sender, args) => StateHasChanged();
         try
