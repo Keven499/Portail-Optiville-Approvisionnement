@@ -1236,23 +1236,27 @@ private async Task ConfirmChange(ChangeEventArgs e)
     {
         string? newValue = e.Value?.ToString();
         // Appel de la fonction JavaScript pour confirmer le changement
-        var isConfirmed = await JSRuntime.InvokeAsync<bool>("confirmSelectionChange");
+        if(newValue != "Resusé")
+        {
+            var isConfirmed = await JSRuntime.InvokeAsync<bool>("confirmSelectionChange");
 
-        if (isConfirmed)
-        {
-            // Si confirmé, on met à jour `previousValue` avec `newValue`
-            previousValue = newValue;
-            currentValue = newValue;
-            await MyConfirmedMethod();
-        }
-        else
-        {
-            // Si non confirmé, réinitialise temporairement `currentValue` pour forcer la synchronisation
-            currentValue = "0";  // Valeur temporaire pour "désélectionner" l'élément
-            StateHasChanged();   // Forcer l'interface à mettre à jour
-            await Task.Delay(1); // Pause rapide pour garantir la prise en compte du changement
-            currentValue = previousValue;  // Retourne à la valeur précédente
-            StateHasChanged();
+            if (isConfirmed)
+            {
+                // Si confirmé, on met à jour `previousValue` avec `newValue`
+                previousValue = newValue;
+                currentValue = newValue;
+                await MyConfirmedMethod();
+                _context.Database.ExecuteSqlRaw("}");
+            }
+            else
+            {
+                // Si non confirmé, réinitialise temporairement `currentValue` pour forcer la synchronisation
+                currentValue = "0";  // Valeur temporaire pour "désélectionner" l'élément
+                StateHasChanged();   // Forcer l'interface à mettre à jour
+                await Task.Delay(1); // Pause rapide pour garantir la prise en compte du changement
+                currentValue = previousValue;  // Retourne à la valeur précédente
+                StateHasChanged();
+            }
         }
     }
 
