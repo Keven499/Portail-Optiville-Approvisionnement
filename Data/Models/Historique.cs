@@ -15,5 +15,11 @@ public partial class Historique
 
     public int? Fournisseur { get; set; }
 
+    public string? ModifiePar { get; set; }
+
+    public string? Retirer { get; set; }
+
+    public string? Ajouter { get; set; }
+
     public virtual Fournisseur? FournisseurNavigation { get; set; }
 }
