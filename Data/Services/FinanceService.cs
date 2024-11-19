@@ -36,8 +36,9 @@ namespace Portail_OptiVille.Data.Services
                 }
                 oldJSON = oldJSON.TrimEnd(',') + "}";
                 newJSON = newJSON.TrimEnd(',') + "}";
+                // WHO MODIFIED IT?
                 historiqueService.ModifyEtat("Modifiée", IdFournisseur, null, null, oldJSON, newJSON);
-
+                
                 finance.NumeroTps = financeFormModel.NumeroTps;
                 finance.NumeroTvq = financeFormModel.NumeroTvq;
                 finance.Devise = financeFormModel.Devise;
