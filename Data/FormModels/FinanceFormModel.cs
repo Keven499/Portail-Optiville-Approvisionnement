@@ -12,10 +12,11 @@ namespace Portail_OptiVille.Data.FormModels {
         [Required(ErrorMessage = "TVQ requis")]
         public string NumeroTvq { get; set; }
 
+        [Required(ErrorMessage = "Devise requise")]
         public string? Devise { get; set; }
         [Required(ErrorMessage = "Condition requise")]
-        
         public string? ConditionPaiement { get; set; }
+        [Required(ErrorMessage = "Mode requis")]
         public string? ModeCommunication { get; set; }
         public int? IdFournisseur { get; set; }
 

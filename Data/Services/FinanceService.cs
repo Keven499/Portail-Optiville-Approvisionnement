@@ -1,9 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Portail_OptiVille.Data.FormModels;
 using Portail_OptiVille.Data.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Portail_OptiVille.Data.Services
 {
@@ -17,13 +14,13 @@ namespace Portail_OptiVille.Data.Services
             _context = context;
         }
 
-        public async Task UpdateFinanceData(FinanceFormModel financeFormModel, int IdFournisseur)
+        public async Task UpdateFinanceData(FinanceFormModel financeFormModel, int IdFournisseur, string email)
         {
             var finance = await _context.Finances.FindAsync(financeFormModel.IdFinance);
             if(finance != null) {
                 // FAIRE LA COMPARAISON ENTRE LA OLD DATA ET LA NOUVELLE DATA
                 string[] oldData = {finance.NumeroTps, finance.NumeroTvq, finance.Devise, finance.ConditionPaiement, finance.ModeCommunication};
-                string[] newData = oldData;
+                string[] newData = {financeFormModel.NumeroTps, financeFormModel.NumeroTvq, financeFormModel.Devise, financeFormModel.ConditionPaiement, financeFormModel.ModeCommunication};
                 string oldJSON = "{";
                 string newJSON = "{";
                 for (int i = 0; i < oldData.Length; i++)
@@ -36,8 +33,7 @@ namespace Portail_OptiVille.Data.Services
                 }
                 oldJSON = oldJSON.TrimEnd(',') + "}";
                 newJSON = newJSON.TrimEnd(',') + "}";
-                // WHO MODIFIED IT?
-                historiqueService.ModifyEtat("Modifiée", IdFournisseur, null, null, oldJSON, newJSON);
+                await historiqueService.ModifyEtat("Modifiée", IdFournisseur, email, null, oldJSON, newJSON);
                 
                 finance.NumeroTps = financeFormModel.NumeroTps;
                 finance.NumeroTvq = financeFormModel.NumeroTvq;

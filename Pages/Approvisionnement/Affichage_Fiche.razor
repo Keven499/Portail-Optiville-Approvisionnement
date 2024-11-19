@@ -574,10 +574,14 @@
                                                 <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
                                                 <select class="form-select @GetInputClass(() => financeFormModel.ModeCommunication) input-vert texte-light py-1" id="inputModeComm" @bind="@financeFormModel.ModeCommunication"
                                                         style="@(modificationFinances ? "pointer-events: none;" : null) width: 325px; ">
+                                                    <option value="">Choisir une option</option>
                                                     <option value="Courriel">Courriel</option>
                                                     <option value="Courrier régulier">Courrier régulier</option>
                                                 </select>                                            
                                             </div>
+                                            <div class="col-xl-11 d-xl-flex justify-content-xl-end col-lg-11 d-lg-flex justify-content-lg-end col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12 mt-1">
+                                                @((MarkupString)GetValidationHTML(() => financeFormModel.ModeCommunication))
+                                            </div> 
                                         </div>
                                         <div class="row mb-3">
                                             <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
@@ -585,10 +589,14 @@
                                                 <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
                                                 <select class="form-select @GetInputClass(() => financeFormModel.Devise) input-vert texte-light py-1" id="inputDevise" @bind="@financeFormModel.Devise"
                                                         style="@(modificationFinances ? "pointer-events: none;" : null) width: 325px;">
+                                                    <option value="">Choisir une option</option>
                                                     <option value="CAD">CAD</option>
                                                     <option value="USD">USD</option>
                                                 </select>                                            
                                             </div>
+                                            <div class="col-xl-11 d-xl-flex justify-content-xl-end col-lg-11 d-lg-flex justify-content-lg-end col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12 mt-1">
+                                                @((MarkupString)GetValidationHTML(() => financeFormModel.Devise))
+                                            </div> 
                                         </div>
                                         <div class="row mb-3">
                                             <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
@@ -596,14 +604,17 @@
                                                 <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
                                                 <select class="form-select @GetInputClass(() => financeFormModel.ConditionPaiement) input-vert texte-light py-1" id="inputCondPaiement" @bind="@financeFormModel.ConditionPaiement" readonly="@modificationFinances"
                                                     style="@(modificationFinances ? "pointer-events: none;" : null)width: 325px;">
+                                                    <option value="">Choisir une option</option>
                                                     @foreach (var item in listConditionPaiement)
                                                     {
-                                                        <option value="item">@item</option>
+                                                        <option value="@item">@item</option>
                                                     }
                                                 </select>                                           
                                             </div>
+                                            <div class="col-xl-11 d-xl-flex justify-content-xl-end col-lg-11 d-lg-flex justify-content-lg-end col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12 mt-1">
+                                                @((MarkupString)GetValidationHTML(() => financeFormModel.ConditionPaiement))
+                                            </div>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
@@ -811,8 +822,11 @@
         if (isValid)
         {
             await financeService.UpdateFinanceData(financeFormModel, selectedFournisseur.IdFournisseur);
-            modificationFinances = true;
-        }
+            modificationFinances = true; 
+            @* editContext = new EditContext(financeFormModel);
+            editContext.NotifyValidationStateChanged();
+            StateHasChanged(); *@
+        } 
     }
 
     private async Task SaveContact()
@@ -867,7 +881,7 @@
         return groupedCategories;
     }
 
-    @* protected override async Task OnAfterRenderAsync(bool firstRender){
+    protected override async Task OnAfterRenderAsync(bool firstRender){
         try{
             var result = await protectedSessionStorage.GetAsync<string>("Email");
             if (!result.Success || string.IsNullOrEmpty(result.Value))
@@ -880,7 +894,7 @@
             //navigationManager.NavigateTo("/Connexion",true);
         }
 
-    } *@
+    } 
 
     public class ContactPhoneInfo
     {
