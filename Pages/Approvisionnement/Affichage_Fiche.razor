@@ -190,14 +190,15 @@
                                         </div>
                                         <div class="row mb-3 pb-1">
                                             <div class="col-xl-12 d-xl-flex justify-content-xl-end col-lg-12 d-lg-flex justify-content-lg-end col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
-                                                <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="inputEmail4" @bind="telephone.NoTelEntreprise">
+                                                <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="inputEmail4" @bind="telephone.NoTelEntreprise" readonly="@modificationInfo">
                                             </div>
                                         </div>
                                         <div class="row mb-3">
                                             <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
                                                 <label for="inputPassword4" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">Poste</label>
                                                 <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
-                                                <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="inputEmail4" @bind="telephone.PosteTelEntreprise">                                </div>
+                                                <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="inputEmail4" @bind="telephone.PosteTelEntreprise" readonly="@modificationInfo">                                
+                                            </div>
                                         </div>
                                     }
                                 </div>
