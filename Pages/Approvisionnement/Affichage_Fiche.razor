@@ -12,7 +12,6 @@
 @using System.Linq.Expressions
 @using System.Timers
 @inject A2024420517riGr1Eq6Context _context
-@inject ProtectedSessionStorage ProtectedSessionStore
 @inject NavigationManager navigationManager
 @inject FichierService fichierService
 @inject HistoriqueService historiqueService
@@ -871,7 +870,7 @@
 
     @* protected override async Task OnAfterRenderAsync(bool firstRender){
         try{
-            var result = await ProtectedSessionStore.GetAsync<string>("Email");
+            var result = await protectedSessionStorage.GetAsync<string>("Email");
             if (!result.Success || string.IsNullOrEmpty(result.Value))
             {
                 throw new UserNotAuthenticatedException("Employé non connecté ou session expirée.");
@@ -1172,7 +1171,7 @@
 
     private async Task DeleteFiche()
     {
-        var result = await ProtectedSessionStore.GetAsync<string>("Email");
+        var result = await protectedSessionStorage.GetAsync<string>("Email");
         if(!result.Success)
         {
             var token = await cookie.GetValue("SToken");
