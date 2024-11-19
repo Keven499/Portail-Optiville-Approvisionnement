@@ -9,10 +9,11 @@ namespace Portail_OptiVille.Data.Services
     public class IdentificationService
     {
         private readonly A2024420517riGr1Eq6Context _context;
-
-        public IdentificationService(A2024420517riGr1Eq6Context context)
+        private HistoriqueService _historiqueService;
+        public IdentificationService(A2024420517riGr1Eq6Context context, HistoriqueService historiqueService)
         {
             _context = context;
+            _historiqueService = historiqueService;
         }
 
         private string HashPassword(string password)
@@ -53,14 +54,30 @@ namespace Portail_OptiVille.Data.Services
             }
         }
 
-        public async Task UpdateIdentificationData(IdenticationFormModel identicationFormModel)
+        public async Task UpdateIdentificationData(IdenticationFormModel identicationFormModel, string email)
         {
             var identification = await _context.Identifications.FindAsync(identicationFormModel.IdIdentification);
+            string[] oldData = {identification.Neq, identification.NomEntreprise, identification.AdresseCourriel};
+            string[] newData = {identicationFormModel.NEQ, identicationFormModel.NomEntreprise, identicationFormModel.CourrielEntreprise};
+            string[] keyData = {"NEQ", "Nom de l'entreprise", "Adresse courriel"};
+            string oldJSON = "{\"Section\": \"Identification\",";
+            string newJSON = "{\"Section\": \"Identification\",";
+            for (int i = 0; i < oldData.Length; i++)
+            {
+                if (!oldData[i].Equals(newData[i]))
+                {
+                    oldJSON += $"\"{keyData[i]}\": \"{oldData[i]}\",";
+                    newJSON += $"\"{keyData[i]}\": \"{newData[i]}\",";
+                }
+            }
+            oldJSON = oldJSON.TrimEnd(',') + "}";
+            newJSON = newJSON.TrimEnd(',') + "}";
+            await _historiqueService.ModifyEtat("Modifiée", (int)identification.Fournisseur, email, null, oldJSON, newJSON);
             identification.Neq = identicationFormModel.NEQ;
             identification.NomEntreprise = identicationFormModel.NomEntreprise;
             identification.AdresseCourriel = identicationFormModel.CourrielEntreprise;
             identification.MotDePasse = identicationFormModel.MotDePasse;
-
+            
             _context.Identifications.Update(identification);
             await _context.SaveChangesAsync();
         }

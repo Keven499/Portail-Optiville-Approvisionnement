@@ -658,7 +658,8 @@
 </script>
 
 @code{
-#region Variables
+#region Variables¸
+    private string email = string.Empty;
     private bool isRefused = false;
     private string strRaisonRefus = "";
     private bool isConfirmed = false;
@@ -822,7 +823,7 @@
         bool isValid = TriggerValidation();
         if (isValid)
         {
-            await financeService.UpdateFinanceData(financeFormModel, selectedFournisseur.IdFournisseur);
+            await financeService.UpdateFinanceData(financeFormModel, selectedFournisseur.IdFournisseur, email);
             modificationFinances = true; 
             @* editContext = new EditContext(financeFormModel);
             editContext.NotifyValidationStateChanged();
@@ -840,7 +841,7 @@
 
     private async Task SaveModifcationInfo()
     {
-        await identificationService.UpdateIdentificationData(combinedFormModel.IdentificationFormModel);
+        await identificationService.UpdateIdentificationData(combinedFormModel.IdentificationFormModel, email);
         await coordonneeService.UpdateCoordonneeData(combinedFormModel.CoordonneeFormModel);
 
         modificationInfo = true;
@@ -883,18 +884,22 @@
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender){
-        try{
+        try {
             var result = await protectedSessionStorage.GetAsync<string>("Email");
             if (!result.Success || string.IsNullOrEmpty(result.Value))
             {
                 throw new UserNotAuthenticatedException("Employé non connecté ou session expirée.");
             }
-        }catch(UserNotAuthenticatedException ex)
+            else {
+                // JE VEUX L'EMAIL
+                email = result.Value;
+            }
+        } 
+        catch(UserNotAuthenticatedException ex)
         {
             Console.WriteLine($"Erreur lors de la récupération de l'adresse courriel: {ex.Message}");
-            //navigationManager.NavigateTo("/Connexion",true);
+            navigationManager.NavigateTo("/",true);
         }
-
     } 
 
     public class ContactPhoneInfo

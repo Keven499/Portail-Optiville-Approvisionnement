@@ -1,6 +1,7 @@
 @page "/historiqueFiche"
 @using Microsoft.EntityFrameworkCore
 @using Portail_OptiVille.Data.Models
+@using System.Text.Json;
 @inject A2024420517riGr1Eq6Context _context
 
 @*
@@ -27,7 +28,9 @@
                         <button type="button"
                             style="font-size: 14px; height: 30px;"
                             class="btn bg-vert d-flex align-items-center texte-light fw-bold text-white"
-                            id="btnVert">
+                            id="btnVert"
+                            >
+                            @* @onclick="EventCallback.Factory.Create(this, () => FetchModifiedData(historiqueChange.IdHistorique))" *@
                                 @* ATTENTION, LES DONNÉES DE LA BD POUR LE ENUM NE REFLÈTENT PLUS LE CODE *@
                                 @switch (historiqueChange.EtatDemande)
                                 {
@@ -44,12 +47,56 @@
                                     case "Désactivée": <i class="bi bi-slash-circle me-2"></i>     
                                         break;
                                 }    
-                                @historiqueChange.EtatDemande                  
+                                @historiqueChange.EtatDemande           
+                                      
                         </button>
                     </div>    
                     <div class="col-4">@historiqueChange.ModifiePar</div>
                 </div>
             }
+            @* @if (historiqueModifiedData.Any())
+            {
+                foreach (var modifDataRecord in historiqueModifiedData)
+                {
+                    Dictionary<string, string> dataAdd = null;
+                    Dictionary<string, string> dataRemove = null;
+
+                    // Deserialize the JSON strings for 'Ajouter' and 'Retirer'
+                    dataAdd = JsonSerializer.Deserialize<Dictionary<string, string>>(modifDataRecord.Ajouter);
+                    dataRemove = JsonSerializer.Deserialize<Dictionary<string, string>>(modifDataRecord.Retirer);
+
+                    <div class="row">
+                        <div class="col-6">
+                            <h5>Ajouter</h5>
+                            @if (dataAdd != null && dataAdd.Any())
+                            {
+                                @foreach (var entry in dataAdd)
+                                {
+                                    <p><strong>@entry.Key:</strong> @entry.Value</p>
+                                }
+                            }
+                            else
+                            {
+                                <p>No data available</p>
+                            }
+                        </div>
+                        <div class="col-6">
+                            <h5>Retirer</h5>
+                            @if (dataRemove != null && dataRemove.Any())
+                            {
+                                @foreach (var entry in dataRemove)
+                                {
+                                    <p><strong>@entry.Key:</strong> @entry.Value</p>
+                                }
+                            }
+                            else
+                            {
+                                <p>No data available</p>
+                            }
+                        </div>
+                    </div>
+                }               
+            } *@
         </div>
     </div>
 </div>
@@ -57,13 +104,33 @@
 @code{
     @* [Parameter]
     public int idFournisseur { get; set; } = 63; *@
-    private int idFournisseur = 63;
+    private int idFournisseur = 74;
     private List<Historique> historiqueFiche = new List<Historique>();
+    private List<HistoriqueModifiedDataDTO> historiqueModifiedData;
 
     protected override async Task OnInitializedAsync()
     {
         historiqueFiche = await _context.Historiques
-                                         .Where(h => h.Fournisseur == idFournisseur)
-                                         .ToListAsync();
+                                        .Where(h => h.Fournisseur == idFournisseur)
+                                        .ToListAsync();
+        // You are calling FetchModifiedData for a fixed `historiqueId` (69)
+    }
+
+    private async Task FetchModifiedData(int historiqueId)
+    {
+        historiqueModifiedData = await _context.Historiques
+            .Where(h => h.IdHistorique == historiqueId)
+            .Select(h => new HistoriqueModifiedDataDTO
+            {
+                Retirer = h.Retirer,
+                Ajouter = h.Ajouter
+            })
+            .ToListAsync();
+    }
+
+    public class HistoriqueModifiedDataDTO
+    {
+        public string Retirer { get; set; }
+        public string Ajouter { get; set; }
     }
 }    

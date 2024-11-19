@@ -1,17 +1,20 @@
 using Microsoft.EntityFrameworkCore;
 using Portail_OptiVille.Data.FormModels;
 using Portail_OptiVille.Data.Models;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace Portail_OptiVille.Data.Services
 {
     public class FinanceService
     {
         private readonly A2024420517riGr1Eq6Context _context;
-        private HistoriqueService historiqueService;
+        private HistoriqueService _historiqueService;
 
-        public FinanceService(A2024420517riGr1Eq6Context context)
+        public FinanceService(A2024420517riGr1Eq6Context context, HistoriqueService historiqueService)
         {
             _context = context;
+            _historiqueService = historiqueService;
         }
 
         public async Task UpdateFinanceData(FinanceFormModel financeFormModel, int IdFournisseur, string email)
@@ -21,19 +24,20 @@ namespace Portail_OptiVille.Data.Services
                 // FAIRE LA COMPARAISON ENTRE LA OLD DATA ET LA NOUVELLE DATA
                 string[] oldData = {finance.NumeroTps, finance.NumeroTvq, finance.Devise, finance.ConditionPaiement, finance.ModeCommunication};
                 string[] newData = {financeFormModel.NumeroTps, financeFormModel.NumeroTvq, financeFormModel.Devise, financeFormModel.ConditionPaiement, financeFormModel.ModeCommunication};
-                string oldJSON = "{";
-                string newJSON = "{";
+                string[] keyData = {"TPS", "TVQ", "Devise", "Conditions de paiement", "Mode de communication"};
+                string oldJSON = "{\"Section\": \"Finance\",";
+                string newJSON = "{\"Section\": \"Finance\",";
                 for (int i = 0; i < oldData.Length; i++)
                 {
-                    if (oldData[i].Equals(newData[i]))
+                    if (!oldData[i].Equals(newData[i]))
                     {
-                        oldJSON += $"\"key{i}\": \"{oldData[i]}\",";
-                        newJSON += $"\"key{i}\": \"{newData[i]}\",";
+                        oldJSON += $"\"{keyData[i]}\": \"{oldData[i]}\",";
+                        newJSON += $"\"{keyData[i]}\": \"{newData[i]}\",";
                     }
                 }
                 oldJSON = oldJSON.TrimEnd(',') + "}";
                 newJSON = newJSON.TrimEnd(',') + "}";
-                await historiqueService.ModifyEtat("Modifiée", IdFournisseur, email, null, oldJSON, newJSON);
+                await _historiqueService.ModifyEtat("Modifiée", IdFournisseur, email, null, oldJSON, newJSON);
                 
                 finance.NumeroTps = financeFormModel.NumeroTps;
                 finance.NumeroTvq = financeFormModel.NumeroTvq;
