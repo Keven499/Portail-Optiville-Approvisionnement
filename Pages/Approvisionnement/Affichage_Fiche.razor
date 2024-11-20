@@ -256,10 +256,10 @@
                                             <label for="regionAdministrative" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">Région administrative</label>
                                             <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
                                             <select class="form-select input-vert texte-light py-1" id="regionAdministrative" @bind="@combinedFormModel.CoordonneeFormModel.RegionAdmEntreprise" style="width: 325px; @(modificationInfo ? "pointer-events: none;" : null)">
-                                                @foreach (string region in listeRegionADM)
-                                                {
-                                                    <option value="@region">@region</option>
-                                                }
+                                            @for (int i = 0; i < listeRegionADM.Count; i++)
+                                            {
+                                                <option value="@listeRegionADM[i]">@listeCodeAdm[i] - @listeRegionADM[i]</option>
+                                            }
                                             </select>
                                         </div>
                                     </div>
@@ -305,7 +305,7 @@
                                             <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
                                                 <label for="courrielInput" class="vertFonce texte-bold">Adresse courriel</label>
                                                 <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
-                                                <InputText id="prenomInput" style="width: 325px; outline: none;" class="form-control input-vert texte-light py-1" @bind-Value="contact.AdresseCourriel" readonly="@modificationContact" />
+                                                <InputText id="courrielInput" style="width: 325px; outline: none;" class="form-control input-vert texte-light py-1" @bind-Value="contact.AdresseCourriel" readonly="@modificationContact" />
                                             </div>
                                         </div>
                                     </div>
@@ -736,10 +736,14 @@
         "Dans les 45 jours sans déduction",
         "Dans les 60 jours sans déduction"
         };
-    private List<string> listeRegionADM = new List<string>{"(01) Bas-Saint-Laurent", "(02) Saguenay-Lac-Saint-Jean", "(03) Capitale-Nationale",
-            "(04) Mauricie", "(05) Estrie", "(06) Montréal", "(07) Outaouais", "(08) Abitibi-Témiscamingue", "(09) Côte-Nord", "(10) Nord-du-Québec",
-            "(11) Gaspésie-Îles-de-la-Madeleine", "(12) Chaudière-Appalaches", "(13) Laval", "(14) Lanaudière", "(15) Laurentides", "(16) Montérégie",
-            "(17) Centre-du-Québec"};
+    private List<string> listeRegionADM = new List<string>{"Bas-Saint-Laurent", "Saguenay-Lac-Saint-Jean", "Capitale-Nationale",
+        "Mauricie", "Estrie", "Montréal", "Outaouais", "Abitibi-Témiscamingue", "Côte-Nord", "Nord-du-Québec",
+        "Gaspésie-Îles-de-la-Madeleine", "Chaudière-Appalaches", "Laval", "Lanaudière", "Laurentides", "Montérégie",
+        "Centre-du-Québec"};
+    private List<string> listeCodeAdm = new List<string>{"(01)", "(02)", "(03)", "(04)", "(05)",
+                                                        "(06)", "(07)", "(08)", "(09)", "(10)",
+                                                        "(11)", "(12)", "(13)", "(14)", "(15)",
+                                                        "(16)", "(17)"};
     private LicenceRBQ LicenceRBQRef;   
     private ContactFormHoster ContactFormHosterRef; 
     public Action<ContactFormHoster>? AssignReferenceContactFormHoster => (contactFormHoster) => ContactFormHosterRef = contactFormHoster;
