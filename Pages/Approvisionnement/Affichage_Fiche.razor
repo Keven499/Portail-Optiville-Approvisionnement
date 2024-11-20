@@ -255,7 +255,12 @@
                                         <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
                                             <label for="regionAdministrative" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">Région administrative</label>
                                             <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
-                                            <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="regionAdministrative" @bind="@combinedFormModel.CoordonneeFormModel.RegionAdmEntreprise" readonly="@modificationInfo">
+                                            <select class="form-select input-vert texte-light py-1" id="regionAdministrative" @bind="@combinedFormModel.CoordonneeFormModel.RegionAdmEntreprise" style="width: 325px; @(modificationInfo ? "pointer-events: none;" : null)">
+                                                @foreach (string region in listeRegionADM)
+                                                {
+                                                    <option value="@region">@region</option>
+                                                }
+                                            </select>
                                         </div>
                                     </div>
                                 </div>                    
@@ -731,6 +736,10 @@
         "Dans les 45 jours sans déduction",
         "Dans les 60 jours sans déduction"
         };
+    private List<string> listeRegionADM = new List<string>{"(01) Bas-Saint-Laurent", "(02) Saguenay-Lac-Saint-Jean", "(03) Capitale-Nationale",
+            "(04) Mauricie", "(05) Estrie", "(06) Montréal", "(07) Outaouais", "(08) Abitibi-Témiscamingue", "(09) Côte-Nord", "(10) Nord-du-Québec",
+            "(11) Gaspésie-Îles-de-la-Madeleine", "(12) Chaudière-Appalaches", "(13) Laval", "(14) Lanaudière", "(15) Laurentides", "(16) Montérégie",
+            "(17) Centre-du-Québec"};
     private LicenceRBQ LicenceRBQRef;   
     private ContactFormHoster ContactFormHosterRef; 
     public Action<ContactFormHoster>? AssignReferenceContactFormHoster => (contactFormHoster) => ContactFormHosterRef = contactFormHoster;
