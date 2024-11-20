@@ -794,6 +794,7 @@
     {
         modificationPieceJointes = true;
         ModifcationPieceJointesActivationONStateMethod();
+        // IMPLÉMENTER LA FEATURE HISTORIQUE EN ENVOYANT EN PARAMÈTRE AU SERVICE, L'EMAIL
         await fichierService.UpdateFichierData(pieceJointeFormModel, selectedFournisseur.IdFournisseur);
     }
     private async Task SaveModifcationLicenceRBQ()
@@ -808,6 +809,7 @@
 
     private async Task SaveModifcationProduitServices()
     {
+        // IMPLÉMENTER LA FEATURE HISTORIQUE EN ENVOYANT EN PARAMÈTRE AU SERVICE, L'EMAIL
         await produitServiceService.UpdateProduitServiceData(produitServiceFormModel, selectedFournisseur.IdFournisseur);
 
         selectedProduitservices = allProduitService
@@ -833,6 +835,7 @@
 
     private async Task SaveContact()
     {
+        // IMPLÉMENTER LA FEATURE HISTORIQUE EN ENVOYANT EN PARAMÈTRE AU SERVICE, L'EMAIL
         await contactsService.UpdateContactsData(contactHosterFormModel);
 
         modificationContact = true;
@@ -842,6 +845,7 @@
     private async Task SaveModifcationInfo()
     {
         await identificationService.UpdateIdentificationData(combinedFormModel.IdentificationFormModel, email);
+        // IMPLÉMENTER LA FEATURE HISTORIQUE EN ENVOYANT EN PARAMÈTRE AU SERVICE, L'EMAIL
         await coordonneeService.UpdateCoordonneeData(combinedFormModel.CoordonneeFormModel);
 
         modificationInfo = true;
