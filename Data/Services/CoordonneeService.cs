@@ -7,10 +7,12 @@ namespace Portail_OptiVille.Data.Services
     public class CoordonneeService
     {
         private readonly A2024420517riGr1Eq6Context _context;
+        private HistoriqueService _historiqueService;
 
-        public CoordonneeService(A2024420517riGr1Eq6Context context)
+        public CoordonneeService(A2024420517riGr1Eq6Context context, HistoriqueService historiqueService)
         {
             _context = context;
+            _historiqueService = historiqueService;
         }
 
         public async Task SaveCoordonneeData(CoordonneeFormModel coordonneeFormModelDto)
@@ -69,9 +71,36 @@ namespace Portail_OptiVille.Data.Services
             }
         }
 
-        public async Task UpdateCoordonneeData(CoordonneeFormModel coordonneeFormModel)
+        public async Task UpdateCoordonneeData(CoordonneeFormModel coordonneeFormModel/*, string email*/)
         {
             var coordonnee = await _context.Coordonnees.FindAsync(coordonneeFormModel.IdCoordonnee);
+            /*
+            Y MANQUE DES CHAMPS, CERTAINS NE SONT PAS PRÉSENTS DANS LA FICHE (SITE WEB ET RÉGION ADMINISTRATIVE) NOUS DEVONS DONC ATTENDRE 
+            POUR RÉALISER CETTE PARTIE ET REVENIR APRÈS AVOIR AJOUTÉ LES CHAMPS MANQUANTS.
+            string[] oldData = {coordonnee.NoCivique, coordonnee.Rue, coordonnee.Bureau, 
+                                coordonnee.Ville, coordonnee.Province, coordonnee.CodePostal,
+                                coordonnee.CodeRegionAdministrative, coordonnee.RegionAdministrative, coordonnee.SiteInternet};
+            string[] newData = {coordonneeFormModel.NoEntreprise, coordonneeFormModel.RueEntreprise, coordonneeFormModel.BureauEntreprise,
+                                coordonneeFormModel.VilleEntreprise, coordonneeFormModel.ProvinceEntreprise, coordonneeFormModel.CodePostalEntreprise,
+                                coordonneeFormModel.CodeRegionAdmEntreprise, coordonneeFormModel.RegionAdmEntreprise, coordonneeFormModel.SiteWebEntreprise};
+            string[] keyData = {"No Civique", "Rue", "Bureau",
+                                "Ville", "Province", "Code Postal", 
+                                "Région administrative", "Site"};
+            string oldJSON = "{\"Section\": \"Coordonnées\",";
+            string newJSON = "{\"Section\": \"Coordonnées\",";
+            for (int i = 0; i < oldData.Length; i++)
+            {
+                if (!oldData[i].Equals(newData[i]))
+                {
+                    oldJSON += $"\"{keyData[i]}\": \"{oldData[i]}\",";
+                    newJSON += $"\"{keyData[i]}\": \"{newData[i]}\",";
+                }
+            }
+            oldJSON = oldJSON.TrimEnd(',') + "}";
+            newJSON = newJSON.TrimEnd(',') + "}";
+            await _historiqueService.ModifyEtat("Modifiée", (int)coordonnee.Fournisseur, email, null, oldJSON, newJSON);
+            */
+
             coordonnee.NoCivique = coordonneeFormModel.NoEntreprise;
             coordonnee.Rue = coordonneeFormModel.RueEntreprise;
             coordonnee.Bureau = coordonneeFormModel.BureauEntreprise;

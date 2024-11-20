@@ -73,6 +73,7 @@ namespace Portail_OptiVille.Data.Services
             oldJSON = oldJSON.TrimEnd(',') + "}";
             newJSON = newJSON.TrimEnd(',') + "}";
             await _historiqueService.ModifyEtat("Modifiée", (int)identification.Fournisseur, email, null, oldJSON, newJSON);
+            
             identification.Neq = identicationFormModel.NEQ;
             identification.NomEntreprise = identicationFormModel.NomEntreprise;
             identification.AdresseCourriel = identicationFormModel.CourrielEntreprise;
