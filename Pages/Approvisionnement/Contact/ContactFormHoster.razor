@@ -11,7 +11,7 @@
 </div>
 <div class="card-body px-3 border-vertFonce bg-blanc py-1">
     @{
-        var contactNo = 1;
+        var contactNo = 0;
         @foreach (var contactModel in ContactHosterFormModel.ContactList)
         {
             <Contact ContactNumber="@contactNo" contactFormModel="contactModel" @ref="contactComponents[contactModel]" />
