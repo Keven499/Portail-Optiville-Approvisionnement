@@ -178,7 +178,7 @@
                                     {
                                         <div class="row mb-3">
                                             <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
-                                                <label for="inputPassword4" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">Numéro de téléphone</label>
+                                                <label for="telephoneType" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">Numéro de téléphone</label>
                                                 <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
                                                 <select class="form-select input-vert texte-light py-1" id="telephoneType" @bind="@telephone.TypeTelEntreprise" style="width: 325px; @(modificationInfo ? "pointer-events: none;" : null)">
                                                         <option value="Bureau">Bureau</option>
@@ -189,14 +189,21 @@
                                         </div>
                                         <div class="row mb-3 pb-1">
                                             <div class="col-xl-12 d-xl-flex justify-content-xl-end col-lg-12 d-lg-flex justify-content-lg-end col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
-                                                <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="inputEmail4" @bind="telephone.NoTelEntreprise" readonly="@modificationInfo">
+                                                <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" @bind="telephone.NoTelEntreprise" readonly="@modificationInfo">
                                             </div>
                                         </div>
                                         <div class="row mb-3">
                                             <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
-                                                <label for="inputPassword4" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">Poste</label>
+                                                <label for="posteTelEntreprise" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">Poste</label>
                                                 <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
-                                                <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="inputEmail4" @bind="telephone.PosteTelEntreprise" readonly="@modificationInfo">                                
+                                                <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="posteTelEntreprise" @bind="telephone.PosteTelEntreprise" readonly="@modificationInfo">                                
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                                <label for="siteInternet" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">Site internet</label>
+                                                <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                                <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="siteInternet" @bind="@combinedFormModel.CoordonneeFormModel.SiteWebEntreprise" readonly="@modificationInfo">
                                             </div>
                                         </div>
                                     }
@@ -204,44 +211,51 @@
                                 <div class="col-xl-6 col-lg-6 col-sm-12 col-12">
                                     <div class="row mb-3">
                                         <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
-                                            <label for="inputPassword4" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">No Civique</label>
+                                            <label for="noEntreprise" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">No Civique</label>
                                             <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
-                                            <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="inputPassword4" @bind="@combinedFormModel.CoordonneeFormModel.NoEntreprise" readonly="@modificationInfo">
+                                            <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="noEntreprise" @bind="@combinedFormModel.CoordonneeFormModel.NoEntreprise" readonly="@modificationInfo">
                                         </div>
                                     </div>
                                     <div class="row mb-3">
                                         <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
-                                            <label for="inputPassword4" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">Rue</label>
+                                            <label for="rueEntreprise" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">Rue</label>
                                             <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
-                                            <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="inputPassword4" @bind="@combinedFormModel.CoordonneeFormModel.RueEntreprise" readonly="@modificationInfo">
+                                            <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="rueEntreprise" @bind="@combinedFormModel.CoordonneeFormModel.RueEntreprise" readonly="@modificationInfo">
                                         </div>
                                     </div>
                                     <div class="row mb-3">
                                         <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
-                                            <label for="inputPassword4" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">Bureau</label>
+                                            <label for="bureauEntreprise" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">Bureau</label>
                                             <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
-                                            <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="inputPassword4" @bind="@combinedFormModel.CoordonneeFormModel.BureauEntreprise" readonly="@modificationInfo">
+                                            <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="bureauEntreprise" @bind="@combinedFormModel.CoordonneeFormModel.BureauEntreprise" readonly="@modificationInfo">
                                         </div>
                                     </div>
                                     <div class="row mb-3">
                                         <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
-                                            <label for="inputPassword4" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">Ville</label>
+                                            <label for="villeEntreprise" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">Ville</label>
                                             <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
-                                            <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="inputPassword4" @bind="@combinedFormModel.CoordonneeFormModel.VilleEntreprise" readonly="@modificationInfo">
+                                            <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="villeEntreprise" @bind="@combinedFormModel.CoordonneeFormModel.VilleEntreprise" readonly="@modificationInfo">
                                         </div>
                                     </div>
                                     <div class="row mb-3">
                                         <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
-                                            <label for="inputPassword4" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">Code Postal</label>
+                                            <label for="codePostal" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">Code Postal</label>
                                             <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
-                                            <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="inputPassword4" @bind="@combinedFormModel.CoordonneeFormModel.CodePostalEntreprise" readonly="@modificationInfo">
+                                            <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="codePostal" @bind="@combinedFormModel.CoordonneeFormModel.CodePostalEntreprise" readonly="@modificationInfo">
                                         </div>
                                     </div>
                                     <div class="row mb-3">
                                         <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
-                                            <label for="inputPassword4" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">Province</label>
+                                            <label for="province" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">Province</label>
                                             <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
-                                            <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="inputPassword4" @bind="@combinedFormModel.CoordonneeFormModel.ProvinceEntreprise" readonly="@modificationInfo">
+                                            <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="province" @bind="@combinedFormModel.CoordonneeFormModel.ProvinceEntreprise" readonly="@modificationInfo">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
+                                            <label for="regionAdministrative" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">Région administrative</label>
+                                            <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
+                                            <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="regionAdministrative" @bind="@combinedFormModel.CoordonneeFormModel.RegionAdmEntreprise" readonly="@modificationInfo">
                                         </div>
                                     </div>
                                 </div>                    
@@ -827,7 +841,8 @@
         {
             await financeService.UpdateFinanceData(financeFormModel, selectedFournisseur.IdFournisseur, email);
             modificationFinances = true; 
-            @* editContext = new EditContext(financeFormModel);
+            @* À VOIR COMMENT CLEAN LES VALIDATIONS APRÈS MODIFICATIONS 
+            editContext = new EditContext(financeFormModel);
             editContext.NotifyValidationStateChanged();
             StateHasChanged(); *@
         } 
