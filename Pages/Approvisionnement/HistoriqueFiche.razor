@@ -17,6 +17,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-12">
+                @* NOUS SOMMES EN TRAIN D'IMPLÉMENTER HISTORIQUE DANS LA BASE DE DONNÉES, DÈS QUE CELA SERA TERMINÉ, NOUS VIENDRONS ICI POUR GÉRER L'AFFICHAGE *@
                 @if (informationToShow != null)
                 {
                     <div class="card mb-2">
@@ -33,11 +34,29 @@
                                     } 
                                     foreach (var kvp in informationToShow.Retirer)
                                     {
+                                        if (!informationToShow.Retirer.ContainsValue("Fichier") && !kvp.Value.Equals("Licence RBQ"))
+                                        {
+                                            <div class="fw-bold">@kvp.Key</div>               
+                                        }
                                         if (!kvp.Key.Equals("Section"))
                                         {
-                                            <div>
-                                                <i class="bi bi-dash"></i> @kvp.Value
-                                            </div>
+                                            if (kvp.Key.Equals("Catégories"))
+                                            {
+                                                var categories = kvp.Value.Split(':');  // Split by comma
+
+                                                foreach (var category in categories)
+                                                {
+                                                    <div>
+                                                        <i class="bi bi-dash"></i> @category.Trim()
+                                                    </div>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <div>
+                                                    <i class="bi bi-dash"></i> @kvp.Value
+                                                </div>
+                                            }
                                         }
                                     }
                                 }
@@ -50,11 +69,29 @@
                                     } 
                                     foreach (var kvp in informationToShow.Ajouter)
                                     {
+                                        if (!informationToShow.Ajouter.ContainsValue("Fichier") && !kvp.Value.Equals("Licence RBQ"))
+                                        {
+                                            <div class="fw-bold">@kvp.Key</div>               
+                                        }
                                         if (!kvp.Key.Equals("Section"))
                                         {
-                                            <div>
-                                                <i class="bi bi-plus"></i> @kvp.Value
-                                            </div>
+                                            if (kvp.Key.Equals("Catégories"))
+                                            {
+                                                var categories = kvp.Value.Split(':');
+
+                                                foreach (var category in categories)
+                                                {
+                                                    <div>
+                                                        <i class="bi bi-plus"></i> @category.Trim()
+                                                    </div>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <div>
+                                                    <i class="bi bi-plus"></i> @kvp.Value
+                                                </div>
+                                            }
                                         }
                                     }
                                 }

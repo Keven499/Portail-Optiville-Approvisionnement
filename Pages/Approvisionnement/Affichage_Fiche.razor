@@ -835,9 +835,7 @@
     }
     private async Task SaveModifcationLicenceRBQ()
     {
-
-        // IMPLÉMENTER LA FEATURE HISTORIQUE EN ENVOYANT EN PARAMÈTRE AU SERVICE, L'EMAIL
-        await licenceRBQService.SaveLicenceRBQData(licenceRBQFormModel);
+        await licenceRBQService.SaveLicenceRBQData(licenceRBQFormModel, email);
         selectedCategorieRBQ = await _context.Categorierbqs.Where(c => c.IdLicenceRbqs.Any(l => l.IdLicenceRbq == licencerbqs.IdLicenceRbq)).ToListAsync();
         groupedCategories = GroupCategoriesByType();
         
