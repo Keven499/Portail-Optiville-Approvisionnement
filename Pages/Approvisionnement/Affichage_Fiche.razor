@@ -835,6 +835,7 @@
     private async Task SaveModifcationLicenceRBQ()
     {
 
+        // IMPLÉMENTER LA FEATURE HISTORIQUE EN ENVOYANT EN PARAMÈTRE AU SERVICE, L'EMAIL
         await licenceRBQService.SaveLicenceRBQData(licenceRBQFormModel);
         selectedCategorieRBQ = await _context.Categorierbqs.Where(c => c.IdLicenceRbqs.Any(l => l.IdLicenceRbq == licencerbqs.IdLicenceRbq)).ToListAsync();
         groupedCategories = GroupCategoriesByType();
@@ -881,7 +882,6 @@
     private async Task SaveModifcationInfo()
     {
         await identificationService.UpdateIdentificationData(combinedFormModel.IdentificationFormModel, email);
-        // IMPLÉMENTER LA FEATURE HISTORIQUE EN ENVOYANT EN PARAMÈTRE AU SERVICE, L'EMAIL
         await coordonneeService.UpdateCoordonneeData(combinedFormModel.CoordonneeFormModel, email);
 
         modificationInfo = true;
