@@ -430,28 +430,26 @@ else
             produitsService = await _context.Produitservices.Take(500).ToListAsync();
             cbxDicProductService = produitsService.ToDictionary(c => c.CodeUnspsc, c => false);
             produitsServiceInternal = produitsService;
-fournisseurFiches = await _context.Fournisseurs
-    .Where(f => f.Historiques.Any(h => h.EtatDemande != "Désactivée" && h.EtatDemande != "Modifiée"))
-    .Select(f => new FournisseurFiche
-    {
-        IdFournisseur = f.IdFournisseur,
-        // Utilisation d'un seul OrderByDescending
-        EtatDemande = f.Historiques
-            .Where(h => h.EtatDemande != "Désactivée" && h.EtatDemande != "Modifiée")
-            .OrderByDescending(h => h.DateEtatChanged)
-            .FirstOrDefault().EtatDemande,
-        NomEntreprise = f.Identifications.FirstOrDefault().NomEntreprise,
-        Ville = f.Coordonnees.FirstOrDefault().Ville,
-        // Réutilisation du premier élément trié
-        DateEtatChanged = f.Historiques
-            .Where(h => h.EtatDemande != "Désactivée" && h.EtatDemande != "Modifiée")
-            .OrderByDescending(h => h.DateEtatChanged)
-            .FirstOrDefault().DateEtatChanged
-    })
-    .ToListAsync();
-
-
-
+            
+            fournisseurFiches = await _context.Fournisseurs
+                .Where(f => f.Historiques.Any(h => h.EtatDemande != "Désactivée" && h.EtatDemande != "Modifiée"))
+                .Select(f => new FournisseurFiche
+                {
+                    IdFournisseur = f.IdFournisseur,
+                    // Utilisation d'un seul OrderByDescending
+                    EtatDemande = f.Historiques
+                        .Where(h => h.EtatDemande != "Désactivée" && h.EtatDemande != "Modifiée")
+                        .OrderByDescending(h => h.DateEtatChanged)
+                        .FirstOrDefault().EtatDemande,
+                    NomEntreprise = f.Identifications.FirstOrDefault().NomEntreprise,
+                    Ville = f.Coordonnees.FirstOrDefault().Ville,
+                    // Réutilisation du premier élément trié
+                    DateEtatChanged = f.Historiques
+                        .Where(h => h.EtatDemande != "Désactivée" && h.EtatDemande != "Modifiée")
+                        .OrderByDescending(h => h.DateEtatChanged)
+                        .FirstOrDefault().DateEtatChanged
+                })
+                .ToListAsync();
 
             copieFournisseurFiches = new List<FournisseurFiche>(fournisseurFiches); 
             isLoading = false;
