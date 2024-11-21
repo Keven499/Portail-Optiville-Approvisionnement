@@ -56,6 +56,7 @@ namespace Portail_OptiVille.Data.Services
 
         public async Task UpdateIdentificationData(IdenticationFormModel identicationFormModel, string email)
         {
+            bool isEqual = true;
             var identification = await _context.Identifications.FindAsync(identicationFormModel.IdIdentification);
             string[] oldData = {identification.Neq, identification.NomEntreprise, identification.AdresseCourriel};
             string[] newData = {identicationFormModel.NEQ, identicationFormModel.NomEntreprise, identicationFormModel.CourrielEntreprise};
@@ -66,13 +67,15 @@ namespace Portail_OptiVille.Data.Services
             {
                 if (!oldData[i].Equals(newData[i]))
                 {
+                    isEqual = false;
                     oldJSON += $"\"{keyData[i]}\": \"{oldData[i]}\",";
                     newJSON += $"\"{keyData[i]}\": \"{newData[i]}\",";
                 }
             }
             oldJSON = oldJSON.TrimEnd(',') + "}";
             newJSON = newJSON.TrimEnd(',') + "}";
-            await _historiqueService.ModifyEtat("Modifiée", (int)identification.Fournisseur, email, null, oldJSON, newJSON);
+            if (!isEqual)
+                await _historiqueService.ModifyEtat("Modifiée", (int)identification.Fournisseur, email, null, oldJSON, newJSON);
             
             identification.Neq = identicationFormModel.NEQ;
             identification.NomEntreprise = identicationFormModel.NomEntreprise;

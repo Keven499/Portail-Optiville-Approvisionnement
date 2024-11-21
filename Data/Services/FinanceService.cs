@@ -19,8 +19,9 @@ namespace Portail_OptiVille.Data.Services
 
         public async Task UpdateFinanceData(FinanceFormModel financeFormModel, int IdFournisseur, string email)
         {
+            bool isEqual = true;
             var finance = await _context.Finances.FindAsync(financeFormModel.IdFinance);
-            if(finance != null) {
+            if (finance != null) {
                 // FAIRE LA COMPARAISON ENTRE LA OLD DATA ET LA NOUVELLE DATA
                 string[] oldData = {finance.NumeroTps, finance.NumeroTvq, finance.Devise, finance.ConditionPaiement, finance.ModeCommunication};
                 string[] newData = {financeFormModel.NumeroTps, financeFormModel.NumeroTvq, financeFormModel.Devise, financeFormModel.ConditionPaiement, financeFormModel.ModeCommunication};
@@ -31,13 +32,15 @@ namespace Portail_OptiVille.Data.Services
                 {
                     if (!oldData[i].Equals(newData[i]))
                     {
+                        isEqual = false;
                         oldJSON += $"\"{keyData[i]}\": \"{oldData[i]}\",";
                         newJSON += $"\"{keyData[i]}\": \"{newData[i]}\",";
                     }
                 }
                 oldJSON = oldJSON.TrimEnd(',') + "}";
                 newJSON = newJSON.TrimEnd(',') + "}";
-                await _historiqueService.ModifyEtat("Modifiée", IdFournisseur, email, null, oldJSON, newJSON);
+                if (!isEqual)
+                    await _historiqueService.ModifyEtat("Modifiée", IdFournisseur, email, null, oldJSON, newJSON);
                 
                 finance.NumeroTps = financeFormModel.NumeroTps;
                 finance.NumeroTvq = financeFormModel.NumeroTvq;

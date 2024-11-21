@@ -71,35 +71,41 @@ namespace Portail_OptiVille.Data.Services
             }
         }
 
-        public async Task UpdateCoordonneeData(CoordonneeFormModel coordonneeFormModel/*, string email*/)
+        public async Task UpdateCoordonneeData(CoordonneeFormModel coordonneeFormModel, string email)
         {
+            bool isEqual = true;
+            string? codeRegion = coordonneeFormModel.RegionAdmEntreprise?.Substring(coordonneeFormModel.RegionAdmEntreprise.IndexOf('(')
+                                                                                     + 1, coordonneeFormModel.RegionAdmEntreprise.IndexOf(')')
+                                                                                     - coordonneeFormModel.RegionAdmEntreprise.IndexOf('(') - 1);
+            string? regionAdm = coordonneeFormModel.RegionAdmEntreprise?.Substring(coordonneeFormModel.RegionAdmEntreprise.IndexOf(' ') + 1);
             var coordonnee = await _context.Coordonnees.FindAsync(coordonneeFormModel.IdCoordonnee);
-            /*
-            Y MANQUE DES CHAMPS, CERTAINS NE SONT PAS PRÉSENTS DANS LA FICHE (SITE WEB ET RÉGION ADMINISTRATIVE) NOUS DEVONS DONC ATTENDRE 
-            POUR RÉALISER CETTE PARTIE ET REVENIR APRÈS AVOIR AJOUTÉ LES CHAMPS MANQUANTS.
             string[] oldData = {coordonnee.NoCivique, coordonnee.Rue, coordonnee.Bureau, 
-                                coordonnee.Ville, coordonnee.Province, coordonnee.CodePostal,
+                                coordonnee.Ville, coordonnee.Province, coordonnee.CodePostal, 
                                 coordonnee.CodeRegionAdministrative, coordonnee.RegionAdministrative, coordonnee.SiteInternet};
             string[] newData = {coordonneeFormModel.NoEntreprise, coordonneeFormModel.RueEntreprise, coordonneeFormModel.BureauEntreprise,
                                 coordonneeFormModel.VilleEntreprise, coordonneeFormModel.ProvinceEntreprise, coordonneeFormModel.CodePostalEntreprise,
-                                coordonneeFormModel.CodeRegionAdmEntreprise, coordonneeFormModel.RegionAdmEntreprise, coordonneeFormModel.SiteWebEntreprise};
+                                codeRegion, regionAdm, coordonneeFormModel.SiteWebEntreprise};
             string[] keyData = {"No Civique", "Rue", "Bureau",
                                 "Ville", "Province", "Code Postal", 
-                                "Région administrative", "Site"};
+                                "Code région administrative", "Région administrative", "Site"};
             string oldJSON = "{\"Section\": \"Coordonnées\",";
             string newJSON = "{\"Section\": \"Coordonnées\",";
             for (int i = 0; i < oldData.Length; i++)
             {
-                if (!oldData[i].Equals(newData[i]))
+                if (oldData[i] != null && newData != null)
                 {
-                    oldJSON += $"\"{keyData[i]}\": \"{oldData[i]}\",";
-                    newJSON += $"\"{keyData[i]}\": \"{newData[i]}\",";
+                    if (!oldData[i].Equals(newData[i]))
+                    {
+                        isEqual = false;
+                        oldJSON += $"\"{keyData[i]}\": \"{oldData[i]}\",";
+                        newJSON += $"\"{keyData[i]}\": \"{newData[i]}\",";
+                    }
                 }
             }
             oldJSON = oldJSON.TrimEnd(',') + "}";
             newJSON = newJSON.TrimEnd(',') + "}";
-            await _historiqueService.ModifyEtat("Modifiée", (int)coordonnee.Fournisseur, email, null, oldJSON, newJSON);
-            */
+            if (!isEqual)
+                await _historiqueService.ModifyEtat("Modifiée", (int)coordonnee.Fournisseur, email, null, oldJSON, newJSON);
 
             coordonnee.NoCivique = coordonneeFormModel.NoEntreprise;
             coordonnee.Rue = coordonneeFormModel.RueEntreprise;
@@ -107,8 +113,8 @@ namespace Portail_OptiVille.Data.Services
             coordonnee.Ville = coordonneeFormModel.VilleEntreprise;
             coordonnee.Province = coordonneeFormModel.ProvinceEntreprise;
             coordonnee.CodePostal = coordonneeFormModel.CodePostalEntreprise;
-            coordonnee.CodeRegionAdministrative = coordonneeFormModel.CodeRegionAdmEntreprise;
-            coordonnee.RegionAdministrative = coordonneeFormModel.RegionAdmEntreprise;
+            coordonnee.CodeRegionAdministrative = codeRegion;
+            coordonnee.RegionAdministrative = regionAdm;
             coordonnee.SiteInternet = coordonneeFormModel.SiteWebEntreprise;
 
             foreach (var telephoneFromList in coordonneeFormModel.PhoneList)
