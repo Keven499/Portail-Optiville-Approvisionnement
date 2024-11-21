@@ -84,8 +84,10 @@
                                         <label class="vertFonce texte-bold mb-0 mb-md-0 me-md-3" for="selectEtat">État</label>       
                                         <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
                                         <select value="@currentValue" @onchange="ConfirmChange" class="form-select input-vert texte-light py-1" style="width: 200px;" id="selectEtat">
-                                            <option value="En attente" disabled>En attente</option>
-                                            <option value="À réviser" disabled>À réviser</option>
+                                            <option value="En attente">En attente</option>
+                                            <option value="À réviser" hidden>À réviser</option>
+                                            <option value="Modifiée" hidden>Modifiée</option>
+                                            <option value="Désactivée" hidden>Désactivée</option>
                                             <option value="Accepté">Accepté</option>
                                             <option value="Refusé">Refusé</option>
                                         </select> 
@@ -283,7 +285,7 @@
                         </div>
                         <div class="card-body border-vertFonce">
                             <div class="row">
-                                @for (int i = 1; i < contactHosterFormModel.ContactList!.Count; i++)
+                                @for (int i = 0; i < contactHosterFormModel.ContactList!.Count; i++)
                                 {
                                     var contact = contactHosterFormModel.ContactList[i];
                                     <div class="col-xl-6 col-lg-6 col-sm-12 col-12">
@@ -447,14 +449,14 @@
                                 <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
                                     <label for="IdLicenceRbq" class="me-3 vertFonce texte-bold">Numéro</label>
                                     <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
-                                    <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="IdLicenceRbq" value="@licencerbqs.IdLicenceRbq">
+                                    <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" readonly id="IdLicenceRbq" value="@licencerbqs.IdLicenceRbq">
                                 </div>
                             </div>
                             <div class="row mb-3">
                                 <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
                                     <label for="TypeLicencerbq" class="me-3 vertFonce texte-bold">Type de licence</label>
                                     <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
-                                    <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="TypeLicencerbq" value="@licencerbqs.Type">
+                                    <input readonly type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="TypeLicencerbq" value="@licencerbqs.Type">
                                 </div>
                             </div>
                         </div>
