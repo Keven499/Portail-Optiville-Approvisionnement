@@ -22,7 +22,6 @@ namespace Portail_OptiVille.Data.Services
             bool isEqual = true;
             var finance = await _context.Finances.FindAsync(financeFormModel.IdFinance);
             if (finance != null) {
-                // FAIRE LA COMPARAISON ENTRE LA OLD DATA ET LA NOUVELLE DATA
                 string[] oldData = {finance.NumeroTps, finance.NumeroTvq, finance.Devise, finance.ConditionPaiement, finance.ModeCommunication};
                 string[] newData = {financeFormModel.NumeroTps, financeFormModel.NumeroTvq, financeFormModel.Devise, financeFormModel.ConditionPaiement, financeFormModel.ModeCommunication};
                 string[] keyData = {"TPS", "TVQ", "Devise", "Conditions de paiement", "Mode de communication"};

@@ -829,8 +829,7 @@
     {
         modificationPieceJointes = true;
         ModifcationPieceJointesActivationONStateMethod();
-        // IMPLÉMENTER LA FEATURE HISTORIQUE EN ENVOYANT EN PARAMÈTRE AU SERVICE, L'EMAIL
-        await fichierService.UpdateFichierData(pieceJointeFormModel, selectedFournisseur.IdFournisseur);
+        await fichierService.UpdateFichierData(pieceJointeFormModel, selectedFournisseur.IdFournisseur, email);
     }
     private async Task SaveModifcationLicenceRBQ()
     {

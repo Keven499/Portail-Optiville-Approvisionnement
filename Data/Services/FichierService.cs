@@ -7,10 +7,12 @@ namespace Portail_OptiVille.Data.Services
     public class FichierService
     {
         private readonly A2024420517riGr1Eq6Context _context;
+        private HistoriqueService _historiqueService;
 
-        public FichierService(A2024420517riGr1Eq6Context context)
+        public FichierService(A2024420517riGr1Eq6Context context, HistoriqueService historiqueService)
         {
             _context = context;
+            _historiqueService = historiqueService;
         }
 
         public async Task SaveFichierData(PieceJointeFormModel pieceJointeFormModelDto, IdenticationFormModel identificationFormModelDto)
@@ -79,13 +81,14 @@ namespace Portail_OptiVille.Data.Services
             }
         }
 
-        public async Task UpdateFichierData(PieceJointeFormModel pieceJointeFormModelDto, int fournisseurID)
+        public async Task UpdateFichierData(PieceJointeFormModel pieceJointeFormModelDto, int fournisseurID, string email)
         {
+            bool isEqual = true;
+            string keyData = "Nom";
+            string oldJSON = "{\"Section\": \"Fichier\",";
+            string newJSON = "{\"Section\": \"Fichier\",";
             var fichiers = new List<Fichier>();
-
-
             var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "files", fournisseurID.ToString());
-
             if (!Directory.Exists(folderPath))
             {
                 Directory.CreateDirectory(folderPath);
@@ -95,11 +98,12 @@ namespace Portail_OptiVille.Data.Services
             var filesToDelete = existingFichiers
             .Where(f => !pieceJointeFormModelDto.ListFichiers.Any(pf => pf.Nom == f.Nom))
             .ToList();
-
             foreach (var fichierToDelete in filesToDelete)
             {
                 try
                 {
+                    isEqual = false;
+                    oldJSON += $"\"{keyData}\": \"{fichierToDelete.Nom}\",";
                     var filePath = Path.Combine(folderPath, fichierToDelete.Nom).ToLower();
                     if (File.Exists(filePath))
                     {
@@ -112,8 +116,6 @@ namespace Portail_OptiVille.Data.Services
                     Console.WriteLine($"Une erreur est survenue lors de la suppression du fichier {fichierToDelete.Nom}: {ex.Message}");
                 }
             }
-
-
             foreach (var fichierFromList in pieceJointeFormModelDto.ListFichiers)
             {
                 try
@@ -123,22 +125,18 @@ namespace Portail_OptiVille.Data.Services
                         Console.WriteLine("File is null or has an empty name, skipping.");
                         continue;
                     }
-
+                    isEqual = false;
+                    newJSON += $"\"{keyData}\": \"{fichierFromList.Nom}\",";
                     var filePath = Path.Combine(folderPath, fichierFromList.Nom).ToLower();
-
-
                     if (!existingFileNames.Contains(fichierFromList.Nom) &&
                         pieceJointeFormModelDto.FileStreams.TryGetValue(fichierFromList.Nom, out var fileStream))
                     {
-
                         using (var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
                         {
                             fileStream.Position = 0;
                             await fileStream.CopyToAsync(stream);
                         }
-
                         var fileExtension = Path.GetExtension(fichierFromList.Nom).ToLower();
-
                         var fichier = new Fichier
                         {
                             Nom = fichierFromList.Nom,
@@ -148,7 +146,7 @@ namespace Portail_OptiVille.Data.Services
                             Path = Path.Combine("files", fournisseurID.ToString(), fichierFromList.Nom).ToLower(),
                             Fournisseur = fournisseurID
                         };
-
+                        
                         _context.Fichiers.Add(fichier);
                     }
                 }
@@ -157,10 +155,13 @@ namespace Portail_OptiVille.Data.Services
                     Console.WriteLine($"Une erreur est survenue lors de la sauvegarde du fichier {fichierFromList?.Nom}: {ex.Message}");
                 }
             }
-
-
             try
             {
+                oldJSON = oldJSON.TrimEnd(',') + "}";
+                newJSON = newJSON.TrimEnd(',') + "}";
+                if (!isEqual)
+                    await _historiqueService.ModifyEtat("Modifiée", fournisseurID, email, null, oldJSON, newJSON);
+
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
