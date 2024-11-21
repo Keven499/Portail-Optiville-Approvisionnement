@@ -15,6 +15,8 @@ namespace Portail_OptiVille.Data.Services
         // CETTE MÉTHODE DOIT ÊTRE APPELER À CHAQUE MODIFICATION D'ÉTAT
         public async Task ModifyEtat(string _etat, int _idFournisseur, string _modifiePar, string? _raisonRefus = null, string? _retirer = null, string? _ajouter = null)
         {
+            Console.WriteLine(_retirer);
+            Console.WriteLine(_ajouter);
             if (_idFournisseur == -1)
             {
                 _idFournisseur = await _context.Fournisseurs.MaxAsync(f => (int)f.IdFournisseur);
