@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Portail_OptiVille.Data.FormModels;
 using Portail_OptiVille.Data.Models;
+using Newtonsoft.Json;
 
 namespace Portail_OptiVille.Data.Services
 {
@@ -85,8 +86,8 @@ namespace Portail_OptiVille.Data.Services
         {
             bool isEqual = true;
             string keyData = "Nom";
-            string oldJSON = "{\"Section\": \"Fichier\",";
-            string newJSON = "{\"Section\": \"Fichier\",";
+            var oldDict = new Dictionary<string, object> { { "Section", "Fichier" } };
+            var newDict = new Dictionary<string, object> { { "Section", "Fichier" } };
             var fichiers = new List<Fichier>();
             var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "files", fournisseurID.ToString());
             if (!Directory.Exists(folderPath))
@@ -98,12 +99,14 @@ namespace Portail_OptiVille.Data.Services
             var filesToDelete = existingFichiers
             .Where(f => !pieceJointeFormModelDto.ListFichiers.Any(pf => pf.Nom == f.Nom))
             .ToList();
+            int indexRem = 1;
             foreach (var fichierToDelete in filesToDelete)
             {
                 try
                 {
                     isEqual = false;
-                    oldJSON += $"\"{keyData}\": \"{fichierToDelete.Nom}\",";
+                    oldDict.Add(keyData + indexRem, fichierToDelete.Nom);
+                    indexRem++;
                     var filePath = Path.Combine(folderPath, fichierToDelete.Nom).ToLower();
                     if (File.Exists(filePath))
                     {
@@ -116,6 +119,7 @@ namespace Portail_OptiVille.Data.Services
                     Console.WriteLine($"Une erreur est survenue lors de la suppression du fichier {fichierToDelete.Nom}: {ex.Message}");
                 }
             }
+            int indexAdd = 1;
             foreach (var fichierFromList in pieceJointeFormModelDto.ListFichiers)
             {
                 try
@@ -126,7 +130,9 @@ namespace Portail_OptiVille.Data.Services
                         continue;
                     }
                     isEqual = false;
-                    newJSON += $"\"{keyData}\": \"{fichierFromList.Nom}\",";
+                    Console.WriteLine(keyData  + indexAdd);
+                    newDict.Add(keyData + indexAdd, fichierFromList.Nom);
+                    indexAdd++;
                     var filePath = Path.Combine(folderPath, fichierFromList.Nom).ToLower();
                     if (!existingFileNames.Contains(fichierFromList.Nom) &&
                         pieceJointeFormModelDto.FileStreams.TryGetValue(fichierFromList.Nom, out var fileStream))
@@ -157,8 +163,8 @@ namespace Portail_OptiVille.Data.Services
             }
             try
             {
-                oldJSON = oldJSON.TrimEnd(',') + "}";
-                newJSON = newJSON.TrimEnd(',') + "}";
+                string oldJSON = JsonConvert.SerializeObject(oldDict, Formatting.None);
+                string newJSON = JsonConvert.SerializeObject(newDict, Formatting.None);
                 if (!isEqual)
                     await _historiqueService.ModifyEtat("Modifiée", fournisseurID, email, null, oldJSON, newJSON);
 

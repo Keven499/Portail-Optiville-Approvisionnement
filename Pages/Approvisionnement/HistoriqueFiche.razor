@@ -21,30 +21,42 @@
                 {
                     <div class="card mb-2">
                         <div class="card-header text-center">
-                            <div class="fs-5 fw-bold">@informationToShow.Retirer.FirstOrDefault().Value</div>
+                            <div class="fs-5 fw-bold">@(informationToShow.Retirer.ContainsKey("Section") ? @informationToShow.Retirer["Section"] : null)</div>
                         </div>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-6">
-                                @foreach (var kvp in informationToShow.Retirer.Skip(1))
-                                {
-                                    <div>
-                                        <div class="fw-bold">@kvp.Key: </div>
-                                        <div>
-                                            <i class="bi bi-dash"></i> @kvp.Value
-                                        </div>
-                                    </div>
+                                @{
+                                    if (informationToShow.Retirer.ContainsValue("Fichier"))
+                                    {
+                                        <div class="fw-bold">Nom: </div>               
+                                    } 
+                                    foreach (var kvp in informationToShow.Retirer)
+                                    {
+                                        if (!kvp.Key.Equals("Section"))
+                                        {
+                                            <div>
+                                                <i class="bi bi-dash"></i> @kvp.Value
+                                            </div>
+                                        }
+                                    }
                                 }
                                 </div>
                                 <div class="col-6">
-                                @foreach (var kvp in informationToShow.Ajouter.Skip(1))
-                                {
-                                    <div>
-                                        <div class="fw-bold">@kvp.Key: </div>
-                                        <div>
-                                             <i class="bi bi-plus"></i> @kvp.Value
-                                        </div>
-                                    </div>
+                                @{
+                                    if (informationToShow.Ajouter.ContainsValue("Fichier"))
+                                    {
+                                        <div class="fw-bold">Nom: </div>               
+                                    } 
+                                    foreach (var kvp in informationToShow.Ajouter)
+                                    {
+                                        if (!kvp.Key.Equals("Section"))
+                                        {
+                                            <div>
+                                                <i class="bi bi-plus"></i> @kvp.Value
+                                            </div>
+                                        }
+                                    }
                                 }
                                 </div>
                             </div>
@@ -124,7 +136,7 @@
 </style>
 
 @code{
-    @* [Parameter]
+    @* [Parame  ter]
     public int idFournisseur { get; set; } = 63; *@
     private int idFournisseur = 74;
     private List<Historique> historiqueFiche = new List<Historique>();

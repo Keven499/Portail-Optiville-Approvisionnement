@@ -3,6 +3,7 @@ using Portail_OptiVille.Data.FormModels;
 using Portail_OptiVille.Data.Models;
 using System.Security.Cryptography;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace Portail_OptiVille.Data.Services
 {
@@ -61,23 +62,19 @@ namespace Portail_OptiVille.Data.Services
             string[] oldData = {identification.Neq, identification.NomEntreprise, identification.AdresseCourriel};
             string[] newData = {identicationFormModel.NEQ, identicationFormModel.NomEntreprise, identicationFormModel.CourrielEntreprise};
             string[] keyData = {"NEQ", "Nom de l'entreprise", "Adresse courriel"};
-            string oldJSON = "{\"Section\": \"Identification\",";
-            string newJSON = "{\"Section\": \"Identification\",";
+            var oldDict = new Dictionary<string, object> { { "Section", "Identification" } };
+            var newDict = new Dictionary<string, object> { { "Section", "Identification" } };
             for (int i = 0; i < oldData.Length; i++)
-            {
-                if (oldData[i] != null && newData != null)
                 {
                     if (!oldData[i].Equals(newData[i]))
-                        {
-                            isEqual = false;
-                            oldJSON += $"\"{keyData[i]}\": \"{oldData[i]}\",";
-                            newJSON += $"\"{keyData[i]}\": \"{newData[i]}\",";
-                        }
+                    {
+                        isEqual = false;
+                        oldDict.Add(keyData[i], oldData[i]);
+                        newDict.Add(keyData[i], newData[i]);
+                    }
                 }
-                
-            }
-            oldJSON = oldJSON.TrimEnd(',') + "}";
-            newJSON = newJSON.TrimEnd(',') + "}";
+                string oldJSON = JsonConvert.SerializeObject(oldDict, Formatting.None);
+                string newJSON = JsonConvert.SerializeObject(newDict, Formatting.None);
             if (!isEqual)
                 await _historiqueService.ModifyEtat("Modifiée", (int)identification.Fournisseur, email, null, oldJSON, newJSON);
             

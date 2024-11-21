@@ -1,8 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Portail_OptiVille.Data.FormModels;
 using Portail_OptiVille.Data.Models;
-using System.Text.Json;
-using System.Text.Json.Nodes;
+using Newtonsoft.Json;
 
 namespace Portail_OptiVille.Data.Services
 {
@@ -21,26 +20,23 @@ namespace Portail_OptiVille.Data.Services
         {
             bool isEqual = true;
             var finance = await _context.Finances.FindAsync(financeFormModel.IdFinance);
+            string[] oldData = {finance.NumeroTps, finance.NumeroTvq, finance.Devise, finance.ConditionPaiement, finance.ModeCommunication};
+            string[] newData = {financeFormModel.NumeroTps, financeFormModel.NumeroTvq, financeFormModel.Devise, financeFormModel.ConditionPaiement, financeFormModel.ModeCommunication};
+            string[] keyData = {"TPS", "TVQ", "Devise", "Conditions de paiement", "Mode de communication"};
+            var oldDict = new Dictionary<string, object> { { "Section", "Finance" } };
+            var newDict = new Dictionary<string, object> { { "Section", "Finance" } };
             if (finance != null) {
-                string[] oldData = {finance.NumeroTps, finance.NumeroTvq, finance.Devise, finance.ConditionPaiement, finance.ModeCommunication};
-                string[] newData = {financeFormModel.NumeroTps, financeFormModel.NumeroTvq, financeFormModel.Devise, financeFormModel.ConditionPaiement, financeFormModel.ModeCommunication};
-                string[] keyData = {"TPS", "TVQ", "Devise", "Conditions de paiement", "Mode de communication"};
-                string oldJSON = "{\"Section\": \"Finance\",";
-                string newJSON = "{\"Section\": \"Finance\",";
                 for (int i = 0; i < oldData.Length; i++)
                 {
                     if (!oldData[i].Equals(newData[i]))
                     {
-                        if (!oldData[i].Equals(newData[i]))
-                        {
-                            isEqual = false;
-                            oldJSON += $"\"{keyData[i]}\": \"{oldData[i]}\",";
-                            newJSON += $"\"{keyData[i]}\": \"{newData[i]}\",";
-                        }
+                        isEqual = false;
+                        oldDict.Add(keyData[i], oldData[i]);
+                        newDict.Add(keyData[i], newData[i]);
                     }
                 }
-                oldJSON = oldJSON.TrimEnd(',') + "}";
-                newJSON = newJSON.TrimEnd(',') + "}";
+                string oldJSON = JsonConvert.SerializeObject(oldDict, Formatting.None);
+                string newJSON = JsonConvert.SerializeObject(newDict, Formatting.None);
                 if (!isEqual)
                     await _historiqueService.ModifyEtat("Modifiée", IdFournisseur, email, null, oldJSON, newJSON);
                 
@@ -69,6 +65,18 @@ namespace Portail_OptiVille.Data.Services
                         ModeCommunication = financeFormModel.ModeCommunication,
                         Fournisseur = IdFournisseur
                     };
+                    for (int i = 0; i < oldData.Length; i++)
+                    {
+                        if (!oldData[i].Equals(newData[i]))
+                        {
+                            isEqual = false;
+                            newDict.Add(keyData[i], newData[i]);
+                        }
+                    }
+                    string oldJSON = JsonConvert.SerializeObject(oldDict, Formatting.None);
+                    string newJSON = JsonConvert.SerializeObject(newDict, Formatting.None);
+                    if (!isEqual)
+                        await _historiqueService.ModifyEtat("Modifiée", IdFournisseur, email, null, oldJSON, newJSON);
 
                     _context.Finances.Add(financeNew);
                     await _context.SaveChangesAsync();

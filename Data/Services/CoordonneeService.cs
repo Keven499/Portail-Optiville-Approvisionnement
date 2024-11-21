@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Portail_OptiVille.Data.FormModels;
 using Portail_OptiVille.Data.Models;
+using Newtonsoft.Json;
 
 namespace Portail_OptiVille.Data.Services
 {
@@ -88,22 +89,19 @@ namespace Portail_OptiVille.Data.Services
             string[] keyData = {"No Civique", "Rue", "Bureau",
                                 "Ville", "Province", "Code Postal", 
                                 "Code région administrative", "Région administrative", "Site"};
-            string oldJSON = "{\"Section\": \"Coordonnées\",";
-            string newJSON = "{\"Section\": \"Coordonnées\",";
+            var oldDict = new Dictionary<string, object> { { "Section", "Finance" } };
+            var newDict = new Dictionary<string, object> { { "Section", "Finance" } };
             for (int i = 0; i < oldData.Length; i++)
             {
-                if (oldData[i] != null && newData != null)
+                if (!oldData[i].Equals(newData[i]))
                 {
-                    if (!oldData[i].Equals(newData[i]))
-                    {
-                        isEqual = false;
-                        oldJSON += $"\"{keyData[i]}\": \"{oldData[i]}\",";
-                        newJSON += $"\"{keyData[i]}\": \"{newData[i]}\",";
-                    }
+                    isEqual = false;
+                    oldDict.Add(keyData[i], oldData[i]);
+                    newDict.Add(keyData[i], newData[i]);
                 }
             }
-            oldJSON = oldJSON.TrimEnd(',') + "}";
-            newJSON = newJSON.TrimEnd(',') + "}";
+            string oldJSON = JsonConvert.SerializeObject(oldDict, Formatting.None);
+            string newJSON = JsonConvert.SerializeObject(newDict, Formatting.None);
             if (!isEqual)
                 await _historiqueService.ModifyEtat("Modifiée", (int)coordonnee.Fournisseur, email, null, oldJSON, newJSON);
 

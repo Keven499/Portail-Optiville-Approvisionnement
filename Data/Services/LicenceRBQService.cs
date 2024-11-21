@@ -55,6 +55,25 @@ namespace Portail_OptiVille.Data.Services
             }
             else
             {
+                /*
+                string[] oldData = {finance.NumeroTps, finance.NumeroTvq, finance.Devise, finance.ConditionPaiement, finance.ModeCommunication};
+                string[] newData = {financeFormModel.NumeroTps, financeFormModel.NumeroTvq, financeFormModel.Devise, financeFormModel.ConditionPaiement, financeFormModel.ModeCommunication};
+                string[] keyData = {"Numéro de licence", "Statut", "Type"};
+                var oldDict = new Dictionary<string, object> { { "Section", "LicenceRBQ" } };
+                var newDict = new Dictionary<string, object> { { "Section", "LicenceRBQ" } };
+                for (int i = 0; i < oldData.Length; i++)
+                {
+                    if (!oldData[i].Equals(newData[i]))
+                    {
+                        isEqual = false;
+                        oldDict.Add(keyData[i], oldData[i]);
+                        newDict.Add(keyData[i], newData[i]);
+                    }
+                }
+                string oldJSON = JsonConvert.SerializeObject(oldDict, Formatting.None);
+                string newJSON = JsonConvert.SerializeObject(newDict, Formatting.None);
+                oldDict.Add(keyData + indexRem, fichierToDelete.Nom);
+                */
                     licenceRBQdata.Fournisseur = licenceRBQdata.Fournisseur;
                     licenceRBQdata.IdLicenceRbq = licenceRBQFormModelDto.NumeroLicence;
                     licenceRBQdata.Statut = licenceRBQFormModelDto.StatutLicence;
