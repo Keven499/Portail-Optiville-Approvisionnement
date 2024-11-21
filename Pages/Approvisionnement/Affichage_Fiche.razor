@@ -248,7 +248,13 @@
                                         <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
                                             <label for="province" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">Province</label>
                                             <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
-                                            <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="province" @bind="@combinedFormModel.CoordonneeFormModel.ProvinceEntreprise" readonly="@modificationInfo">
+                                            <select class="form-select input-vert texte-light py-1" id="province" @bind="@combinedFormModel.CoordonneeFormModel.ProvinceEntreprise" style="width: 325px; @(modificationInfo ? "pointer-events: none;" : null)">
+                                            @foreach (var item in listeProvinces)
+                                            {
+                                                
+                                                <option value="@item">@item</option>
+                                            }
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="row mb-3">
@@ -741,10 +747,9 @@
         "(04) Mauricie", "(05) Estrie", "(06) Montréal", "(07) Outaouais", "(08) Abitibi-Témiscamingue", "(09) Côte-Nord", "(10) Nord-du-Québec",
         "(11) Gaspésie-Îles-de-la-Madeleine", "(12) Chaudière-Appalaches", "(13) Laval", "(14) Lanaudière", "(15) Laurentides", "(16) Montérégie",
         "(17) Centre-du-Québec"};
-    @* private List<string> listeCodeAdm = new List<string>{"(01)", "(02)", "(03)", "(04)", "(05)",
-                                                        "(06)", "(07)", "(08)", "(09)", "(10)",
-                                                        "(11)", "(12)", "(13)", "(14)", "(15)",
-                                                        "(16)", "(17)"}; *@
+    private List<string> listeProvinces = new List<string>{"Ontario", "Manitoba", "Saskatchewan", "Alberta", "Colombie-Britannique",
+        "Île-du-Prince-Édouard", "Nouveau-Brunswick", "Nouvelle-Écosse", "Terre-Neuve-et-Labrador", "Nunavut", "Territoires du Nord-Ouest",
+        "Yukon"};
     private LicenceRBQ LicenceRBQRef;   
     private ContactFormHoster ContactFormHosterRef; 
     public Action<ContactFormHoster>? AssignReferenceContactFormHoster => (contactFormHoster) => ContactFormHosterRef = contactFormHoster;
