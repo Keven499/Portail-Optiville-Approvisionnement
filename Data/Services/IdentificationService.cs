@@ -65,12 +65,16 @@ namespace Portail_OptiVille.Data.Services
             string newJSON = "{\"Section\": \"Identification\",";
             for (int i = 0; i < oldData.Length; i++)
             {
-                if (!oldData[i].Equals(newData[i]))
+                if (oldData[i] != null && newData != null)
                 {
-                    isEqual = false;
-                    oldJSON += $"\"{keyData[i]}\": \"{oldData[i]}\",";
-                    newJSON += $"\"{keyData[i]}\": \"{newData[i]}\",";
+                    if (!oldData[i].Equals(newData[i]))
+                        {
+                            isEqual = false;
+                            oldJSON += $"\"{keyData[i]}\": \"{oldData[i]}\",";
+                            newJSON += $"\"{keyData[i]}\": \"{newData[i]}\",";
+                        }
                 }
+                
             }
             oldJSON = oldJSON.TrimEnd(',') + "}";
             newJSON = newJSON.TrimEnd(',') + "}";

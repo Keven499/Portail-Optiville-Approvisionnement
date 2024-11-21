@@ -32,9 +32,12 @@ namespace Portail_OptiVille.Data.Services
                 {
                     if (!oldData[i].Equals(newData[i]))
                     {
-                        isEqual = false;
-                        oldJSON += $"\"{keyData[i]}\": \"{oldData[i]}\",";
-                        newJSON += $"\"{keyData[i]}\": \"{newData[i]}\",";
+                        if (!oldData[i].Equals(newData[i]))
+                        {
+                            isEqual = false;
+                            oldJSON += $"\"{keyData[i]}\": \"{oldData[i]}\",";
+                            newJSON += $"\"{keyData[i]}\": \"{newData[i]}\",";
+                        }
                     }
                 }
                 oldJSON = oldJSON.TrimEnd(',') + "}";
