@@ -26,21 +26,41 @@ namespace Portail_OptiVille.Data.Services
             }
         }
 
-        public async Task UpdateContactsData(ContactHosterFormModel contactHosterFormModel, string email)
+        public async Task UpdateContactsData(ContactHosterFormModel contactHosterFormModel, int idFournisseur, string email)
         {
-            int idFournisseur = 0;
             /*  USER CAN DO THE FOLLOWING ACTIONS:
                 - MODIFY (Add & Remove)
                 - ADD (Add)
                 - REMOVE (Remove)
                 ALL THESE ACTIONS NEEDS TO BE INSERTED IN THE TABLE HISTORIQUE IN ONE ADD
             */
+
+            /*  COUNT ALL THE CONTACTS IN THE TABLE FOR A GIVEN IDFOURNISSEUR 
+            - REMOVE (Remove)
+            */
+            List<Contact> contacts = await _context.Contacts.Where(c => c.Fournisseur == idFournisseur).ToListAsync();
+            List<ContactFormModel> contactHosterFormModelContacts = contactHosterFormModel.ContactList;
+            var missingContacts = contacts.Where(c => !contactHosterFormModelContacts
+                .Any(modelContact => modelContact.IdContact == c.IdContact)).ToList();
+            foreach (var missingContact in missingContacts)
+            {
+                _context.Contacts.Remove(missingContact);
+            }
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Une erreur est survenue lors l'effacement d'un contact", ex);
+            }
+
+            //- MODIFY (Add & Remove)
             foreach (var contactFromList in contactHosterFormModel.ContactList)
             {
                 var existingContact = await _context.Contacts.SingleOrDefaultAsync(c => c.IdContact == contactFromList.IdContact);
                 if (existingContact != null)
                 {
-                    idFournisseur = (int)existingContact.Fournisseur;
                     existingContact.IdContact = contactFromList.IdContact;
                     existingContact.Prenom = contactFromList.Prenom;
                     existingContact.Nom = contactFromList.Nom;
@@ -55,7 +75,7 @@ namespace Portail_OptiVille.Data.Services
                     {
                         throw new Exception("Une erreur est survenue lors de la mise à jour du contact", ex);
                     }
-                
+
                     var existingTelephone = await _context.Telephones.SingleOrDefaultAsync(t => t.Contact == existingContact.IdContact);
                     if (existingTelephone != null)
                     {
@@ -77,6 +97,7 @@ namespace Portail_OptiVille.Data.Services
                 else
                 {
                     // CREATES THE NEW CONTACT IF NOT IN THE DATABASE MEANING IT'S A NEW CONTACT FROM THE MODIFICATION
+                    // ADD (Add)
                     await AddContact(contactFromList, idFournisseur);
                 }
             }
