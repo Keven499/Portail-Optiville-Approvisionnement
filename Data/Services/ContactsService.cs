@@ -1,16 +1,19 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Portail_OptiVille.Data.FormModels;
 using Portail_OptiVille.Data.Models;
+using Newtonsoft.Json;
 
 namespace Portail_OptiVille.Data.Services
 {
     public class ContactsService
     {
         private readonly A2024420517riGr1Eq6Context _context;
+        private HistoriqueService _historiqueFiche;
 
-        public ContactsService(A2024420517riGr1Eq6Context context)
+        public ContactsService(A2024420517riGr1Eq6Context context, HistoriqueService historiqueFiche)
         {
             _context = context;
+            _historiqueFiche = historiqueFiche;
         }
 
         public async Task SaveContactsData(ContactHosterFormModel contactHosterFormModelDto)
@@ -58,7 +61,7 @@ namespace Portail_OptiVille.Data.Services
                 }
             }
         }
-        public async Task UpdateContactsData(ContactHosterFormModel contactHosterFormModel)
+        public async Task UpdateContactsData(ContactHosterFormModel contactHosterFormModel, string email)
         {
             foreach (var contactFromList in contactHosterFormModel.ContactList)
             {
@@ -103,7 +106,6 @@ namespace Portail_OptiVille.Data.Services
                     }
                 }
             }
-            
         }
     }
 }

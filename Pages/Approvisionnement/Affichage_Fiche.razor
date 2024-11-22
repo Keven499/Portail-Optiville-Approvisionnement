@@ -871,7 +871,7 @@
     private async Task SaveContact()
     {
         // IMPLÉMENTER LA FEATURE HISTORIQUE EN ENVOYANT EN PARAMÈTRE AU SERVICE, L'EMAIL
-        await contactsService.UpdateContactsData(contactHosterFormModel);
+        await contactsService.UpdateContactsData(contactHosterFormModel, email);
 
         modificationContact = true;
         await JSRuntime.InvokeVoidAsync("hideModal", "ContactModal");
