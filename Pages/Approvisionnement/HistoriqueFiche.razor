@@ -37,13 +37,16 @@
                                     {
                                         if (!informationToShow.Retirer.ContainsValue("Fichier") 
                                         && !kvp.Value.Equals("Licence RBQ") 
-                                        && !kvp.Value.Equals("Produits et services"))
+                                        && !kvp.Value.Equals("Produits et services")
+                                        && !kvp.Value.Equals("Contacts"))
                                         {
                                             <div class="fw-bold">@kvp.Key</div>               
                                         }
                                         if (!kvp.Key.Equals("Section"))
                                         {
-                                            if (kvp.Key.Equals("Catégories") || kvp.Key.Equals("Produits et services"))
+                                            if (kvp.Key.Equals("Catégories") || kvp.Key.Equals("Produits et services")
+                                            || kvp.Key.Equals("Nom") || kvp.Key.Equals("Prénom") || kvp.Key.Equals("Fonction")
+                                            || kvp.Key.Equals("Type de numéro") || kvp.Key.Equals("Adresse courriel") || kvp.Key.Equals("Numéro de téléphone"))
                                             {
                                                 var categories = kvp.Value.Split(':');  // Split by comma
                                                 foreach (var category in categories)
@@ -79,7 +82,9 @@
                                         }
                                         if (!kvp.Key.Equals("Section"))
                                         {
-                                            if (kvp.Key.Equals("Catégories") || kvp.Key.Equals("Produits et services"))
+                                            if (kvp.Key.Equals("Catégories") || kvp.Key.Equals("Produits et services")
+                                            || kvp.Key.Equals("Nom") || kvp.Key.Equals("Prénom") || kvp.Key.Equals("Fonction")
+                                            || kvp.Key.Equals("Type de numéro") || kvp.Key.Equals("Adresse courriel") || kvp.Key.Equals("Numéro de téléphone"))
                                             {
                                                 var categories = kvp.Value.Split(':');
 

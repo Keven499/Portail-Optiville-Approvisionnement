@@ -873,7 +873,6 @@
 
     private async Task SaveContact()
     {
-        // IMPLÉMENTATION DE LA FEATURE HISTORIQUE EN COURS
         await contactsService.UpdateContactsData(contactHosterFormModel, selectedFournisseur.IdFournisseur, email);
 
         modificationContact = true;
