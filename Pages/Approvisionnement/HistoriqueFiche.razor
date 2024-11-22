@@ -17,7 +17,8 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-12">
-                @* NOUS SOMMES EN TRAIN D'IMPLÉMENTER HISTORIQUE DANS LA BASE DE DONNÉES, DÈS QUE CELA SERA TERMINÉ, NOUS VIENDRONS ICI POUR GÉRER L'AFFICHAGE *@
+                @*  NOUS SOMMES EN TRAIN D'IMPLÉMENTER HISTORIQUE DANS LA BASE DE DONNÉES, DÈS QUE CELA SERA TERMINÉ, NOUS VIENDRONS ICI POUR GÉRER L'AFFICHAGE,
+                    CAR POUR L'INSTANT TRÈS RUSTIQUE ET SEMI HARDCODÉ. TRÈS NUL ET À AMÉLIORER *@
                 @if (informationToShow != null)
                 {
                     <div class="card mb-2">
@@ -34,16 +35,17 @@
                                     } 
                                     foreach (var kvp in informationToShow.Retirer)
                                     {
-                                        if (!informationToShow.Retirer.ContainsValue("Fichier") && !kvp.Value.Equals("Licence RBQ"))
+                                        if (!informationToShow.Retirer.ContainsValue("Fichier") 
+                                        && !kvp.Value.Equals("Licence RBQ") 
+                                        && !kvp.Value.Equals("Produits et services"))
                                         {
                                             <div class="fw-bold">@kvp.Key</div>               
                                         }
                                         if (!kvp.Key.Equals("Section"))
                                         {
-                                            if (kvp.Key.Equals("Catégories"))
+                                            if (kvp.Key.Equals("Catégories") || kvp.Key.Equals("Produits et services"))
                                             {
                                                 var categories = kvp.Value.Split(':');  // Split by comma
-
                                                 foreach (var category in categories)
                                                 {
                                                     <div>
@@ -69,13 +71,15 @@
                                     } 
                                     foreach (var kvp in informationToShow.Ajouter)
                                     {
-                                        if (!informationToShow.Ajouter.ContainsValue("Fichier") && !kvp.Value.Equals("Licence RBQ"))
+                                        if (!informationToShow.Ajouter.ContainsValue("Fichier") 
+                                        && !kvp.Value.Equals("Licence RBQ")
+                                        && !kvp.Value.Equals("Produits et services"))
                                         {
                                             <div class="fw-bold">@kvp.Key</div>               
                                         }
                                         if (!kvp.Key.Equals("Section"))
                                         {
-                                            if (kvp.Key.Equals("Catégories"))
+                                            if (kvp.Key.Equals("Catégories") || kvp.Key.Equals("Produits et services"))
                                             {
                                                 var categories = kvp.Value.Split(':');
 

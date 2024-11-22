@@ -844,8 +844,7 @@
 
     private async Task SaveModifcationProduitServices()
     {
-        // IMPLÉMENTER LA FEATURE HISTORIQUE EN ENVOYANT EN PARAMÈTRE AU SERVICE, L'EMAIL
-        await produitServiceService.UpdateProduitServiceData(produitServiceFormModel, selectedFournisseur.IdFournisseur);
+        await produitServiceService.UpdateProduitServiceData(produitServiceFormModel, selectedFournisseur.IdFournisseur, email);
 
         selectedProduitservices = allProduitService
         .Where(p => produitServiceFormModel.SousProduitSelected.ContainsKey(p.CodeUnspsc) &&
