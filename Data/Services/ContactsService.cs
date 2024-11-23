@@ -2,6 +2,7 @@
 using Portail_OptiVille.Data.FormModels;
 using Portail_OptiVille.Data.Models;
 using Newtonsoft.Json;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Portail_OptiVille.Data.Services
 {
@@ -193,20 +194,21 @@ namespace Portail_OptiVille.Data.Services
                     }
                 }
             }
-            oldDict.Add(keyData[0], string.Join(": ", catToRemovePrenom));
-            oldDict.Add(keyData[1], string.Join(": ", catToRemoveNom));
-            oldDict.Add(keyData[2], string.Join(": ", catToRemoveFonction));
-            oldDict.Add(keyData[3], string.Join(": ", catToRemoveAdresseCourriel));
-            oldDict.Add(keyData[4], string.Join(": ", catToRemoveTypeNumeroTel));
-            oldDict.Add(keyData[5], string.Join(": ", catToRemoveNumeroTel));
-            oldDict.Add(keyData[6], string.Join(": ", catToRemovePoste));
-            newDict.Add(keyData[0], string.Join(": ", catToAddPrenom));
-            newDict.Add(keyData[1], string.Join(": ", catToAddNom));
-            newDict.Add(keyData[2], string.Join(": ", catToAddFonction));
-            newDict.Add(keyData[3], string.Join(": ", catToAddAdresseCourriel));
-            newDict.Add(keyData[4], string.Join(": ", catToAddTypeNumeroTel));
-            newDict.Add(keyData[5], string.Join(": ", catToAddNumeroTel));
-            newDict.Add(keyData[6], string.Join(": ", catToAddPoste));
+            if (!catToRemovePrenom.IsNullOrEmpty()) oldDict.Add(keyData[0], string.Join(": ", catToRemovePrenom));
+            if (!catToRemoveNom.IsNullOrEmpty()) oldDict.Add(keyData[1], string.Join(": ", catToRemoveNom));
+            if (!catToRemoveFonction.IsNullOrEmpty()) oldDict.Add(keyData[2], string.Join(": ", catToRemoveFonction));
+            if (!catToRemoveAdresseCourriel.IsNullOrEmpty()) oldDict.Add(keyData[3], string.Join(": ", catToRemoveAdresseCourriel));
+            if (!catToRemoveTypeNumeroTel.IsNullOrEmpty()) oldDict.Add(keyData[4], string.Join(": ", catToRemoveTypeNumeroTel));
+            if (!catToRemoveNumeroTel.IsNullOrEmpty()) oldDict.Add(keyData[5], string.Join(": ", catToRemoveNumeroTel));
+            if (!catToRemovePoste.IsNullOrEmpty()) oldDict.Add(keyData[6], string.Join(": ", catToRemovePoste));
+
+            if (!catToAddPrenom.IsNullOrEmpty()) newDict.Add(keyData[0], string.Join(": ", catToAddPrenom));
+            if (!catToAddNom.IsNullOrEmpty()) newDict.Add(keyData[1], string.Join(": ", catToAddNom));
+            if (!catToAddFonction.IsNullOrEmpty()) newDict.Add(keyData[2], string.Join(": ", catToAddFonction));
+            if (!catToAddAdresseCourriel.IsNullOrEmpty()) newDict.Add(keyData[3], string.Join(": ", catToAddAdresseCourriel));
+            if (!catToAddTypeNumeroTel.IsNullOrEmpty()) newDict.Add(keyData[4], string.Join(": ", catToAddTypeNumeroTel));
+            if (!catToAddNumeroTel.IsNullOrEmpty()) newDict.Add(keyData[5], string.Join(": ", catToAddNumeroTel));
+            if (!catToAddPoste.IsNullOrEmpty()) newDict.Add(keyData[6], string.Join(": ", catToAddPoste));
             string oldJSON = JsonConvert.SerializeObject(oldDict, Formatting.None);
             string newJSON = JsonConvert.SerializeObject(newDict, Formatting.None);
             if (!isEqual)

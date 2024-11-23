@@ -91,7 +91,7 @@ namespace Portail_OptiVille.Data.Services
                     licenceRBQdata.IdCategorieRbqs.Add(categorieRBQ);
                     catToAdd.Add(categorieRBQ.CodeSousCategorie + " - " + categorieRBQ.TravauxPermis);
                 }
-                newDict.Add(keyData[3], string.Join(": ", catToAdd));
+                if (catToAdd.Any()) newDict.Add(keyData[3], string.Join(": ", catToAdd));
 
                 foreach (var categorieRBQ in CategorieRBQToRemove)
                 {
@@ -99,7 +99,7 @@ namespace Portail_OptiVille.Data.Services
                     licenceRBQdata.IdCategorieRbqs.Remove(categorieRBQ);
                     catToRemove.Add(categorieRBQ.CodeSousCategorie + " - " + categorieRBQ.TravauxPermis);
                 }
-                oldDict.Add(keyData[3], string.Join(": ", catToRemove));
+                if (catToRemove.Any()) oldDict.Add(keyData[3], string.Join(": ", catToRemove));
                     
                 string oldJSON = JsonConvert.SerializeObject(oldDict, Formatting.None);
                 string newJSON = JsonConvert.SerializeObject(newDict, Formatting.None);

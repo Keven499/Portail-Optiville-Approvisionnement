@@ -87,7 +87,7 @@ namespace Portail_OptiVille.Data.Services
                     fournisseur.IdProduitServices.Add(produitService);
                     produitToAdd.Add(produitService.CodeUnspsc + " - " + produitService.Description);
                 }
-                newDict.Add(keyData[1], string.Join(": ", produitToAdd));
+                if (produitToAdd.Any()) newDict.Add(keyData[1], string.Join(": ", produitToAdd));
 
                 foreach (var produitService in produitServicesToRemove)
                 {
@@ -95,7 +95,7 @@ namespace Portail_OptiVille.Data.Services
                     fournisseur.IdProduitServices.Remove(produitService);
                     produitToRemove.Add(produitService.CodeUnspsc + " - " + produitService.Description);
                 }
-                oldDict.Add(keyData[1], string.Join(": ", produitToRemove));
+                if (produitToRemove.Any()) oldDict.Add(keyData[1], string.Join(": ", produitToRemove));
 
                 string oldJSON = JsonConvert.SerializeObject(oldDict, Formatting.None);
                 string newJSON = JsonConvert.SerializeObject(newDict, Formatting.None);
