@@ -89,8 +89,8 @@ namespace Portail_OptiVille.Data.Services
             string[] keyData = {"No Civique", "Rue", "Bureau",
                                 "Ville", "Province", "Code Postal", 
                                 "Code région administrative", "Région administrative", "Site"};
-            var oldDict = new Dictionary<string, object> { { "Section", "Finance" } };
-            var newDict = new Dictionary<string, object> { { "Section", "Finance" } };
+            var oldDict = new Dictionary<string, object> { { "Section", "Coordonnées" } };
+            var newDict = new Dictionary<string, object> { { "Section", "Coordonnées" } };
             for (int i = 0; i < oldData.Length; i++)
             {
                 if (!oldData[i].Equals(newData[i]))
@@ -115,9 +115,18 @@ namespace Portail_OptiVille.Data.Services
             coordonnee.RegionAdministrative = regionAdm;
             coordonnee.SiteInternet = coordonneeFormModel.SiteWebEntreprise;
 
+            
+            string[] keyDataPhone = {"Numéro de téléphone", "Type", "Poste"};
+
             foreach (var telephoneFromList in coordonneeFormModel.PhoneList)
             {
                 var telephone = await _context.Telephones.FindAsync(telephoneFromList.IdTelephone);
+                string[] oldDataPhoneTemp = {telephone.NumTelephone, telephone.Type, telephone.Poste};
+                string[] newDataPhoneTemp = {telephoneFromList.NoTelEntreprise, telephoneFromList.TypeTelEntreprise, telephoneFromList.PosteTelEntreprise};
+                if (!oldDataPhoneTemp.SequenceEqual(newDataPhoneTemp))
+                {
+                    await SavingChangesPhone(oldDataPhoneTemp, newDataPhoneTemp, keyDataPhone, email, (int)coordonnee.Fournisseur);
+                }
                 telephone.NumTelephone = telephoneFromList.NoTelEntreprise; 
                 telephone.Type = telephoneFromList.TypeTelEntreprise; 
                 telephone.Poste = telephoneFromList.PosteTelEntreprise; 
@@ -127,5 +136,30 @@ namespace Portail_OptiVille.Data.Services
             _context.Coordonnees.Update(coordonnee);
             await _context.SaveChangesAsync();
         }
+        private async Task SavingChangesPhone(string[] oldData, string[] newData, string[] keys, string email, int id)
+        {
+            bool isEqual = true;
+            var oldDict = new Dictionary<string, object> { { "Section", "Téléphones" } };
+            var newDict = new Dictionary<string, object> { { "Section", "Téléphones" } };
+
+            for (int i = 0; i < oldData.Length; i++)
+            {
+                if (!oldData[i].Equals(newData[i]))
+                {
+                    isEqual = false;
+                    oldDict.Add(keys[i], oldData[i]);
+                    newDict.Add(keys[i], newData[i]);
+                }
+            }
+
+            string oldJSON = JsonConvert.SerializeObject(oldDict, Formatting.None);
+            string newJSON = JsonConvert.SerializeObject(newDict, Formatting.None);
+            Console.WriteLine("Phone Changes Detected:");
+            Console.WriteLine($"Old Data: {oldJSON}");
+            Console.WriteLine($"New Data: {newJSON}");
+            if (!isEqual)
+                await _historiqueService.ModifyEtat("Modifiée", id, email, null, oldJSON, newJSON);
+        }
     }
+
 }

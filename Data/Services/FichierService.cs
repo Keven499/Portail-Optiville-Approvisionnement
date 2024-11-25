@@ -131,8 +131,7 @@ namespace Portail_OptiVille.Data.Services
                     }
                     isEqual = false;
                     Console.WriteLine(keyData  + indexAdd);
-                    newDict.Add(keyData + indexAdd, fichierFromList.Nom);
-                    indexAdd++;
+
                     var filePath = Path.Combine(folderPath, fichierFromList.Nom).ToLower();
                     if (!existingFileNames.Contains(fichierFromList.Nom) &&
                         pieceJointeFormModelDto.FileStreams.TryGetValue(fichierFromList.Nom, out var fileStream))
@@ -152,7 +151,8 @@ namespace Portail_OptiVille.Data.Services
                             Path = Path.Combine("files", fournisseurID.ToString(), fichierFromList.Nom).ToLower(),
                             Fournisseur = fournisseurID
                         };
-                        
+                        newDict.Add(keyData + indexAdd, fichier.Nom);
+                        indexAdd++;
                         _context.Fichiers.Add(fichier);
                     }
                 }
