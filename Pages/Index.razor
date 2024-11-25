@@ -10,13 +10,29 @@
 @inject JwtTokenGenerator tokenGenerator
 @inject A2024420517riGr1Eq6Context _context
 
-<PageTitle>Index</PageTitle>
+@inject ProtectedSessionStorage protectedSessionStorage
+@inject NavigationManager NavigationManager
 
-<h1>Hello, world!</h1>
+<div class="container-fluid">
+    <div class="row d-flex justify-content-center">
+        <div class="col-xl-11">
+            <div class="d-flex justify-content-end pb-3">
+                <button id="btnVert" class="btn bg-vert text-white texte-bold" style="width: 200px" @onclick="Deconnexion"><i class="bi bi-box-arrow-left me-1"></i>Déconnexion</button>
+            </div> 
+            <div class="card">
+                <div class="card-header py-2 bg-vertFonce d-flex justify-content-between align-items-center">
+                    <h3 class="text-white titre-bold m-0">Votre portail</h3>
+                </div>
+                <div class="card-body border-vertFonce">
+                    <h1 class="titre-90bold m-0 vert text-center">Bienvenue</h1>
+                    @* <p class="texte-40bold text-center"></p> *@
+                </div>
+                <div class="card-footer py-2 bg-vertFonce"></div>
+            </div>
+        </div>
+    </div>
+</div>
 
-Welcome to your new app.
-
-<SurveyPrompt Title="How is Blazor working for you?" />
 @code {
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -59,5 +75,53 @@ Welcome to your new app.
             navigationManager.NavigateTo("/", true);
         }
     }
+        private async Task Deconnexion()
+    {
+        Usersession[] usersessions;
+        string email;
+
+        var result = await protectedSessionStorage.GetAsync<string>("Email"); // Je vais chercher le mail dans le protectedSessionStorage
+
+        email = result.Value;
+        usersessions = _context.Usersessions.Where(u => u.OwnerEmail == email).ToArray();
+        if(usersessions.Length > 0)
+        {
+            foreach (var usersession in usersessions)
+            {
+                _context.Usersessions.Remove(usersession);
+            }
+            await _context.SaveChangesAsync();    
+
+            await protectedSessionStorage.DeleteAsync("Email");
+            await cookie.destroy("SToken");
+        }
+        else
+        {
+            var token = await cookie.GetValue("SToken");
+            if(!string.IsNullOrEmpty(token))
+            {
+                email = tokenGenerator.GetValueFromToken(token).Split(":")[0];
+                usersessions = _context.Usersessions.Where(u => u.OwnerEmail == email).ToArray();
+                foreach (var usersession in usersessions)
+                {
+                    _context.Usersessions.Remove(usersession);
+                }
+                await _context.SaveChangesAsync();
+            }
+            
+            await protectedSessionStorage.DeleteAsync("Email");
+            await cookie.destroy("SToken");
+        } 
+
+
+        // usersessions = _context.Usersessions.Where(u => u.OwnerEmail == email).ToArray();
+        // foreach (var usersession in usersessions)
+        // {
+        //     _context.Usersessions.Remove(usersession);
+        // }
+        // await _context.SaveChangesAsync();
+        
+        NavigationManager.NavigateTo("/", true);
+    }   
 
 }

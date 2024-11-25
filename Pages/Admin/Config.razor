@@ -58,14 +58,10 @@
                             }
                             else
                             {
-                                <button class="btn bg-vert texte-medium text-white" style="width: 200px;" @onclick="SaveConfig"><i class="bi bi-floppy me-1"></i>Sauvegarder</button>
+                                <button class="btn bg-vert texte-medium text-white" id="btnVert" style="width: 200px;" @onclick="SaveConfig"><i class="bi bi-floppy me-1"></i>Sauvegarder</button>
                             }
                         </div>
                     </div>
-                    @if (saveSuccess)
-                    {
-                        <div class="alert alert-success mt-3">La configuration a été sauvegardée!</div>
-                    }
             </div>
         </div>
     </div>

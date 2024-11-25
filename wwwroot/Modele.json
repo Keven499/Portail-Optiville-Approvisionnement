@@ -2,19 +2,25 @@
   {
     "Id": 1,
     "Nom": "Accus\u00E9",
-    "Objet": "Objet Accus\u00E9",
-    "Message": "Message Accus\u00E9"
+    "Objet": "Accus\u00E9 de r\u00E9ception de votre demande d\u0027ajout",
+    "Message": "Madame, Monsieur,\nNous vous remercions d\u0027avoir contact\u00E9 la Ville de Trois-Rivi\u00E8res et d\u0027avoir exprim\u00E9 votre int\u00E9r\u00EAt \u00E0 \u00EAtre ajout\u00E9 \u00E0 notre bottin central en tant que fournisseur potentiel.\n\nNous accusons r\u00E9ception de votre demande ainsi que des documents et informations que vous avez soumis. Nous tenons \u00E0 vous assurer que votre demande sera trait\u00E9e avec l\u0027attention et la diligence requises. Notre processus d\u0027\u00E9valuation implique une revue d\u00E9taill\u00E9e des informations fournies, ainsi qu\u0027une analyse de la compatibilit\u00E9 de vos produits et services avec les besoins de la Ville. Ce processus peut prendre un certain temps, et nous nous engageons \u00E0 vous fournir une r\u00E9ponse d\u00E9finitive dans les meilleurs d\u00E9lais.\n\nNous vous remercions de votre patience et de votre compr\u00E9hension, et nous sommes impatients d\u0027explorer les\npossibilit\u00E9s d\u0027une collaboration fructueuse.\nCordialement,\n\nJohn Doe\nDirection de l\u0027approvisionnement\nVille de Trois-Rivi\u00E8res"
   },
   {
     "Id": 2,
     "Nom": "Refus",
-    "Objet": "Objet Refus",
-    "Message": "Message Refus\nligne 2\nligne 3"
+    "Objet": "Suite \u00E0 votre demande d\u0027ajout au bottin des fournisseurs",
+    "Message": "Madame, Monsieur,\n\nNous vous remercions d\u2019avoir soumis votre demande pour \u00EAtre ajout\u00E9 \u00E0 notre bottin central en tant que fournisseur potentiel de la Ville de Trois-Rivi\u00E8res.\n\nApr\u00E8s une analyse attentive de votre dossier, nous regrettons de vous informer que votre demande n\u2019a pas \u00E9t\u00E9 retenue.\n\nNous vous remercions sinc\u00E8rement pour l\u2019int\u00E9r\u00EAt que vous portez \u00E0 la Ville de Trois-Rivi\u00E8res. Bien que votre demande n\u2019ait pas pu aboutir cette fois-ci, nous vous encourageons \u00E0 rester attentif \u00E0 d\u2019\u00E9ventuelles opportunit\u00E9s futures qui pourraient mieux correspondre \u00E0 vos produits ou services.\n\nNous vous souhaitons le meilleur dans vos d\u00E9marches et vous remercions \u00E0 nouveau pour votre compr\u00E9hension.\n\nCordialement,\nJohn Doe\nDirection de l\u2019approvisionnement\nVille de Trois-Rivi\u00E8res"
   },
   {
     "Id": 3,
     "Nom": "Accept\u00E9",
-    "Objet": "Objet Accept\u00E9",
-    "Message": "Message Accept\u00E9"
+    "Objet": "Confirmation de votre ajout au bottin des fournisseurs",
+    "Message": "Madame, Monsieur,\n\nNous avons le plaisir de vous informer que votre demande pour \u00EAtre ajout\u00E9 \u00E0 notre bottin central en tant que fournisseur potentiel de la Ville de Trois-Rivi\u00E8res a \u00E9t\u00E9 accept\u00E9e.\n\nNous vous remercions pour l\u2019int\u00E9r\u00EAt que vous portez \u00E0 notre organisation et pour les informations que vous nous avez transmises. Votre profil a \u00E9t\u00E9 int\u00E9gr\u00E9 \u00E0 notre base de donn\u00E9es, et nous n\u2019h\u00E9siterons pas \u00E0 vous contacter dans le cadre de nos besoins en produits et services compatibles avec votre offre.\n\nNous sommes ravis de compter sur votre collaboration \u00E9ventuelle et nous restons \u00E0 votre disposition pour toute information compl\u00E9mentaire ou pr\u00E9cision n\u00E9cessaire.\n\nCordialement,\nJohn Doe\nDirection de l\u2019approvisionnement\nVille de Trois-Rivi\u00E8res"
+  },
+  {
+    "Id": 4,
+    "Nom": "Finances",
+    "Objet": "Ajout d\u0027un nouveau fournisseur",
+    "Message": "Madame, Monsieur,\n\nNous vous informons qu\u2019un nouveau fournisseur a \u00E9t\u00E9 ajout\u00E9 au bottin central de la Ville de Trois-Rivi\u00E8res. Vous trouverez en pi\u00E8ce jointe la fiche compl\u00E8te de ce fournisseur, incluant ses informations pertinentes pour vos dossiers.\n\nNous vous remercions de bien vouloir int\u00E9grer ces informations \u00E0 vos syst\u00E8mes et de nous aviser si des renseignements suppl\u00E9mentaires sont n\u00E9cessaires.\n\nInformations principales du fournisseur :\nNom de l\u2019entreprise : [Nom de l\u2019entreprise]\nAdresse : [Adresse compl\u00E8te]\nPersonne-ressource : [Nom, fonction, courriel, t\u00E9l\u00E9phone]\nSi vous avez des questions ou besoin de pr\u00E9cisions, n\u2019h\u00E9sitez pas \u00E0 me contacter directement.\n\nCordialement,\nJohn Doe,\nDirection de l\u2019approvisionnement\nVille de Trois-Rivi\u00E8res\n\nPi\u00E8ce jointe : Fiche fournisseur \u2013 [Nom de l\u2019entreprise]"
   }
 ]
