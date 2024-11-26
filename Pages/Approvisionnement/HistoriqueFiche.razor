@@ -1,5 +1,5 @@
-@page "/historiqueFiche"
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.IdentityModel.Tokens
 @using Portail_OptiVille.Data.Models
 @using System.Text.Json
 @inject A2024420517riGr1Eq6Context _context
@@ -9,7 +9,7 @@
 *@
 
 <PageTitle>Historique de {fournisseur}</PageTitle>
-<div class="container-fluid">
+<div class="container-fluid p-0">
     <div class="card">
         <div class="card-header bg-vert d-flex justify-content-center">
             <div class="fw-bold fs-4 text-white">Historique</div>
@@ -38,7 +38,8 @@
                                         if (!informationToShow.Retirer.ContainsValue("Fichier") 
                                         && !kvp.Value.Equals("Licence RBQ") 
                                         && !kvp.Value.Equals("Produits et services")
-                                        && !kvp.Value.Equals("Contacts"))
+                                        && !kvp.Value.Equals("Contacts")
+                                        && !kvp.Value.Equals("Coordonnées"))
                                         {
                                             <div class="fw-bold">@kvp.Key</div>               
                                         }
@@ -46,13 +47,14 @@
                                         {
                                             if (kvp.Key.Equals("Catégories") || kvp.Key.Equals("Produits et services")
                                             || kvp.Key.Equals("Nom") || kvp.Key.Equals("Prénom") || kvp.Key.Equals("Fonction")
-                                            || kvp.Key.Equals("Type de numéro") || kvp.Key.Equals("Adresse courriel") || kvp.Key.Equals("Numéro de téléphone"))
+                                            || kvp.Key.Equals("Type de numéro") || kvp.Key.Equals("Adresse courriel") || kvp.Key.Equals("Numéro de téléphone")
+                                            || kvp.Key.Equals("Poste") || kvp.Key.Equals("Type de téléphone"))
                                             {
                                                 var categories = kvp.Value.Split(':');  // Split by comma
                                                 foreach (var category in categories)
                                                 {
                                                     <div>
-                                                        <i class="bi bi-dash"></i> @category.Trim()
+                                                        <i class="bi bi-dash"></i> @(category.IsNullOrEmpty() ? "Aucun" : category.Trim())
                                                     </div>
                                                 }
                                             }
@@ -77,7 +79,8 @@
                                         if (!informationToShow.Ajouter.ContainsValue("Fichier") 
                                         && !kvp.Value.Equals("Licence RBQ")
                                         && !kvp.Value.Equals("Produits et services")
-                                        && !kvp.Value.Equals("Contacts"))
+                                        && !kvp.Value.Equals("Contacts")
+                                        && !kvp.Value.Equals("Coordonnées"))
                                         {
                                             <div class="fw-bold">@kvp.Key</div>               
                                         }
@@ -85,14 +88,15 @@
                                         {
                                             if (kvp.Key.Equals("Catégories") || kvp.Key.Equals("Produits et services")
                                             || kvp.Key.Equals("Nom") || kvp.Key.Equals("Prénom") || kvp.Key.Equals("Fonction")
-                                            || kvp.Key.Equals("Type de numéro") || kvp.Key.Equals("Adresse courriel") || kvp.Key.Equals("Numéro de téléphone"))
+                                            || kvp.Key.Equals("Type de numéro") || kvp.Key.Equals("Adresse courriel") || kvp.Key.Equals("Numéro de téléphone")
+                                            || kvp.Key.Equals("Poste") || kvp.Key.Equals("Type de téléphone"))
                                             {
                                                 var categories = kvp.Value.Split(':');
 
                                                 foreach (var category in categories)
                                                 {
                                                     <div>
-                                                        <i class="bi bi-plus"></i> @category.Trim()
+                                                        <i class="bi bi-plus"></i> @(category.IsNullOrEmpty() ? "Aucun" : category.Trim())
                                                     </div>
                                                 }
                                             }
@@ -183,9 +187,8 @@
 </style>
 
 @code{
-    @* [Parame  ter]
-    public int idFournisseur { get; set; } = 63; *@
-    private int idFournisseur = 74;
+    [Parameter]
+    public int idFournisseur { get; set; } 
     private List<Historique> historiqueFiche = new List<Historique>();
     private InformationToShowDTO informationToShow;
 
