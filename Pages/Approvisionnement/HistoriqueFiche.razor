@@ -7,8 +7,11 @@
 @*
     HISTORIQUE
 *@
+@if (ShowTitle)
+{
+    <PageTitle>Historique de la fiche</PageTitle>
+}
 
-<PageTitle>Historique de {fournisseur}</PageTitle>
 <div class="container-fluid p-0">
     <div class="card">
         <div class="card-header bg-vertFonce">
@@ -168,6 +171,7 @@
 @code{
     [Parameter]
     public int idFournisseur { get; set; } 
+    [Parameter] public bool ShowTitle { get; set; } = true;
     private List<Historique> historiqueFiche = new List<Historique>();
     private InformationToShowDTO informationToShow;
 
