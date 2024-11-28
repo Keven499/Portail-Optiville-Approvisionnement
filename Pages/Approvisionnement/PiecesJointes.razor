@@ -257,7 +257,11 @@
                     errorTable.Add($"En ajoutant {file.Name}, vous dépassez la taille maximale autorisée");
                     continue;
                 }
-
+                if (file.Name.Length > 32)
+                {
+                    errorTable.Add($"Le fichier {file.Name} possède un nom trop long");
+                    continue;
+                }
                 var fichier = new Fichier
                     {
                         Nom = file.Name,
