@@ -30,6 +30,8 @@
                     <span class="bi bi-search me-2 ms-4" aria-hidden="true"></span> Recherche
                 </NavLink>
             </div>
+            @if(niveauAcces == 3)
+            {
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="gestionUser">
                     <span class="bi bi-people-fill me-2 ms-4" aria-hidden="true"></span>Gestion utilisateurs
@@ -45,6 +47,7 @@
                     <span class="bi bi-envelope-fill me-2 ms-4" aria-hidden="true"></span>Modèle de courriels
                 </NavLink>
             </div>
+            }
         </div>
         <div>
             <div class="nav-item px-3">
@@ -57,9 +60,25 @@
 @code {
     private bool collapseNavMenu = true;
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : "show";
+    private int niveauAcces = 0;
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+    private RoleChecker _roleChecker;
+    private async Task<bool> CheckRole(string role)
+    {
+        _roleChecker = new RoleChecker(protectedSessionStorage, cookie, tokenGenerator);
+        return await _roleChecker.CheckRole(role);
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+        _roleChecker = new RoleChecker(protectedSessionStorage, cookie, tokenGenerator);
+        niveauAcces = await _roleChecker.GetNiveauAcces();
+        StateHasChanged();
+        }
     }
     private async Task Deconnexion()
     {

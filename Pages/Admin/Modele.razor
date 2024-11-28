@@ -129,6 +129,8 @@
     private string? selectedObjet;
     private string? selectedMessage;
     private int selectedId =0;
+    private RoleChecker _roleChecker;
+
 
     private ModeleAjouteModel AjouteModel = new ModeleAjouteModel();
     private class ModeleAjouteModel
@@ -141,6 +143,13 @@
         public string? MessageNewModele { get; set; }
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        _roleChecker = new RoleChecker(protectedSessionStorage, cookie, tokenGenerator);
+        if(await _roleChecker.CheckRole("Administrateur") == false){
+            NavigationManager.NavigateTo("/index", true);
+        }
+    }
     private void CreateModele(bool save)
     {
         if(save)

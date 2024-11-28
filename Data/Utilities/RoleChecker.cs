@@ -50,4 +50,21 @@ public class RoleChecker
         // Vérifie si le rôle actuel est au moins égal ou supérieur au rôle requis
         return currentRoleIndex >= requiredRoleIndex;
     }
+
+    public async Task<int> GetNiveauAcces(){
+        if(await CheckRole("Administrateur")){
+            //Console.WriteLine("Admin");
+            return 3;
+        }
+        else if(await CheckRole("Responsable")){
+            //Console.WriteLine("Responsable");
+            return 2;
+        }
+        else if(await CheckRole("Commis"))
+        {
+            //Console.WriteLine("Commis");
+            return 1;
+        }
+        return 0;
+    }
 }

@@ -133,6 +133,7 @@
     private List<Employe> allNonUsers = new List<Employe>();
     private List<string> employesCourrielUpdate = new List<string>();
     private List<string> employesRoleUpdate = new List<string>();
+    private RoleChecker _roleChecker;
 
     protected override async Task OnInitializedAsync()
     {
@@ -147,6 +148,15 @@
         catch (Exception ex)
         {
             Console.WriteLine($"Erreur lors de la récupération des personnes: {ex.Message}");
+        }
+
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+                _roleChecker = new RoleChecker(protectedSessionStorage, cookie, tokenGenerator);
+        if(await _roleChecker.CheckRole("Administrateur") == false){
+            NavigationManager.NavigateTo("/index", true);
         }
     }
 

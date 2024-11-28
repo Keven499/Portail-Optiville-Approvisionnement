@@ -9,8 +9,8 @@
 @inject MailManager _mailManager
 @inject DownloadService DownloadService
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject ProtectedSessionStorage ProtectedSessionStore
 @inject NavigationManager navigationManager
+@inject ProtectedSessionStorage ProtectedSessionStore
 @inject ICookie cookie
 @inject JwtTokenGenerator tokenGenerator
 
@@ -32,10 +32,9 @@
     }
     private async Task SendMail()
     {
-       _roleChecker = new RoleChecker(ProtectedSessionStore, cookie, tokenGenerator);
+        _roleChecker = new RoleChecker(ProtectedSessionStore, cookie, tokenGenerator);
         if(await _roleChecker.CheckRole("Commis"))
         {
-            Console.WriteLine("Je suis un administrateur");
         }
     }
 

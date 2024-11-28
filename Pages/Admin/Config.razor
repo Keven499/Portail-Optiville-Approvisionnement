@@ -70,10 +70,18 @@
     private bool isEditing = false;
     private bool saveSuccess = false;
     Configappro allConfigs = new Configappro();
+    private RoleChecker _roleChecker;
 
     protected override async Task OnInitializedAsync()
     {
         allConfigs = await _context.Configappros.SingleAsync();
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        _roleChecker = new RoleChecker(protectedSessionStorage, cookie, tokenGenerator);
+        if(await _roleChecker.CheckRole("Administrateur") == false){
+            NavigationManager.NavigateTo("/index", true);
+        }
     }
     private void EditConfig()
     {
