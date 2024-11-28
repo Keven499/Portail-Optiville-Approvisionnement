@@ -272,10 +272,13 @@
                                     phoneNo++;        
                                 }
                             }
-                        <div class="d-flex justify-content-center pb-2">
-                            <button type="button" class="btn bg-bleu text-white texte-bold me-2" id="btnBleu" @onclick="AddTelephone" style="width: 200px;" ><i class="bi bi-plus-circle"></i> Ajout</button>
-                            <button type="button" class="btn bg-danger text-white texte-bold" id="btnSupp" @onclick="RemoveTelephone" disabled="@(!(combinedFormModel.CoordonneeFormModel.PhoneList.Count > 1))" style="width: 200px;"><i class="bi bi-trash"></i> Retirer</button>
-                        </div>
+                            @if(!modificationInfo)
+                            {
+                                <div class="d-flex justify-content-center pb-2">
+                                    <button type="button" class="btn bg-bleu text-white texte-bold me-2" id="btnBleu" @onclick="AddTelephone" style="width: 200px;" ><i class="bi bi-plus-circle"></i> Ajout</button>
+                                    <button type="button" class="btn bg-danger text-white texte-bold" id="btnSupp" @onclick="RemoveTelephone" disabled="@(!(combinedFormModel.CoordonneeFormModel.PhoneList.Count > 1))" style="width: 200px;"><i class="bi bi-trash"></i> Retirer</button>
+                                </div>
+                            }
                     </div> 
                 </EditForm>
 @* Contacts*@
@@ -1071,39 +1074,45 @@
             //closestHistorique = await _context.Historiques.Where(h => h.Fournisseur == selectedFournisseur.IdFournisseur && h.DateEtatChanged.HasValue).OrderBy(h => Math.Abs((h.DateEtatChanged.Value - DateTime.UtcNow).TotalDays)).FirstOrDefaultAsync();
             if(identification.Neq != null)
             {
-                licencerbqs = await _context.Licencerbqs.SingleAsync(c => c.Fournisseur == selectedFournisseur.IdFournisseur);
-                selectedCategorieRBQ = await _context.Categorierbqs.Where(c => c.IdLicenceRbqs.Any(l => l.IdLicenceRbq == licencerbqs.IdLicenceRbq)).ToListAsync();
-                selectedLicencerbqs = await _context.Licencerbqs.Where(l => l.Fournisseur == selectedFournisseur.IdFournisseur).Include(l => l.IdCategorieRbqs).ToListAsync();
-                allCategoriesForm = await _context.Categorierbqs.ToListAsync();
-                selectedCurrentCategorieRBQ = allCategoriesForm.ToDictionary(c => c.CodeSousCategorie, c => false);
-            
-                allCategories = await _context.Categorierbqs.ToListAsync(); 
-                foreach(var categorie in allCategoriesForm)
-                {
-                    AllCodeSousCategorie.Add(categorie.CodeSousCategorie);
-                }
-                licenceRBQFormModel = new LicenceRBQFormModel
-                {
-                    NumeroLicence = licencerbqs.IdLicenceRbq,
-                    StatutLicence = licencerbqs.Statut,
-                    TypeLicence = licencerbqs.Type,
-                    CodeSousCategorie = AllCodeSousCategorie,
-                    SousCategoSelected = allCategories.ToDictionary(c => c.CodeSousCategorie, c => false)
-                };
-                foreach(var item in selectedCurrentCategorieRBQ)
-                {
-                    foreach(var cate in selectedCategorieRBQ)
+                try{
+                    licencerbqs = await _context.Licencerbqs.SingleAsync(c => c.Fournisseur == selectedFournisseur.IdFournisseur);
+                    selectedCategorieRBQ = await _context.Categorierbqs.Where(c => c.IdLicenceRbqs.Any(l => l.IdLicenceRbq == licencerbqs.IdLicenceRbq)).ToListAsync();
+                    selectedLicencerbqs = await _context.Licencerbqs.Where(l => l.Fournisseur == selectedFournisseur.IdFournisseur).Include(l => l.IdCategorieRbqs).ToListAsync();
+                    allCategoriesForm = await _context.Categorierbqs.ToListAsync();
+                    selectedCurrentCategorieRBQ = allCategoriesForm.ToDictionary(c => c.CodeSousCategorie, c => false);
+                
+                    allCategories = await _context.Categorierbqs.ToListAsync(); 
+                    foreach(var categorie in allCategoriesForm)
                     {
-                        if (cate.CodeSousCategorie == item.Key)
+                        AllCodeSousCategorie.Add(categorie.CodeSousCategorie);
+                    }
+                    licenceRBQFormModel = new LicenceRBQFormModel
+                    {
+                        NumeroLicence = licencerbqs.IdLicenceRbq,
+                        StatutLicence = licencerbqs.Statut,
+                        TypeLicence = licencerbqs.Type,
+                        CodeSousCategorie = AllCodeSousCategorie,
+                        SousCategoSelected = allCategories.ToDictionary(c => c.CodeSousCategorie, c => false)
+                    };
+                    foreach(var item in selectedCurrentCategorieRBQ)
+                    {
+                        foreach(var cate in selectedCategorieRBQ)
                         {
-                            licenceRBQFormModel.SousCategoSelected[item.Key] = true;
+                            if (cate.CodeSousCategorie == item.Key)
+                            {
+                                licenceRBQFormModel.SousCategoSelected[item.Key] = true;
+                            }
                         }
                     }
-                }
 
-                if(licencerbqs == null && selectedCategorieRBQ == null)
+                    if(licencerbqs == null && selectedCategorieRBQ == null)
+                    {
+                        LicenceRBQInfoNull = true;
+                    }
+                }
+                catch (Exception ex)
                 {
-                    LicenceRBQInfoNull = true;
+                    Console.WriteLine($"Erreur NEQ: {ex.Message}");
                 }
             }
                 //allCategories = await _context.Categorierbqs.ToListAsync();
