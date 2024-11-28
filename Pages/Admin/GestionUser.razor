@@ -19,9 +19,6 @@
 <PageTitle>Gestion des rôles</PageTitle>
     <div class="row d-flex justify-content-center">
         <div class="col-xl-11 col-lg-11 col-sm-12 col-12 p-0">
-            <div class="d-flex justify-content-end pb-3">
-                <button id="btnVert" class="btn bg-vert text-white texte-bold" style="width: 200px" @onclick="Deconnexion"><i class="bi bi-box-arrow-left me-1"></i>Déconnexion</button>
-            </div> 
             <div class="card">
                 <div class="card-header py-2 bg-vertFonce d-flex align-items-center">
                     <h3 class="py-2 my-0 text-white titre-bold">Gestion des utilisateurs</h3>
@@ -41,27 +38,27 @@
                         <div class="titre-medium vert fs-3">Rôle</div>
                     </div>
                 </div>
-                    @foreach (var employe in allEmployes)
-                    {
-                        <div class="row d-flex align-items-center">
-                            <div class="col-xl-5 col-lg-5 col-12 col-sm-12">
-                                <div class="texte-light fs-6 fw-bold">@employe.Courriel</div>
-                            </div>
-                            <div class="col-xl-5 col-lg-5 col-4 col-sm-4">
-                                <select class="form-select input-vert texte-light " @onchange="(e) => OnRoleChange(employe, e.Value!.ToString()!)">
-                                    @foreach (var value in Roles)
-                                    {
-                                        <option value="@value" selected="@((employe.Role == value))">@value</option>
-                                    }
-                                </select>
-                            </div>
-                            <div class="col-xl-1 col-lg-1 col-4 col-sm-4">
-                                <button type="button" class="btn btn-danger w-100" id="btnSupp" @onclick="() => OnDeleteUser(employe)"><i class="bi bi-trash"></i></button>
-                            </div>
-                            <hr class="mt-2 mb-2"/>
+                @foreach (var employe in allEmployes)
+                {
+                    <div class="row d-flex align-items-center">
+                        <div class="col-xl-5 col-lg-5 col-12 col-sm-12">
+                            <div class="texte-light fs-6 fw-bold">@employe.Courriel</div>
                         </div>
-                    }
-                <div class="">
+                        <div class="col-xl-5 col-lg-5 col-4 col-sm-4">
+                            <select class="form-select input-vert texte-light " @onchange="(e) => OnRoleChange(employe, e.Value!.ToString()!)">
+                                @foreach (var value in Roles)
+                                {
+                                    <option value="@value" selected="@((employe.Role == value))">@value</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-xl-1 col-lg-1 col-4 col-sm-4">
+                            <button type="button" class="btn btn-danger w-100" id="btnSupp" @onclick="() => OnDeleteUser(employe)"><i class="bi bi-trash"></i></button>
+                        </div>
+                        <hr class="mt-2 mb-2"/>
+                    </div>
+                }
+                <div>
                 @if (!formAjouter)
                 {
                     <div class="row justify-content-center">
@@ -104,15 +101,14 @@
                 </div>
             </div>
             <div class="card-footer bg-vertFonce">
-                @if (isRoleChanged)
-                {
-                    <button type="submit" class="btn bg-vert w-100 text-white texte-bold" id="btnVert" @onclick="UpdateEmployesRole">Sauvegarder</button>
-                }
+            @if (isRoleChanged)
+            {
+                <button type="submit" class="btn bg-vert w-100 text-white texte-bold" id="btnVert" @onclick="UpdateEmployesRole">Sauvegarder</button>
+            }
             </div>
         </div>
     </div>
 </div>
-@* <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script> *@
 
 <style>
     .valid {
@@ -133,6 +129,7 @@
     private List<Employe> allNonUsers = new List<Employe>();
     private List<string> employesCourrielUpdate = new List<string>();
     private List<string> employesRoleUpdate = new List<string>();
+    private List<string> newRole = new List<string>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -142,6 +139,9 @@
         try
         {
             allEmployes = await _context.Employes.Where(e => Roles.Contains(e.Role)).ToListAsync();
+            newRole = allEmployes
+                .Select(e => e.Role)
+                .ToList();
             allNonUsers = await _context.Employes.Where(e => e.Role == "Aucun").ToListAsync();
         }
         catch (Exception ex)
@@ -162,6 +162,8 @@
     private void OnRoleChange(Employe employe, string selectedRole)
     {
         int index = employesCourrielUpdate.IndexOf(employe.Courriel);
+        int indexEmploye = allEmployes.FindIndex(e => e.Courriel == employe.Courriel);
+        newRole[indexEmploye] = selectedRole;
         if (index != -1)
         {
             employesRoleUpdate[index] = selectedRole;
@@ -226,9 +228,11 @@
 
     private bool ValidateAdminCount(bool action, string role)
     {
+        Console.WriteLine($"ACTION: {action}, ROLE: {role}");
         message = string.Empty;
         bool isRespectHierarchy = true;
         int adminCount = allEmployes.Count(e => e.Role == "Administrateur");
+        Console.WriteLine($"ADMIN COUNT: {adminCount}");
         if (action)
         {
             if (role.Equals("Administrateur"))
@@ -281,6 +285,20 @@
 
     private async Task UpdateEmployesRole()
     {
+        Console.WriteLine("----OLD EMPLOYE ROLE STATE----");
+        foreach (var emp in allEmployes)
+        {
+            Console.WriteLine(emp.Role);
+        }
+        Console.WriteLine("----NEW EMPLOYE ROLE STATE----");
+        foreach (var role in newRole)
+        {
+            Console.WriteLine(role);
+        }
+        @* if (!ValidateAdminCount(false, employe.Role) || !ValidateResponsableCount(employe.Role))
+        {
+            return;
+        } *@
         await GestionUserService.UpdateRoleOfUsers(employesCourrielUpdate, employesRoleUpdate);
         employesCourrielUpdate.Clear();
         employesRoleUpdate.Clear();
