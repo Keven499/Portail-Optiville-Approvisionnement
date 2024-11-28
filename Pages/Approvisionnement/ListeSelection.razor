@@ -23,7 +23,7 @@
                 </div>
             </div>
         </div>  
-        <div style="max-height: 400px; cursor: default;" class="card-body border-vertFonce box-vert listFiltre p-0">
+        <div style="max-height: 100%; cursor: default;" class="card-body border-vertFonce box-vert listFiltre p-0">
             <!-- LISTE DES FICHES -->
             @if (fournisseurFiches.Any())
             {
@@ -36,7 +36,7 @@
                         <div class="col-3 d-flex justify-content-center align-items-center border-right" style="word-wrap: break-word; white-space: normal;">
                             <div class="row w-100 text-center">
                                 <div class="col-12">
-                                    <div class="mb-2">@fiche.NomEntreprise</div>
+                                    <div class="mb-2 texte-bold vertFonce">@fiche.NomEntreprise</div>
                                     <div>@fiche.AdresseCourriel</div>
                                 </div>
                             </div>
@@ -52,13 +52,13 @@
                         </div>
                         <!-- CONTACTS (NOM, PRÉNOM, ADRESSE COURRIEL, NUMÉRO DE TÉLÉPHONE) -->
                         <div class="col-3 d-flex justify-content-center align-items-center border-right" style="word-wrap: break-word; white-space: normal;">
-                            <div class="row w-100 listFiltre" style="max-height: 150px;">
+                            <div class="row w-100 listFiltre" style="max-height: 100%;">
                             @{
                                 int j = 0;
                                 @foreach (var contact in fiche.Contacts)
                                 {
                                     <div class="col-12">
-                                        <div>@contact.Prenom - @contact.Nom</div>
+                                        <div class="texte-bold vertFonce">@contact.Prenom - @contact.Nom</div>
                                         <div class="my-2">@contact.AdresseCourriel</div>
                                         <div>@contact.NumTelephone</div>
                                     </div>
@@ -87,6 +87,9 @@
             {
                 <div class="text-center fw-bold py-2">NO DATA</div>
             }
+        </div>
+        <div class="card-footer bg-vertFonce rounded-0">
+
         </div>
     </div>
 </div>
