@@ -190,6 +190,15 @@
                 Console.WriteLine("N'a pu initialisé drag and drop");
             }
         }
+        try
+        {
+            await _jsRuntime.InvokeVoidAsync("dragAndDrop.initialize", "dropArea", "fileInput");
+            Console.WriteLine("drag and drop initialisé");
+        }
+        catch (JSException ex)
+        {
+            await Task.Delay(200);
+        }
     }
     private string GetFormatSizeFile(long size)
     {
