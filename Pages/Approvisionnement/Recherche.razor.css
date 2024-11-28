@@ -72,13 +72,13 @@
         border-right: 1px solid rgb(30, 73, 45);
     }
     .bg-yellowEtat {
-        background-color: rgb(243 231 0);
+        background-color: rgb(243, 231, 0);
     }
     .bg-redEtat {
-        background-color: rgb(229 0 77);
+        background-color: rgb(229, 0, 77);
     }
     .bg-grayEtat {
-        background-color: gray;
+        background-color: rgb(136, 134, 134);
     }
 
     

@@ -11,12 +11,12 @@
 <PageTitle>Historique de {fournisseur}</PageTitle>
 <div class="container-fluid p-0">
     <div class="card">
-        <div class="card-header bg-vert d-flex justify-content-center">
-            <div class="fw-bold fs-4 text-white">Historique</div>
+        <div class="card-header bg-vertFonce">
+            <h3 class="text-white titre-bold m-0">Historique</h3>
         </div>
         <div class="card-body">
             <div class="row">
-                <div class="col-12">
+                <div class="col-8">
                 @*  NOUS SOMMES EN TRAIN D'IMPLÉMENTER HISTORIQUE DANS LA BASE DE DONNÉES, DÈS QUE CELA SERA TERMINÉ, NOUS VIENDRONS ICI POUR GÉRER L'AFFICHAGE,
                     CAR POUR L'INSTANT TRÈS RUSTIQUE ET SEMI HARDCODÉ. TRÈS NUL ET À AMÉLIORER *@
                 @if (informationToShow != null)
@@ -117,26 +117,26 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-4">Date et heure</div>
-                <div class="col-4">État de la demande</div>
-                <div class="col-4">Modifié par</div>
+                <div class="col-4 titre-20bold vertFonce">Date et heure</div>
+                <div class="col-4 titre-20bold vertFonce">État de la demande</div>
+                <div class="col-4 titre-20bold vertFonce">Modifié par</div>
             </div>
             @foreach (var historiqueChange in historiqueFiche)
             {
                 <div class="row my-1">
-                    <div class="col-4">@historiqueChange.DateEtatChanged</div>
+                    <div class="col-4 texte-medium">@historiqueChange.DateEtatChanged</div>
                     <div class="col-4">
                         @* COULEUR TEMPORAIRE *@
                         <button type="button"
-                            style="font-size: 14px; height: 30px;"
-                            class="btn bg-vert d-flex align-items-center texte-light fw-bold text-white
+                            style="width: 150px;"
+                            class="btn d-flex justify-content-center 
                             @(historiqueChange.EtatDemande == "Accepté" ? "bg-Accepte texte-medium" :
                             historiqueChange.EtatDemande == "Refusé" ? "bg-Refuse text-white texte-medium" :
-                            historiqueChange.EtatDemande == "En attente" ? "bg-EnAttente text-white texte-medium" : 
+                            historiqueChange.EtatDemande == "En attente" ? "bg-EnAttente texte-medium" : 
                             historiqueChange.EtatDemande == "À réviser" ? "bg-Reviser text-white texte-medium" :
                             historiqueChange.EtatDemande == "Désactivée" ? "bg-Desactive text-white texte-medium" :
                             historiqueChange.EtatDemande == "Modifiée" ? "bg-Modifie text-white texte-medium" : "")"
-                            id="btnVert"
+                           
                             @onclick="() => ShowInformationState(historiqueChange.IdHistorique, historiqueChange.EtatDemande)">
                             @* ATTENTION, LES DONNÉES DE LA BD POUR LE ENUM NE REFLÈTENT PLUS LE CODE *@
                             @* NE PAS OUBLIER DE CHANGER LES COULEURS *@
@@ -150,9 +150,9 @@
                                     break;
                                 case "À réviser": <i class="bi bi-exclamation-circle me-2"></i>  
                                     break;
-                                case "Modifiée": <i class="bi bi-pencil me-2"></i>
+                                case "Modifié": <i class="bi bi-pencil me-2"></i>
                                     break;
-                                case "Désactivée": <i class="bi bi-slash-circle me-2"></i>     
+                                case "Désactivé": <i class="bi bi-slash-circle me-2"></i>     
                                     break;
                             }    
                             @historiqueChange.EtatDemande                 
@@ -164,27 +164,6 @@
         </div>
     </div>
 </div>
-
-<style>
-    .bg-EnAttente {
-        background-color: rgba(217, 167, 0, 0.78);
-    }
-    .bg-Refuse {
-        background-color: red;
-    }
-    .bg-Accepte {
-        background-color: green;
-    }
-    .bg-Modifie {
-        background-color: rgb(21, 21, 178);
-    }
-    .bg-Reviser {
-        background-color: rgba(217, 167, 0, 0.78);
-    }
-    .bg-Desactive {
-        background-color: purple;
-    }
-</style>
 
 @code{
     [Parameter]

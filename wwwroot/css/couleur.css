@@ -295,6 +295,11 @@ input[type="checkbox"]:checked + .check-blanc:before {
     font-size: 30px;
 }
 
+.titre-20bold {
+    font-family: 'Alumni Extra Bold';
+    font-size: 20px;
+}
+
 .titre-medium {
     font-family: 'Alumni Medium';
 }
@@ -353,4 +358,52 @@ input[type="checkbox"]:checked + .check-blanc:before {
     .navbar-brand img {
         max-height: 60px; /* Taille réduite pour les petits écrans */
     }
+}
+
+.bg-EnAttente{
+    background-color: rgba(243, 231, 0, 0.78);
+}
+
+.bg-EnAttente:hover{
+    background-color: rgba(243, 231, 0, 0.3);
+}
+
+.bg-Refuse {
+    background-color:  rgb(229, 0, 77);
+}
+
+.bg-Refuse:hover {
+    background-color:  rgb(131, 16, 54);
+}
+
+.bg-Accepte {
+    background-color: rgb(99, 188, 85);
+}
+
+.bg-Accepte:hover {
+    background-color: rgb(44, 102, 35);
+}
+
+.bg-Modifie {
+    background-color: rgb(204, 127, 55);
+}
+
+.bg-Modifie:hover {
+    background-color: rgb(153, 90, 31);
+}
+
+.bg-Reviser {
+    background-color: rgba(136, 134, 134, 0.78);
+}
+
+.bg-Reviser:hover {
+    background-color: rgba(95, 94, 94, 0.78);
+}
+
+.bg-Desactive {
+    background-color: rgb(91, 125, 136);
+}
+
+.bg-Desactive:hover {
+    background-color: rgb(53, 87, 99);
 }
