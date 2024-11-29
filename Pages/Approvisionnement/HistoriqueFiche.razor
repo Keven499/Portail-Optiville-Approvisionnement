@@ -38,11 +38,7 @@
                                     } 
                                     foreach (var kvp in informationToShow.Retirer)
                                     {
-                                        if (!informationToShow.Retirer.ContainsValue("Fichier") 
-                                        && !kvp.Value.Equals("Licence RBQ") 
-                                        && !kvp.Value.Equals("Produits et services")
-                                        && !kvp.Value.Equals("Contacts")
-                                        && !kvp.Value.Equals("Coordonnées"))
+                                        if (!kvp.Key.Equals("Section"))
                                         {
                                             <div class="fw-bold">@kvp.Key</div>               
                                         }
@@ -79,11 +75,7 @@
                                     } 
                                     foreach (var kvp in informationToShow.Ajouter)
                                     {
-                                        if (!informationToShow.Ajouter.ContainsValue("Fichier") 
-                                        && !kvp.Value.Equals("Licence RBQ")
-                                        && !kvp.Value.Equals("Produits et services")
-                                        && !kvp.Value.Equals("Contacts")
-                                        && !kvp.Value.Equals("Coordonnées"))
+                                        if (!kvp.Key.Equals("Section"))
                                         {
                                             <div class="fw-bold">@kvp.Key</div>               
                                         }

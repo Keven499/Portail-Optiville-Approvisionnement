@@ -63,6 +63,7 @@
 @code {
     private LogInModel logInModel = new LogInModel();
     private bool isSubmit = false;
+    private bool isValidForm = false;
      private ValidationMessageStore validationMessageStore;
     private EditContext editContext;
 
@@ -77,12 +78,13 @@
     {
         validationMessageStore.Clear();
         isSubmit = true;
-        return editContext.Validate();
+        isValidForm = editContext.Validate();
+        return isValidForm;
     }
 
     private string GetInputClass<TField> (Expression<Func<TField>> fieldExpression)
     {
-        if (!isSubmit) {
+        if (!isSubmit || isValidForm) {
             return "";
         }
         var fieldIdentifier = FieldIdentifier.Create(fieldExpression);
@@ -96,7 +98,7 @@
 
     private string GetValidationHTML<TField> (Expression<Func<TField>> fieldExpression) 
     {
-        if (!isSubmit) {
+        if (!isSubmit || isValidForm) {
             return "";
         }
         var fieldIdentifier = FieldIdentifier.Create(fieldExpression);

@@ -587,20 +587,20 @@
                                             <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
                                                 <label for="inputTPS" class="vertFonce texte-bold">TPS</label>
                                                 <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
-                                                <input type="text" style="width: 325px;" class="form-control @GetInputClass(() => financeFormModel.NumeroTps) input-vert texte-light py-1" id="inputTPS" @bind="@financeFormModel.NumeroTps" readonly="@modificationFinances">                                                                                               
-                                            </div>                                                                                      
-                                            <div class="col-xl-11 d-xl-flex justify-content-xl-end col-lg-11 d-lg-flex justify-content-lg-end col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12 mt-1">
-                                                @((MarkupString)GetValidationHTML(() => financeFormModel.NumeroTps))
-                                            </div>                                            
+                                                <div>
+                                                    <input type="text" style="width: 325px;" class="form-control @GetInputClass(() => financeFormModel.NumeroTps) input-vert texte-light py-1" id="inputTPS" @bind="@financeFormModel.NumeroTps" readonly="@modificationFinances">                                                                                               
+                                                    @((MarkupString)GetValidationHTML(() => financeFormModel.NumeroTps))
+                                                </div>
+                                            </div>                                                                                                                              
                                         </div>
                                         <div class="row mb-3">
                                             <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
                                                 <label for="inputTVQ" class="vertFonce texte-bold">TVQ</label>
                                                 <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
-                                                <input type="text" style="width: 325px;" class="form-control @GetInputClass(() => financeFormModel.NumeroTvq) input-vert texte-light py-1" id="inputTVQ" @bind="@financeFormModel.NumeroTvq" readonly="@modificationFinances">                                                                                               
-                                            </div>
-                                            <div class="col-xl-11 d-xl-flex justify-content-xl-end col-lg-11 d-lg-flex justify-content-lg-end col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12 mt-1">
-                                                @((MarkupString)GetValidationHTML(() => financeFormModel.NumeroTvq))
+                                                <div>
+                                                    <input type="text" style="width: 325px;" class="form-control @GetInputClass(() => financeFormModel.NumeroTvq) input-vert texte-light py-1" id="inputTVQ" @bind="@financeFormModel.NumeroTvq" readonly="@modificationFinances">                                                                                               
+                                                    @((MarkupString)GetValidationHTML(() => financeFormModel.NumeroTvq))
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -609,47 +609,50 @@
                                             <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
                                                 <label for="inputModeComm" class="vertFonce texte-bold">Mode de communication</label>
                                                 <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
-                                                <select class="form-select @GetInputClass(() => financeFormModel.ModeCommunication) input-vert texte-light py-1" id="inputModeComm" @bind="@financeFormModel.ModeCommunication"
+                                                <div>
+                                                    <select class="form-select @GetInputClass(() => financeFormModel.ModeCommunication) input-vert texte-light py-1" id="inputModeComm" @bind="@financeFormModel.ModeCommunication"
                                                         style="@(modificationFinances ? "pointer-events: none;" : null) width: 325px; ">
-                                                    <option value="">Choisir une option</option>
-                                                    <option value="Courriel">Courriel</option>
-                                                    <option value="Courrier régulier">Courrier régulier</option>
-                                                </select>                                            
+                                                        <option value="">Choisir une option</option>
+                                                        <option value="Courriel">Courriel</option>
+                                                        <option value="Courrier régulier">Courrier régulier</option>
+                                                    </select>      
+                                                    @((MarkupString)GetValidationHTML(() => financeFormModel.ModeCommunication))  
+                                                </div>                                    
                                             </div>
-                                            <div class="col-xl-11 d-xl-flex justify-content-xl-end col-lg-11 d-lg-flex justify-content-lg-end col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12 mt-1">
-                                                @((MarkupString)GetValidationHTML(() => financeFormModel.ModeCommunication))
-                                            </div> 
                                         </div>
                                         <div class="row mb-3">
                                             <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
                                                 <label for="inputDevise" class="vertFonce texte-bold">Devise</label>
                                                 <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
-                                                <select class="form-select @GetInputClass(() => financeFormModel.Devise) input-vert texte-light py-1" id="inputDevise" @bind="@financeFormModel.Devise"
+                                                <div>
+                                                    <select class="form-select @GetInputClass(() => financeFormModel.Devise) input-vert texte-light py-1" id="inputDevise" @bind="@financeFormModel.Devise"
                                                         style="@(modificationFinances ? "pointer-events: none;" : null) width: 325px;">
-                                                    <option value="">Choisir une option</option>
-                                                    <option value="CAD">CAD</option>
-                                                    <option value="USD">USD</option>
-                                                </select>                                            
+                                                        <option value="">Choisir une option</option>
+                                                        <option value="CAD">CAD</option>
+                                                        <option value="USD">USD</option>
+                                                    </select> 
+                                                    @((MarkupString)GetValidationHTML(() => financeFormModel.Devise)) 
+                                                </div>                                       
                                             </div>
                                             <div class="col-xl-11 d-xl-flex justify-content-xl-end col-lg-11 d-lg-flex justify-content-lg-end col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12 mt-1">
-                                                @((MarkupString)GetValidationHTML(() => financeFormModel.Devise))
+                                                
                                             </div> 
                                         </div>
                                         <div class="row mb-3">
                                             <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
                                                 <label for="inputCondPaiement" class="vertFonce texte-bold">Conditions de paiement</label>
                                                 <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
-                                                <select class="form-select @GetInputClass(() => financeFormModel.ConditionPaiement) input-vert texte-light py-1" id="inputCondPaiement" @bind="@financeFormModel.ConditionPaiement" readonly="@modificationFinances"
-                                                    style="@(modificationFinances ? "pointer-events: none;" : null)width: 325px;">
-                                                    <option value="">Choisir une option</option>
-                                                    @foreach (var item in listConditionPaiement)
-                                                    {
-                                                        <option value="@item">@item</option>
-                                                    }
-                                                </select>                                           
-                                            </div>
-                                            <div class="col-xl-11 d-xl-flex justify-content-xl-end col-lg-11 d-lg-flex justify-content-lg-end col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12 mt-1">
-                                                @((MarkupString)GetValidationHTML(() => financeFormModel.ConditionPaiement))
+                                                <div>
+                                                    <select class="form-select @GetInputClass(() => financeFormModel.ConditionPaiement) input-vert texte-light py-1" id="inputCondPaiement" @bind="@financeFormModel.ConditionPaiement" readonly="@modificationFinances"
+                                                        style="@(modificationFinances ? "pointer-events: none;" : null)width: 325px;">
+                                                        <option value="">Choisir une option</option>
+                                                        @foreach (var item in listConditionPaiement)
+                                                        {
+                                                            <option value="@item">@item</option>
+                                                        }
+                                                    </select>     
+                                                    @((MarkupString)GetValidationHTML(() => financeFormModel.ConditionPaiement))    
+                                                </div>                                  
                                             </div>
                                         </div>
                                     </div>
@@ -694,7 +697,7 @@
 </script>
 
 @code{
-#region Variables¸
+    private bool isValidFormFinance = false;
     private string email = string.Empty;
     private bool isRefused = false;
     private string strRaisonRefus = "";
@@ -769,7 +772,6 @@
     private Dictionary<string, bool> selectedCurrentCategorieRBQ = new Dictionary<string, bool>();
     private EditContext editContext;
     private bool isSubmit = false;
-#endregion
     public class CombinedFormModel
     {
         public CoordonneeFormModel CoordonneeFormModel { get; set; }
@@ -873,12 +875,16 @@
         bool isValid = TriggerValidation();
         if (isValid)
         {
+            @* Console.WriteLine($"ID: {selectedFournisseur.IdFournisseur}");
+            Console.WriteLine($"Email: {email}");
+            Console.WriteLine("------------FINANCE FORM MODEL------------");
+            Console.WriteLine($"TPS: {financeFormModel.NumeroTps}");
+            Console.WriteLine($"TVQ {financeFormModel.NumeroTvq}");
+            Console.WriteLine($"Mode de communication: {financeFormModel.ModeCommunication}");
+            Console.WriteLine($"Devise: {financeFormModel.Devise}");
+            Console.WriteLine($"Conditions de paiement: {financeFormModel.ConditionPaiement}"); *@
             await financeService.UpdateFinanceData(financeFormModel, selectedFournisseur.IdFournisseur, email);
             modificationFinances = true; 
-            @* À VOIR COMMENT CLEAN LES VALIDATIONS APRÈS MODIFICATIONS 
-            editContext = new EditContext(financeFormModel);
-            editContext.NotifyValidationStateChanged();
-            StateHasChanged(); *@
         } 
     }
 
@@ -1195,7 +1201,7 @@
 
     private string GetInputClass<TField> (Expression<Func<TField>> fieldExpression)
     {
-        if (!isSubmit) {
+        if (!isSubmit || isValidFormFinance) {
             return "";
         }
         var fieldIdentifier = FieldIdentifier.Create(fieldExpression);
@@ -1205,22 +1211,20 @@
 
     private string GetValidationHTML<TField> (Expression<Func<TField>> fieldExpression) 
     {
-        if (!isSubmit) {
+        if (!isSubmit || isValidFormFinance) {
             return "";
         }
         var fieldIdentifier = FieldIdentifier.Create(fieldExpression);
         var isValid = !editContext.GetValidationMessages(fieldIdentifier).Any();
-        return isValid ? "<span class=\"input-group-text text-success\" style=\"width: 200px;\"><i class=\"bi bi-check-circle me-2\"></i><span class=\"texte-validation\">Valide</span></span>" 
-                       : "<span class=\"input-group-text text-danger\" style=\"width: 200px;\"><i class=\"bi bi-x-circle me-2\"></i><span class=\"texte-validation\">" + editContext.GetValidationMessages(fieldIdentifier).FirstOrDefault() + "</span></span>";  
+        return isValid ? "<span class=\"input-group-text text-success\"><i class=\"bi bi-check-circle me-2\"></i><span class=\"texte-validation\">Valide</span></span>" 
+                       : "<span class=\"input-group-text text-danger\"><i class=\"bi bi-x-circle me-2\"></i><span class=\"texte-validation\">" + editContext.GetValidationMessages(fieldIdentifier).FirstOrDefault() + "</span></span>";  
     }
 
     public bool TriggerValidation() 
     {
         isSubmit = true;
-        bool isValid = false;
-        isValid = editContext.Validate();
-        StateHasChanged();
-        return isValid;
+        isValidFormFinance = editContext.Validate();
+        return isValidFormFinance;
     }
 
     private void GetGroupProduitService()

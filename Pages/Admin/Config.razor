@@ -114,7 +114,6 @@
     {
         isSubmit = true;
         isValidForm = editContext.Validate();
-        StateHasChanged();
         return isValidForm;
     }
 
@@ -153,19 +152,6 @@
         var isValid = !editContext.GetValidationMessages(fieldIdentifier).Any();
         return isValid ? "<span class=\"input-group-text text-success\"><i class=\"bi bi-check-circle me-2\"></i><span class=\"texte-validation\">Valide</span></span>"
                        : "<span class=\"input-group-text text-danger\"><i class=\"bi bi-x-circle me-2\"></i><span class=\"texte-validation\">" + editContext.GetValidationMessages(fieldIdentifier).FirstOrDefault() + "</span></span>";
-    }
-
-    private string GetValidationHTML(string message)
-    {
-        var isValid = (message == null);
-        return isValid
-        ? ""
-        : "<div style=\"display: flex; justify-content: left;\">" +
-          "<span style=\"display: flex; align-items: center; border-radius: 0; background: none; border: none;\" class=\"input-group-text text-danger\">" +
-          "<i class=\"bi bi-x-circle me-2\"></i>" +
-          $"<span class=\"text-wrap\" style=\"letter-spacing: 1px;\">{message}</span>" +
-          "</span>" +
-          "</div>";
     }
 
     private async Task Deconnexion()
