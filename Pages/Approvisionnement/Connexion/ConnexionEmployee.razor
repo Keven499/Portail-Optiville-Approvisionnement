@@ -9,6 +9,7 @@
 @using Portail_OptiVille.Data.Utilities
 @using System.Text.RegularExpressions
 @using Shared.LoginLayout
+@using System.Linq.Expressions
 @inject ProtectedSessionStorage ProtectedSessionStore
 @inject NavigationManager NavigationManager
 @inject A2024420517riGr1Eq6Context _context
@@ -23,75 +24,105 @@
 }
 
 <PageTitle>Connexion Employe</PageTitle>
-
-
-<EditForm Model="@logInModel" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="ValidateInput">
-    <!-- OnValidSubmit="HandleValidSubmit" -->
+<EditForm EditContext="@editContext">
+    <DataAnnotationsValidator />
     <div class="form-group container-fluid">
         <div class="row d-flex justify-content-center">
             <div class="col-xl-6 col-xl-6 col-lg-11 col-12 col-sm-12 py-2">
                 <div class="card">
-
-                    @* Identification *@
                     <div class="card-header py-2 bg-vertFonce">
                         <h3 class="py-2 p-0 my-0 text-white titre-bold">Identification</h3>
                     </div>
                     <div class="card-body border-vertFonce py-1">
                         <div class="col-xl-8 col-lg-8 col-12 col-sm-12 py-2">
                             <label class="vertFonce texte-bold" for="Courriel">Courriel <i class="bi bi-braces-asterisk text-danger"></i></label>
-                            <InputText class="form-control input-vert texte-light" id="Courriel" @bind-Value="logInModel.Username" />
-                            @*Affichage de l'erreur*@
-                            <div class="d-flex align-baseline">
-                                <i class="bi @GetEmailIcon() me-1"></i><ValidationMessage For="@(() => logInModel.Username)" />
-                            </div>
+                            <input type="text" class="form-control @GetInputClass(() => logInModel.Username) input-vert texte-light" id="Courriel" @bind="logInModel.Username" />
+                            @((MarkupString)GetValidationHTML(() => logInModel.Username))
                         </div>
-
                         <div class="col-xl-8 col-lg-8 col-12 col-sm-12 py-2">
                             <label class="vertFonce texte-bold" for="MotDePasse">Mot de passe <i class="bi bi-braces-asterisk text-danger"></i></label>
-                            <InputText type="password" class="form-control input-vert texte-light" id="MotDePasse" @bind-Value="logInModel.MotDePasse" />
-                            @*Affichage de l'erreur*@
-                            <div class="d-flex align-baseline">
-                                <i class="bi @passwordIconClass me-1"></i><ValidationMessage For="@(() => logInModel.MotDePasse)" />
-                            </div>
+                            <input type="password" class="form-control @GetInputClass(() => logInModel.MotDePasse) input-vert texte-light" id="MotDePasse" @bind="logInModel.MotDePasse"  />
+                            @((MarkupString)GetValidationHTML(() => logInModel.MotDePasse))
                         </div>
-
                     </div>
-
                     <div class="card-footer py-2 bg-vertFonce d-flex justify-content-center">
-                        <button type="submit" id="btnVert" class="btn bg-vert texte-bold text-white" style="width: 200px;">Connexion</button>
+                        <button type="button" @onclick="ConnectUser" id="btnVert" class="btn bg-vert texte-bold text-white" style="width: 200px;">Connexion</button>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
-    <DataAnnotationsValidator />
 </EditForm>
+
+<style>
+    .valid {
+        outline: 1px solid #26b050;
+    }
+</style>
+
 @code {
-
     private LogInModel logInModel = new LogInModel();
+    private bool isSubmit = false;
+     private ValidationMessageStore validationMessageStore;
+    private EditContext editContext;
 
-    private async void HandleValidSubmit()
+    protected override void OnInitialized()
     {
-        if (IsValidInput(logInModel.Username))
-        {
+        editContext = new EditContext(logInModel);
+        editContext.OnValidationStateChanged += (sender, args) => StateHasChanged();
+        validationMessageStore = new ValidationMessageStore(editContext);
+    }
 
-            // Récupérer le fournisseur qui a l'adresse courriel
+    public bool TriggerValidation() 
+    {
+        validationMessageStore.Clear();
+        isSubmit = true;
+        return editContext.Validate();
+    }
+
+    private string GetInputClass<TField> (Expression<Func<TField>> fieldExpression)
+    {
+        if (!isSubmit) {
+            return "";
+        }
+        var fieldIdentifier = FieldIdentifier.Create(fieldExpression);
+        var isValid = !editContext.GetValidationMessages(fieldIdentifier).Any();
+        if (fieldIdentifier.FieldName.Equals("NumeroLicence")) {
+            return isValid ? "" : "invalid";
+        }
+
+        return isValid ? "valid" : "invalid";
+    }
+
+    private string GetValidationHTML<TField> (Expression<Func<TField>> fieldExpression) 
+    {
+        if (!isSubmit) {
+            return "";
+        }
+        var fieldIdentifier = FieldIdentifier.Create(fieldExpression);
+        var isValid = !editContext.GetValidationMessages(fieldIdentifier).Any();
+        if (fieldIdentifier.FieldName.Equals("NumeroLicence")) {
+            return isValid ? "" : "<span class=\"input-group-text text-danger\"><i class=\"bi bi-x-circle me-2\"></i><span class=\"texte-validation\">" + editContext.GetValidationMessages(fieldIdentifier).FirstOrDefault() + "</span></span>";
+        }
+
+        return isValid ? "<span class=\"input-group-text text-success\"><i class=\"bi bi-check-circle me-2\"></i><span class=\"texte-validation\">Valide</span></span>" 
+                       : "<span class=\"input-group-text text-danger\"><i class=\"bi bi-x-circle me-2\"></i><span class=\"texte-validation\">" + editContext.GetValidationMessages(fieldIdentifier).FirstOrDefault() + "</span></span>";  
+    }
+
+    private async void ConnectUser()
+    {
+        if (TriggerValidation())
+        {
             Employe? employe = _context.Employes.FirstOrDefault(e => e.Courriel == logInModel.Username);
             try
             {
-
                 if (employe != null)
                 {
-                    // Vérification du mot de passe
                     if (VerifyPassword(logInModel.MotDePasse, employe.MotDePasse))
                     {
-                        // Redirection si les informations sont correctes
                         await ProtectedSessionStore.SetAsync("Email", employe.Courriel);
                         await ProtectedSessionStore.SetAsync("Role", employe.Role);
-
                         string token = tokenGenerator.GenerateToken($"{employe.Courriel}:{employe.Role}");
-                        // ajouter le token dans la BD
                         Usersession usersession = new Usersession
                             {
                                 Token = token,
@@ -109,15 +140,14 @@
                     }
                     else
                     {
-                        // Réinitialisation du mot de passe si incorrect
                         logInModel.MotDePasse = "";
-                        await JsRuntime.InvokeVoidAsync("alert", "Adresse Courriel incorrect!");
+                        validationMessageStore.Add(() => logInModel.Username, "Données incorrectes");
+                        validationMessageStore.Add(() => logInModel.MotDePasse, "Données incorrectes");
                     }
                 }
                 else
                 {
-                    // Cas où le fournisseur n'est pas trouvé
-                    await JsRuntime.InvokeVoidAsync("alert", "Adresse Courriel incorrect!");
+                   validationMessageStore.Add(() => logInModel.Username, "Données incorrectes");
                 }
             }
             catch
@@ -127,65 +157,22 @@
 
             }
         }
-        else
-        {
-            await JsRuntime.InvokeVoidAsync("alert", "Adresse Courriel incorrect!");
-        }
     }
-
 
     static string HashPassword(string input)
     => Convert.ToHexString(SHA1.HashData(Encoding.UTF8.GetBytes(input)));
 
     public bool VerifyPassword(string password, string hashedPassword)
     {
-        // Hacher le mot de passe saisi
         string newHash = HashPassword(password);
         return newHash == hashedPassword;
     }
 
 
-
-
-    private string emailIconClass = ""; // Par défaut
-    private string passwordIconClass = ""; // Par défaut
-
-    private void ValidateInput()
-    {
-        if (IsValidInput(logInModel.Username))
-        {
-            emailIconClass = "bi-check-circle text-success"; // Valide
-        }
-        else
-        {
-            emailIconClass = "bi-x-circle text-danger"; // Invalide
-        }
-
-        if (string.IsNullOrEmpty(logInModel.MotDePasse))
-        {
-            passwordIconClass = "bi-x-circle text-danger"; // Invalide
-        }
-        else
-        {
-            passwordIconClass = "bi-check-circle text-success"; // Valide
-        }
-    }
-
-    private bool IsValidInput(string input)
-    {
-        return (!string.IsNullOrEmpty(input) && input.Contains("@") && input.Contains("."));
-    }
-
-    private string GetEmailIcon()
-    {
-        return emailIconClass;
-    }
-
     public class LogInModel
     {
         [Required(ErrorMessage = "Le courriel est requis")]
-        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage =
-        "Le courriel")]
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "Mauvais format")]
         public string Username { get; set; }
 
         [Required(ErrorMessage = "Le mot de passe est requis")]
@@ -196,7 +183,6 @@
     {
         if (firstRender)
         {
-
             try
             {
                 var result = await ProtectedSessionStore.GetAsync<string>("Email");
@@ -210,7 +196,6 @@
             {
                 Console.WriteLine($"Erreur lors de la récupération de l'adresse courriel");
             }
-
         }
     }
 }
