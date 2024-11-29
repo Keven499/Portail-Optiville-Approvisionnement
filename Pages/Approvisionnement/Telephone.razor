@@ -6,7 +6,7 @@
     <div class="py-2 col-lg-12 col-xl-12 titre-bold fs-4 vertFonce">Téléphone @TelephoneNumber</div>
     <div class="row pb-2 d-flex align-baseline">
         <div class="col-lg-3 col-xl-3 col-6 col-sm-6">
-            <label class="vertFonce texte-bold" for="typeTel">Type <i class="bi bi-braces-asterisk text-danger"></i></label>
+            <label class="vertFonce texte-bold" for="typeTel">Type @if (!isView) { <i class="bi bi-braces-asterisk text-danger"></i> }</label>
             <select class="form-select @GetInputClass(() => telephoneFormModel.TypeTelEntreprise) input-vert texte-light" id="typeTel" @bind="telephoneFormModel.TypeTelEntreprise">
                 <option disabled selected>Veuillez choisir un type</option>
                 <option value="Bureau">Bureau</option>
@@ -16,7 +16,7 @@
             @((MarkupString)GetValidationHTML(() => telephoneFormModel.TypeTelEntreprise))
         </div>
         <div class="col-lg-5 col-xl-5 col-6 col-sm-6">
-            <label class="vertFonce texte-bold" for="NoTel">Numéro <i class="bi bi-braces-asterisk text-danger"></i></label>
+            <label class="vertFonce texte-bold" for="NoTel">Numéro @if (!isView) { <i class="bi bi-braces-asterisk text-danger"></i> }</label>
             <input type="text" @bind="telephoneFormModel.NoTelEntreprise" maxlength="10" placeholder="0000000000" class="form-control @GetInputClass(() => telephoneFormModel.NoTelEntreprise) input-vert texte-light" id="NoTel" />
             @((MarkupString)GetValidationHTML(() => telephoneFormModel.NoTelEntreprise))
         </div>
@@ -33,8 +33,11 @@
     public int TelephoneNumber { get; set; } = 1;
     [Parameter]
     public TelephoneFormModel telephoneFormModel { get; set; }   
+    [Parameter]
+    public bool isView { get; set; } = false;
     private EditContext editContext { get; set; }
     private bool isSubmit = false;
+    private bool isValidForm = false;
 
     protected override void OnInitialized() 
     {
@@ -44,7 +47,7 @@
 
     private string GetInputClass<TField> (Expression<Func<TField>> fieldExpression)
     {
-        if (!isSubmit) {
+        if (!isSubmit || isValidForm) {
            return "";
         }
         var fieldIdentifier = FieldIdentifier.Create(fieldExpression);
@@ -60,7 +63,7 @@
 
     private string GetValidationHTML<TField> (Expression<Func<TField>> fieldExpression) 
     {
-        if (!isSubmit) {
+        if (!isSubmit || isValidForm) {
            return "";
         }
         var fieldIdentifier = FieldIdentifier.Create(fieldExpression);
@@ -78,7 +81,7 @@
     public bool TriggerValidation() 
     {
         isSubmit = true;
-        StateHasChanged();
-        return editContext.Validate();
+        isValidForm = editContext.Validate();
+        return isValidForm;
     }
 }

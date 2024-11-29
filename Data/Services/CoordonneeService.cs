@@ -81,12 +81,12 @@ namespace Portail_OptiVille.Data.Services
                                                                                      - coordonneeFormModel.RegionAdmEntreprise.IndexOf('(') - 1);
             string? regionAdm = coordonneeFormModel.RegionAdmEntreprise?.Substring(coordonneeFormModel.RegionAdmEntreprise.IndexOf(' ') + 1);
             var coordonnee = await _context.Coordonnees.FindAsync(coordonneeFormModel.IdCoordonnee);
-            string[] oldData = {coordonnee.NoCivique, coordonnee.Rue, coordonnee.Bureau, 
+            string[] oldData = {coordonnee.NoCivique, coordonnee.Rue, coordonnee.Bureau ?? "",  
                                 coordonnee.Ville, coordonnee.Province, coordonnee.CodePostal, 
-                                coordonnee.CodeRegionAdministrative, coordonnee.RegionAdministrative, coordonnee.SiteInternet};
-            string[] newData = {coordonneeFormModel.NoEntreprise, coordonneeFormModel.RueEntreprise, coordonneeFormModel.BureauEntreprise,
+                                coordonnee.CodeRegionAdministrative, coordonnee.RegionAdministrative, coordonnee.SiteInternet ?? ""};
+            string[] newData = {coordonneeFormModel.NoEntreprise, coordonneeFormModel.RueEntreprise, coordonneeFormModel.BureauEntreprise ?? "",
                                 coordonneeFormModel.VilleEntreprise, coordonneeFormModel.ProvinceEntreprise, coordonneeFormModel.CodePostalEntreprise,
-                                codeRegion, regionAdm, coordonneeFormModel.SiteWebEntreprise};
+                                codeRegion, regionAdm, coordonneeFormModel.SiteWebEntreprise ?? ""};
             string[] keyData = {"No Civique", "Rue", "Bureau",
                                 "Ville", "Province", "Code Postal", 
                                 "Code région administrative", "Région administrative", "Site"

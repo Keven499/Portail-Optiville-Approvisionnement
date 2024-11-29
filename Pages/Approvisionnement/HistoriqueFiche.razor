@@ -60,7 +60,7 @@
                                             else
                                             {
                                                 <div>
-                                                    <i class="bi bi-dash"></i> @kvp.Value
+                                                    <i class="bi bi-dash"></i> @(kvp.Value.IsNullOrEmpty() ? "Aucun" : @kvp.Value)
                                                 </div>
                                             }
                                         }
@@ -98,7 +98,7 @@
                                             else
                                             {
                                                 <div>
-                                                    <i class="bi bi-plus"></i> @kvp.Value
+                                                    <i class="bi bi-plus"></i> @(kvp.Value.IsNullOrEmpty() ? "Aucun" : @kvp.Value)
                                                 </div>
                                             }
                                         }

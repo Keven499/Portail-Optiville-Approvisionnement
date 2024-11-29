@@ -261,15 +261,24 @@
                                     </div>
                                 </div>                    
                             </div>           
-                            @{
+                            @if (phoneExistsResults != null)
+                            {
                                 var phoneNo = 1;
+                                var phoneListCount = combinedFormModel.CoordonneeFormModel.PhoneList.Count;
                                 foreach (var phoneModel in combinedFormModel.CoordonneeFormModel.PhoneList!)
                                 {
-                                    <Telephone TelephoneNumber="@phoneNo" telephoneFormModel="@phoneModel" @ref="telephoneComponents[phoneModel]" />   
-                                    if (!(combinedFormModel.CoordonneeFormModel.PhoneList.Count == phoneNo)) {
-                                        <hr class="m-0">  
+                                    bool exists = phoneExistsResults[phoneNo - 1];
+                                    <Telephone TelephoneNumber="@phoneNo" 
+                                            telephoneFormModel="@phoneModel" 
+                                            isView="@(exists)" 
+                                            @ref="telephoneComponents[phoneModel]" />
+                                    
+                                    if (phoneNo < phoneListCount)
+                                    {
+                                        <hr class="m-0" />  
                                     }
-                                    phoneNo++;        
+
+                                    phoneNo++;
                                 }
                             }
                             @if(!modificationInfo)
@@ -704,6 +713,7 @@
 
 @code{
     private bool isValidFormFinance = false;
+    private List<bool> phoneExistsResults;
     private string email = string.Empty;
     private bool isRefused = false;
     private string strRaisonRefus = "";
@@ -1153,6 +1163,7 @@
             GetGroupProduitService();
             groupedCategories = GroupCategoriesByType();
             combinedFormModel.FillData(coordonnee, identification, selectedTelephones);
+            phoneExistsResults = await GetPhoneExistenceResults();
             Console.WriteLine("Fin Fetch Data");
             ModifcationPieceJointesActivationONStateMethod();
         }
@@ -1173,14 +1184,27 @@
         previousValue = currentValue;
     }
 
+    private async Task<List<bool>> GetPhoneExistenceResults()
+    {
+        var results = new List<bool>();
+        foreach (var phoneModel in combinedFormModel.CoordonneeFormModel.PhoneList!)
+        {
+            bool exists = await _context.Telephones.AnyAsync(p => p.NumTelephone.Equals(phoneModel.NoTelEntreprise));
+            results.Add(exists);
+        }
+        return results;
+    }
+
     private void AddTelephone()
     {
+        phoneExistsResults.Add(false);
         combinedFormModel.CoordonneeFormModel.PhoneList.Add(new TelephoneFormModel());
     }
 
     private void RemoveTelephone()
     {
         if (combinedFormModel.CoordonneeFormModel.PhoneList.Count > 1) {
+            phoneExistsResults.RemoveAt(phoneExistsResults.Count - 1);
             combinedFormModel.CoordonneeFormModel.PhoneList.RemoveAt(combinedFormModel.CoordonneeFormModel.PhoneList.Count - 1);
         }
     }
