@@ -612,7 +612,7 @@
                                                 <div>
                                                     <select class="form-select @GetInputClass(() => financeFormModel.ModeCommunication) input-vert texte-light py-1" id="inputModeComm" @bind="@financeFormModel.ModeCommunication"
                                                         style="@(modificationFinances ? "pointer-events: none;" : null) width: 325px; ">
-                                                        <option value="">Choisir une option</option>
+                                                        <option value="" disabled selected>Choisir une option</option>
                                                         <option value="Courriel">Courriel</option>
                                                         <option value="Courrier régulier">Courrier régulier</option>
                                                     </select>      
@@ -627,7 +627,7 @@
                                                 <div>
                                                     <select class="form-select @GetInputClass(() => financeFormModel.Devise) input-vert texte-light py-1" id="inputDevise" @bind="@financeFormModel.Devise"
                                                         style="@(modificationFinances ? "pointer-events: none;" : null) width: 325px;">
-                                                        <option value="">Choisir une option</option>
+                                                        <option value="" disabled selected>Choisir une option</option>
                                                         <option value="CAD">CAD</option>
                                                         <option value="USD">USD</option>
                                                     </select> 
@@ -645,7 +645,7 @@
                                                 <div>
                                                     <select class="form-select @GetInputClass(() => financeFormModel.ConditionPaiement) input-vert texte-light py-1" id="inputCondPaiement" @bind="@financeFormModel.ConditionPaiement" readonly="@modificationFinances"
                                                         style="@(modificationFinances ? "pointer-events: none;" : null)width: 325px;">
-                                                        <option value="">Choisir une option</option>
+                                                        <option value="" disabled selected>Choisir une option</option>
                                                         @foreach (var item in listConditionPaiement)
                                                         {
                                                             <option value="@item">@item</option>
@@ -695,6 +695,12 @@
         }
     }
 </script>
+
+<style>
+    select option:first-child:checked {
+        display: none;
+    }
+</style>
 
 @code{
     private bool isValidFormFinance = false;
@@ -875,14 +881,6 @@
         bool isValid = TriggerValidation();
         if (isValid)
         {
-            @* Console.WriteLine($"ID: {selectedFournisseur.IdFournisseur}");
-            Console.WriteLine($"Email: {email}");
-            Console.WriteLine("------------FINANCE FORM MODEL------------");
-            Console.WriteLine($"TPS: {financeFormModel.NumeroTps}");
-            Console.WriteLine($"TVQ {financeFormModel.NumeroTvq}");
-            Console.WriteLine($"Mode de communication: {financeFormModel.ModeCommunication}");
-            Console.WriteLine($"Devise: {financeFormModel.Devise}");
-            Console.WriteLine($"Conditions de paiement: {financeFormModel.ConditionPaiement}"); *@
             await financeService.UpdateFinanceData(financeFormModel, selectedFournisseur.IdFournisseur, email);
             modificationFinances = true; 
         } 
