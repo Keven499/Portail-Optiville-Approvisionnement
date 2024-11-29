@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Portail_OptiVille.Data.FormModels;
 using Portail_OptiVille.Data.Models;
 
 namespace Portail_OptiVille.Data.Services
@@ -12,13 +13,13 @@ namespace Portail_OptiVille.Data.Services
             _context = context;
         }
 
-        public async Task ModifierConfig(Configappro configApproNew)
+        public async Task ModifierConfig(ConfigFormModel configApproNew)
         {
             var allConfigsOld = await _context.Configappros.SingleAsync();
             allConfigsOld.CourrielAppro = configApproNew.CourrielAppro;
             allConfigsOld.CourrielFinance = configApproNew.CourrielFinance;
-            allConfigsOld.DelaiRevision = configApproNew.DelaiRevision;
-            allConfigsOld.TailleMaxFichiers = configApproNew.TailleMaxFichiers;
+            allConfigsOld.DelaiRevision = configApproNew.DelaiBeforeRevision;
+            allConfigsOld.TailleMaxFichiers = configApproNew.MaxFileSize;
             _context.Configappros.Update(allConfigsOld);
             await _context.SaveChangesAsync();
         }

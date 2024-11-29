@@ -1,15 +1,17 @@
 @page "/config"
 @using System.Text.Json
-@inject Portail_OptiVille.Data.Utilities.Config config
-@using Portail_OptiVille.Data.Models
-@using Microsoft.EntityFrameworkCore
-@inject A2024420517riGr1Eq6Context _context
-@using Portail_OptiVille.Data.Services;
-@inject ConfigService configService
-@inject IHostEnvironment hostEnvironment
-
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using Portail_OptiVille.Data.Utilities
+@using Portail_OptiVille.Data.Models
+@using Microsoft.EntityFrameworkCore
+@using Portail_OptiVille.Data.FormModels
+@using Portail_OptiVille.Data.Services
+@using System.ComponentModel.DataAnnotations
+@using System.Linq.Expressions
+@inject ConfigService configService
+@inject IHostEnvironment hostEnvironment
+@inject A2024420517riGr1Eq6Context _context
+@inject Portail_OptiVille.Data.Utilities.Config config
 @inject ProtectedSessionStorage protectedSessionStorage
 @inject NavigationManager NavigationManager
 @inject ICookie cookie
@@ -17,61 +19,83 @@
 @inject JwtTokenGenerator tokenGenerator
 
 <PageTitle>Gestion des paramètres</PageTitle>
-
-<div class="form-group container-fluid">
-    <div class="row d-flex justify-content-center">
-        <div class="col-xl-11 col-xl-11 col-lg-11 col-12 col-sm-12 py-2">
-            <div class="card">
-                <div class="card-header py-2 bg-vertFonce">
-                    <h3 class="py-2 p-0 my-0 text-white titre-bold">Paramètres</h3>
-                </div>
-                <div class="card-body border-vertFonce py-1">
-                    <div class="col-xl-6 col-lg-6 col-12 col-sm-12 py-2">
-                        <label for="CourrielAppro" class="vertFonce texte-bold">Courriel de l'approvisionnement</label>
-                        <InputText @bind-Value="allConfigs.CourrielAppro" type="email" class="form-control input-vert texte-light" id="CourrielAppro"
-                            readonly="@(!isEditing)" />
+<EditForm EditContext="@editContext">
+    <DataAnnotationsValidator />
+    <div class="form-group container-fluid">
+        <div class="row d-flex justify-content-center">
+            <div class="col-xl-11 col-xl-11 col-lg-11 col-12 col-sm-12 py-2">
+                <div class="card">
+                    <div class="card-header py-2 bg-vertFonce">
+                        <h3 class="py-2 p-0 my-0 text-white titre-bold">Paramètres</h3>
                     </div>
-                    <div class="col-xl-6 col-lg-6 col-12 col-sm-12 py-2">
-                        <label for="CourrielFinance" class="vertFonce texte-bold">Courriel des finances</label>
-                        <InputText @bind-Value="allConfigs.CourrielFinance" type="email" class="form-control input-vert texte-light" id="CourrielFinance"
+                    <div class="card-body border-vertFonce py-1">
+                        <div class="col-xl-6 col-lg-6 col-12 col-sm-12 py-2">
+                            <label for="CourrielAppro" class="vertFonce texte-bold">Courriel de l'approvisionnement</label>
+                            <input type="email" @bind="configModel.CourrielAppro" class="form-control @GetInputClass(() => configModel.CourrielAppro) input-vert texte-light" id="CourrielAppro"
                                 readonly="@(!isEditing)" />
-                    </div>
-                    <div class="col-xl-4 col-lg-4 col-10 col-sm-8 py-2">
-                        <label for="DelaiRevision" class="vertFonce texte-bold">Délai avant la révision (mois)</label>
-                        <InputNumber @bind-Value="allConfigs.DelaiRevision" TValue="int" class="form-control input-vert texte-light" id="DelaiRevision"
+                            @((MarkupString)GetValidationHTML(() => configModel.CourrielAppro))
+                        </div>
+                        <div class="col-xl-6 col-lg-6 col-12 col-sm-12 py-2">
+                            <label for="CourrielFinance" class="vertFonce texte-bold">Courriel des finances</label>
+                            <input type="email" @bind="configModel.CourrielFinance" class="form-control @GetInputClass(() => configModel.CourrielFinance) input-vert texte-light" id="CourrielFinance"
                                     readonly="@(!isEditing)" />
-                    </div>                    
-                    <div class="col-xl-4 col-lg-4 col-10 col-sm-8 py-2">
-                         <label for="TailleMaxFichiers" class="vertFonce texte-bold">Taille max. des fichiers joints (Mo)</label>
-                         <InputNumber @bind-Value="allConfigs.TailleMaxFichiers" TValue="int" class="form-control input-vert texte-light" id="TailleMaxFichiers"
-                                     readonly="@(!isEditing)" />
-                    </div>
-                </div>
-                    <div class="card-footer bg-vertFonce d-flex justify-content-center">
-                        <div>
-                            @if (!isEditing)
-                            {
-                                <button class="btn bg-vert texte-medium text-white" id="btnVert" style="width: 200px;" @onclick="EditConfig"><i class="bi bi-pencil me-1"></i>Modifier</button>
-                            }
-                            else
-                            {
-                                <button class="btn bg-vert texte-medium text-white" id="btnVert" style="width: 200px;" @onclick="SaveConfig"><i class="bi bi-floppy me-1"></i>Sauvegarder</button>
-                            }
+                            @((MarkupString)GetValidationHTML(() => configModel.CourrielFinance))
+                        </div>
+                        <div class="col-xl-4 col-lg-4 col-10 col-sm-8 py-2">
+                            <label for="DelaiRevision" class="vertFonce texte-bold">Délai avant la révision (mois)</label>
+                            <input type="number" @bind="configModel.DelaiBeforeRevision" TValue="int" class="form-control @GetInputClass(() => configModel.DelaiBeforeRevision) input-vert texte-light" id="DelaiRevision"
+                                        readonly="@(!isEditing)" />
+                            @((MarkupString)GetValidationHTML(() => configModel.DelaiBeforeRevision))
+                        </div>                    
+                        <div class="col-xl-4 col-lg-4 col-10 col-sm-8 py-2">
+                            <label for="TailleMaxFichiers" class="vertFonce texte-bold">Taille max. des fichiers joints (Mo)</label>
+                            <input type="number" @bind="configModel.MaxFileSize" TValue="int" class="form-control @GetInputClass(() => configModel.MaxFileSize) input-vert texte-light" id="TailleMaxFichiers"
+                                        readonly="@(!isEditing)" />
+                            @((MarkupString)GetValidationHTML(() => configModel.MaxFileSize))
                         </div>
                     </div>
+                        <div class="card-footer bg-vertFonce d-flex justify-content-center">
+                            <div>
+                                @if (!isEditing)
+                                {
+                                    <button class="btn bg-vert texte-medium text-white" id="btnVert" style="width: 200px;" @onclick="EditConfig"><i class="bi bi-pencil me-1"></i>Modifier</button>
+                                }
+                                else
+                                {
+                                    <button class="btn bg-vert texte-medium text-white" id="btnVert" style="width: 200px;" @onclick="SaveConfig"><i class="bi bi-floppy me-1"></i>Sauvegarder</button>
+                                }
+                            </div>
+                        </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</EditForm>
+
+<style>
+    .valid {
+        outline: 1px solid #26b050;
+    }
+</style>
+
 @code {
     private bool isEditing = false;
     private bool saveSuccess = false;
-    Configappro allConfigs = new Configappro();
+    private bool isValidForm = false;
+    private bool isSubmit = false;
+    private ConfigFormModel configModel = new ConfigFormModel();
+    private EditContext editContext;
     private RoleChecker _roleChecker;
 
     protected override async Task OnInitializedAsync()
     {
-        allConfigs = await _context.Configappros.SingleAsync();
+        editContext = new EditContext(configModel);
+        editContext.OnValidationStateChanged += (sender, args) => StateHasChanged();
+        var configData = await _context.Configappros.SingleAsync();
+        configModel.CourrielAppro = configData.CourrielAppro; 
+        configModel.CourrielFinance = configData.CourrielFinance; 
+        configModel.DelaiBeforeRevision = configData.DelaiRevision; 
+        configModel.MaxFileSize = configData.TailleMaxFichiers;
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -86,15 +110,62 @@
         saveSuccess = false; 
     }
 
+    public bool TriggerValidation()
+    {
+        isSubmit = true;
+        isValidForm = editContext.Validate();
+        StateHasChanged();
+        return isValidForm;
+    }
+
     private async Task SaveConfig()
     {
-        await configService.ModifierConfig(allConfigs);
-        _context.ExecuteEvent(allConfigs.DelaiRevision);
-        isEditing = false; 
-        saveSuccess = true; 
-        StateHasChanged();
-        await Task.Delay(4000);
-        saveSuccess = false; 
+        if (TriggerValidation())
+        {
+            await configService.ModifierConfig(configModel);
+            _context.ExecuteEvent(configModel.DelaiBeforeRevision);
+            isEditing = false; 
+            saveSuccess = true; 
+            StateHasChanged();
+            await Task.Delay(4000);
+            saveSuccess = false; 
+        }
+    }
+
+    private string GetInputClass<TField>(Expression<Func<TField>> fieldExpression)
+    {
+        if (!isSubmit || isValidForm)
+        {
+            return "";
+        }
+        var fieldIdentifier = FieldIdentifier.Create(fieldExpression);
+        var isValid = !editContext.GetValidationMessages(fieldIdentifier).Any();
+        return isValid ? "valid" : "invalid";
+    }
+
+    private string GetValidationHTML<TField>(Expression<Func<TField>> fieldExpression)
+    {
+        if (!isSubmit || isValidForm)
+        {
+            return "";
+        }
+        var fieldIdentifier = FieldIdentifier.Create(fieldExpression);
+        var isValid = !editContext.GetValidationMessages(fieldIdentifier).Any();
+        return isValid ? "<span class=\"input-group-text text-success\"><i class=\"bi bi-check-circle me-2\"></i><span class=\"texte-validation\">Valide</span></span>"
+                       : "<span class=\"input-group-text text-danger\"><i class=\"bi bi-x-circle me-2\"></i><span class=\"texte-validation\">" + editContext.GetValidationMessages(fieldIdentifier).FirstOrDefault() + "</span></span>";
+    }
+
+    private string GetValidationHTML(string message)
+    {
+        var isValid = (message == null);
+        return isValid
+        ? ""
+        : "<div style=\"display: flex; justify-content: left;\">" +
+          "<span style=\"display: flex; align-items: center; border-radius: 0; background: none; border: none;\" class=\"input-group-text text-danger\">" +
+          "<i class=\"bi bi-x-circle me-2\"></i>" +
+          $"<span class=\"text-wrap\" style=\"letter-spacing: 1px;\">{message}</span>" +
+          "</span>" +
+          "</div>";
     }
 
     private async Task Deconnexion()
