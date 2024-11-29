@@ -1,6 +1,7 @@
 @page "/gestionUser"
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.IdentityModel.Tokens
 @using Portail_OptiVille.Data.Models
 @using Portail_OptiVille.Data.Services
 @using System.Linq.Expressions
@@ -22,11 +23,12 @@
                     <h3 class="py-2 my-0 text-white titre-bold">Gestion des utilisateurs</h3>
                 </div>
             <div class="card-body border-vertFonce">
-                <div class="col-xl-12 col-lg-12 col-12 col-sm-12 texte-bold">
-                    @if (!string.IsNullOrEmpty(message))
-                    {
+                <div class="col-12 texte-bold">
+                @if (messages != null)
+                {
+                    foreach (var message in messages)
                         @((MarkupString)GetValidationHTML((message)))
-                    }
+                }
                 </div>
                 <div class="row d-flex align-baseline">
                     <div class="col-xl-5 col-lg-5 col-4 col-sm-4">
@@ -36,27 +38,28 @@
                         <div class="titre-medium vert fs-3">Rôle</div>
                     </div>
                 </div>
-                    @foreach (var employe in allEmployes)
-                    {
-                        <div class="row d-flex align-items-center">
-                            <div class="col-xl-5 col-lg-5 col-12 col-sm-12">
-                                <div class="texte-light fs-6 fw-bold">@employe.Courriel</div>
-                            </div>
-                            <div class="col-xl-5 col-lg-5 col-4 col-sm-4">
-                                <select class="form-select input-vert texte-light " @onchange="(e) => OnRoleChange(employe, e.Value!.ToString()!)">
-                                    @foreach (var value in Roles)
-                                    {
-                                        <option value="@value" selected="@((employe.Role == value))">@value</option>
-                                    }
-                                </select>
-                            </div>
-                            <div class="col-xl-1 col-lg-1 col-4 col-sm-4">
-                                <button type="button" class="btn btn-danger w-100" id="btnSupp" @onclick="() => OnDeleteUser(employe)"><i class="bi bi-trash"></i></button>
-                            </div>
-                            <hr class="mt-2 mb-2"/>
+                @foreach (var employe in allEmployes)
+                {
+                    <div class="row d-flex align-items-center">
+                        <div class="col-xl-5 col-lg-5 col-12 col-sm-12">
+                            <div class="texte-light fs-6 fw-bold">@employe.Courriel</div>
                         </div>
-                    }
-                <div class="">
+                        <div class="col-xl-5 col-lg-5 col-4 col-sm-4">
+                            <!-- Bind value directly to employe.Role -->
+                            <select class="form-select input-vert texte-light" @onchange="(e) => OnRoleChange(employe, e.Value!.ToString()!)" value="@employe.Role">
+                                @foreach (var value in Roles)
+                                {
+                                    <option value="@value">@value</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-xl-1 col-lg-1 col-4 col-sm-4">
+                            <button type="button" class="btn btn-danger w-100" id="btnSupp" @onclick="() => OnDeleteUser(employe)"><i class="bi bi-trash"></i></button>
+                        </div>
+                        <hr class="mt-2 mb-2"/>
+                    </div>
+                }
+                <div>
                 @if (!formAjouter)
                 {
                     <div class="row justify-content-center">
@@ -72,18 +75,18 @@
                         <div class="row mb-3 justify-content-center">
                             <div class="col-xl-12">
                                 <label class="vertFonce texte-bold" for="emailNewUser">Courriel <i class="bi bi-braces-asterisk text-danger"></i></label>
-                                    <input type="text" class="form-control @GetInputClass(() => userModel.courriel) input-vert texte-light" id="emailNewUser" @bind="userModel.courriel" placeholder="courriel@votre-entreprise.extension" />
-                                    @((MarkupString)GetValidationHTML(() => userModel.courriel))
+                                <input type="text" class="form-control @GetInputClass(() => userModel.courriel) input-vert texte-light" id="emailNewUser" @bind="userModel.courriel" placeholder="courriel@votre-entreprise.extension" />
+                                @((MarkupString)GetValidationHTML(() => userModel.courriel))
                             </div>
                         </div>
                         <div class="row mb-3 justify-content-center">
                             <div class="col-xl-12">
-                                    <label class="vertFonce texte-bold" for="roleNewUser">Rôle <i class="bi bi-braces-asterisk text-danger"></i></label>
-                                    <select class="form-select @GetInputClass(() => userModel.role) input-vert texte-light" @bind="userModel.role" id="roleNewUser" selected="@((userModel.role == "Commis"))">
-                                    @foreach (var value in Roles)
-                                    {
-                                        <option value="@value">@value</option>
-                                    }
+                                <label class="vertFonce texte-bold" for="roleNewUser">Rôle <i class="bi bi-braces-asterisk text-danger"></i></label>
+                                <select class="form-select @GetInputClass(() => userModel.role) input-vert texte-light" @bind="userModel.role" id="roleNewUser" selected="@((userModel.role == "Commis"))">
+                                @foreach (var value in Roles)
+                                {
+                                    <option value="@value">@value</option>
+                                }
                                 </select>
                                 @((MarkupString)GetValidationHTML(() => userModel.role))
                             </div>
@@ -99,15 +102,14 @@
                 </div>
             </div>
             <div class="card-footer bg-vertFonce">
-                @if (isRoleChanged)
-                {
-                    <button type="submit" class="btn bg-vert w-100 text-white texte-bold" id="btnVert" @onclick="UpdateEmployesRole">Sauvegarder</button>
-                }
+            @if (isRoleChanged)
+            {
+                <button type="submit" class="btn bg-vert w-100 text-white texte-bold" id="btnVert" @onclick="UpdateEmployesRole">Sauvegarder</button>
+            }
             </div>
         </div>
     </div>
 </div>
-@* <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script> *@
 
 <style>
     .valid {
@@ -120,7 +122,7 @@
     private bool formAjouter = false;
     private EditContext editContext;
     private bool isSubmit = false;
-    private string message;
+    private List<string> messages = new List<string>();
     private bool isRoleChanged = false;
     private ValidationMessageStore validationMessageStore;
     List<string> Roles = new() { "Commis", "Responsable", "Administrateur" };
@@ -168,35 +170,36 @@
     }
 
     private void OnRoleChange(Employe employe, string selectedRole)
+{
+    int index = employesCourrielUpdate.IndexOf(employe.Courriel);
+    int indexEmploye = allEmployes.FindIndex(e => e.Courriel == employe.Courriel);
+    var originalRole = newRole[indexEmploye];
+    newRole[indexEmploye] = selectedRole;
+    if (index != -1)
     {
-        int index = employesCourrielUpdate.IndexOf(employe.Courriel);
-        int indexEmploye = allEmployes.FindIndex(e => e.Courriel == employe.Courriel);
-        newRole[indexEmploye] = selectedRole;
-        if (index != -1)
+        employesRoleUpdate[index] = selectedRole;
+        Employe matchingEmploye = allEmployes.FirstOrDefault(e => e.Courriel == employe.Courriel);
+        if (matchingEmploye != null)
         {
-            employesRoleUpdate[index] = selectedRole;
-            Employe matchingEmploye = allEmployes.FirstOrDefault(e => e.Courriel == employe.Courriel);
-            if (matchingEmploye != null)
+            index = employesCourrielUpdate.IndexOf(matchingEmploye.Courriel);
+            if (employesRoleUpdate[index] == matchingEmploye.Role)
             {
-                index = employesCourrielUpdate.IndexOf(matchingEmploye.Courriel);
-                if (employesRoleUpdate[index] == matchingEmploye.Role)
+                employesCourrielUpdate.Remove(matchingEmploye.Courriel);
+                employesRoleUpdate.RemoveAt(index);
+                if (employesCourrielUpdate.Count == 0)
                 {
-                    employesCourrielUpdate.Remove(matchingEmploye.Courriel);
-                    employesRoleUpdate.RemoveAt(index);
-                    if (employesCourrielUpdate.Count == 0)
-                    {
-                        isRoleChanged = false;
-                    }
+                    isRoleChanged = false;
                 }
             }
         }
-        else
-        {
-            employesCourrielUpdate.Add(employe.Courriel);
-            employesRoleUpdate.Add(selectedRole);
-            isRoleChanged = true;
-        }
     }
+    else
+    {
+        employesCourrielUpdate.Add(employe.Courriel);
+        employesRoleUpdate.Add(selectedRole);
+        isRoleChanged = true;
+    }
+}
 
     private string GetInputClass<TField>(Expression<Func<TField>> fieldExpression)
     {
@@ -226,7 +229,7 @@
         var isValid = (message == null);
         return isValid
         ? ""
-        : "<div style=\"display: flex; justify-content: center;\">" +
+        : "<div style=\"display: flex; justify-content: left;\">" +
           "<span style=\"display: flex; align-items: center; border-radius: 0; background: none; border: none;\" class=\"input-group-text text-danger\">" +
           "<i class=\"bi bi-x-circle me-2\"></i>" +
           $"<span class=\"text-wrap\" style=\"letter-spacing: 1px;\">{message}</span>" +
@@ -236,11 +239,9 @@
 
     private bool ValidateAdminCount(bool action, string role)
     {
-        Console.WriteLine($"ACTION: {action}, ROLE: {role}");
-        message = string.Empty;
+        messages.Clear();
         bool isRespectHierarchy = true;
         int adminCount = allEmployes.Count(e => e.Role == "Administrateur");
-        Console.WriteLine($"ADMIN COUNT: {adminCount}");
         if (action)
         {
             if (role.Equals("Administrateur"))
@@ -255,7 +256,7 @@
         }
         if (adminCount != 2)
         {
-            message = "2 administrateurs en tout temps";
+            messages.Add("2 administrateurs en tout temps");
             isRespectHierarchy = false;
             return isRespectHierarchy;
         }
@@ -264,7 +265,7 @@
 
     private bool ValidateResponsableCount(string role)
     {
-        message = string.Empty;
+        messages.Clear();
         bool isRespectHierarchy = true;
         int responsableCount = allEmployes.Count(e => e.Role == "Responsable");
         if (role.Equals("Responsable"))
@@ -273,7 +274,7 @@
         }
         if (responsableCount < 1)
         {
-            message = "1 responsable minimum";
+            messages.Add("1 responsable minimum");
             isRespectHierarchy = false;
             return isRespectHierarchy;
         }
@@ -286,31 +287,38 @@
         {
             return;
         }
-        message = string.Empty;
+        messages.Clear();
         allEmployes.Remove(employe);
         await GestionUserService.UpdateUserRole(employe.Courriel, "Aucun");
     }
 
     private async Task UpdateEmployesRole()
     {
-        Console.WriteLine("----OLD EMPLOYE ROLE STATE----");
-        foreach (var emp in allEmployes)
-        {
-            Console.WriteLine(emp.Role);
-        }
-        Console.WriteLine("----NEW EMPLOYE ROLE STATE----");
-        foreach (var role in newRole)
-        {
-            Console.WriteLine(role);
-        }
-        @* if (!ValidateAdminCount(false, employe.Role) || !ValidateResponsableCount(employe.Role))
-        {
-            return;
-        } *@
+        if (!CompareOldNewData())
+            return;       
         await GestionUserService.UpdateRoleOfUsers(employesCourrielUpdate, employesRoleUpdate);
         employesCourrielUpdate.Clear();
         employesRoleUpdate.Clear();
         isRoleChanged = false;
+    }
+
+    private bool CompareOldNewData()
+    {
+        messages.Clear();
+        bool isRespectHierarchy = true;
+        int adminCount = newRole.Count(e => e == "Administrateur");
+        int responsableCount = newRole.Count(e => e == "Responsable");
+        if (adminCount < 2)
+        {
+            messages.Add("2 administrateurs en tout temps");
+            isRespectHierarchy = false;
+        }
+        if (responsableCount < 1)
+        {
+            messages.Add("1 responsable minimum");
+            isRespectHierarchy = false;
+        }
+        return isRespectHierarchy;
     }
 
     private void ShowForm()
@@ -350,7 +358,7 @@
 
     public bool TriggerValidation()
     {
-        message = string.Empty;
+        messages.Clear();
         if (!ValidateAdminCount(true, userModel.role))
         {
             return false;
