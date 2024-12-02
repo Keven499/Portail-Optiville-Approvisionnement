@@ -145,11 +145,14 @@
                         logInModel.MotDePasse = "";
                         validationMessageStore.Add(() => logInModel.Username, "Données incorrectes");
                         validationMessageStore.Add(() => logInModel.MotDePasse, "Données incorrectes");
+                        await JsRuntime.InvokeVoidAsync("alert", "Mot de passe ou nom d'utilisateur incorrect !");
                     }
                 }
                 else
                 {
-                   validationMessageStore.Add(() => logInModel.Username, "Données incorrectes");
+                    validationMessageStore.Add(() => logInModel.Username, "Données incorrectes");
+                    await JsRuntime.InvokeVoidAsync("alert", "Mot de passe ou nom d'utilisateur incorrect !");
+
                 }
             }
             catch
@@ -193,6 +196,7 @@
                     Console.WriteLine($"Adresse courriel: {result.Value}");
                     NavigationManager.NavigateTo("/index", true);
                 }
+
             }
             catch
             {
