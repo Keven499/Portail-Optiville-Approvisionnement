@@ -168,7 +168,7 @@
                             </div>
                         }                   
                     </div>
-@* Informations générales*@
+                @* Informations générales*@
                 <EditForm Model="combinedFormModel" OnValidSubmit="SaveModifcationInfo">
                     <DataAnnotationsValidator />
                         <div class="card-header py-2 bg-vertFonce d-flex justify-content-between align-items-center rounded-0">
@@ -196,14 +196,27 @@
                                         <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
                                             <label for="inputEmail4" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">Nom de l'entreprise</label>
                                             <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
-                                            <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="inputEmail4" @bind="@combinedFormModel.IdentificationFormModel.NomEntreprise" readonly="@modificationInfo">
+                                            <div>
+                                                <input type="text" style="width: 325px;" 
+                                                    class="form-control @ValidateClass(errorMessagesInfoGen[0]) input-vert texte-light py-1" 
+                                                    id="inputEmail4" 
+                                                    @bind="@combinedFormModel.IdentificationFormModel.NomEntreprise" 
+                                                    readonly="@modificationInfo">
+                                                @((MarkupString)errorMessagesInfoGen[0])
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row mb-3">
                                         <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
                                             <label for="inputEmail4" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">Adresse courriel</label>
                                             <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
-                                            <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="inputEmail4" @bind="@combinedFormModel.IdentificationFormModel.CourrielEntreprise" readonly="@modificationInfo">
+                                            <div>
+                                                <input type="text" style="width: 325px;" 
+                                                    class="form-control @ValidateClass(errorMessagesInfoGen[1]) input-vert texte-light py-1" id="inputEmail4" 
+                                                    @bind="@combinedFormModel.IdentificationFormModel.CourrielEntreprise" 
+                                                    readonly="@modificationInfo">
+                                                @((MarkupString)errorMessagesInfoGen[1])
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row mb-3">
@@ -245,14 +258,20 @@
                                         <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
                                             <label for="noEntreprise" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">No Civique</label>
                                             <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
-                                            <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="noEntreprise" @bind="@combinedFormModel.CoordonneeFormModel.NoEntreprise" readonly="@modificationInfo">
+                                            <div>
+                                                <input type="text" style="width: 325px;" class="form-control @ValidateClass(errorMessagesInfoGen[2]) input-vert texte-light py-1" id="noEntreprise" @bind="@combinedFormModel.CoordonneeFormModel.NoEntreprise" readonly="@modificationInfo">
+                                                @((MarkupString)errorMessagesInfoGen[2])
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row mb-3">
                                         <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
                                             <label for="rueEntreprise" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">Rue</label>
                                             <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
-                                            <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="rueEntreprise" @bind="@combinedFormModel.CoordonneeFormModel.RueEntreprise" readonly="@modificationInfo">
+                                            <div>
+                                                <input type="text" style="width: 325px;" class="form-control @ValidateClass(errorMessagesInfoGen[3]) input-vert texte-light py-1" id="rueEntreprise" @bind="@combinedFormModel.CoordonneeFormModel.RueEntreprise" readonly="@modificationInfo">
+                                                @((MarkupString)errorMessagesInfoGen[3])
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row mb-3">
@@ -266,14 +285,20 @@
                                         <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
                                             <label for="villeEntreprise" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">Ville</label>
                                             <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
-                                            <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="villeEntreprise" @bind="@combinedFormModel.CoordonneeFormModel.VilleEntreprise" readonly="@modificationInfo">
+                                            <div>
+                                                <input type="text" style="width: 325px;" class="form-control @ValidateClass(errorMessagesInfoGen[4]) input-vert texte-light py-1" id="villeEntreprise" @bind="@combinedFormModel.CoordonneeFormModel.VilleEntreprise" readonly="@modificationInfo">
+                                                @((MarkupString)errorMessagesInfoGen[4])
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row mb-3">
                                         <div class="col-xl-12 col-lg-12 col-12 d-md-flex flex-md-row flex-column align-items-md-center col-sm-12">
                                             <label for="codePostal" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">Code Postal</label>
                                             <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
-                                            <input type="text" style="width: 325px;" class="form-control input-vert texte-light py-1" id="codePostal" @bind="@combinedFormModel.CoordonneeFormModel.CodePostalEntreprise" readonly="@modificationInfo">
+                                            <div>
+                                                <input type="text" style="width: 325px;" class="form-control @ValidateClass(errorMessagesInfoGen[5]) input-vert texte-light py-1" id="codePostal" @bind="@combinedFormModel.CoordonneeFormModel.CodePostalEntreprise" readonly="@modificationInfo">
+                                                @((MarkupString)errorMessagesInfoGen[5])
+                                            </div>
                                         </div>
                                     </div>
                                 </div>                    
@@ -732,6 +757,7 @@
     private bool isValidFormFinance = false;
     private List<bool> phoneExistsResults;
     private string email = string.Empty;
+    private string[] errorMessagesInfoGen = Enumerable.Repeat(string.Empty, 6).ToArray();
     private bool isRefused = false;
     private string strRaisonRefus = "";
     private bool isConfirmed = false;
@@ -926,16 +952,134 @@
 
     private async Task SaveModifcationInfo()
     {
-        isSubmit = true;
-        StateHasChanged();
+        var isValidInfoGen = ValidationsInformationGen();
         var isAllPhonesValid = ValidatePhones();
-        if (isAllPhonesValid)
+        if (isAllPhonesValid && isValidInfoGen)
         {
+            modificationInfo = true;
+            for (int i = 0; i < errorMessagesInfoGen.Length; i++)
+            {
+                errorMessagesInfoGen[i] = ValidateField(true, string.Empty);
+            }
             await identificationService.UpdateIdentificationData(combinedFormModel.IdentificationFormModel, email);
             await coordonneeService.UpdateCoordonneeData(combinedFormModel.CoordonneeFormModel, email);
         }
-        modificationInfo = true;
-        
+    }
+
+    private bool ValidationsInformationGen()
+    {
+        bool isValid = true;
+        // NOM D'ENTREPRISE
+        if (combinedFormModel.IdentificationFormModel.NomEntreprise.IsNullOrEmpty())
+        {
+            errorMessagesInfoGen[0] = ValidateField(false, "Nom requis");
+            isValid = false;
+        }
+        else
+        {
+            errorMessagesInfoGen[0] = ValidateField(true, string.Empty);
+        }
+
+        // ADRESSE COURRIEL
+        string courriel = combinedFormModel.IdentificationFormModel.CourrielEntreprise;
+        if (courriel.IsNullOrEmpty())
+        {
+            errorMessagesInfoGen[1] = ValidateField(false, "Courriel requis");
+            isValid = false;
+        }
+        else
+        {
+            string pattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+            if (!Regex.IsMatch(courriel, pattern, RegexOptions.IgnoreCase))
+            {
+                errorMessagesInfoGen[1] = ValidateField(false, "Format invalide");
+                isValid = false;
+            }
+            else
+            {
+                errorMessagesInfoGen[1] = ValidateField(true, string.Empty);
+            }
+        }
+
+        // NO CIVIQUE
+        string noCivique = combinedFormModel.CoordonneeFormModel.NoEntreprise;
+        if (noCivique.IsNullOrEmpty())
+        {
+            errorMessagesInfoGen[2] = ValidateField(false, "\u2116 requis");
+            isValid = false;
+        }
+        else
+        {
+            string pattern = @"^[a-zA-Z0-9]{1,8}$";
+            if (!Regex.IsMatch(noCivique, pattern, RegexOptions.IgnoreCase))
+            {
+                errorMessagesInfoGen[2] = ValidateField(false, "Entre 1 à 8 chiffres ou lettres");
+                isValid = false;
+            }
+            else
+            {
+                errorMessagesInfoGen[2] = ValidateField(true, string.Empty);
+            }
+        }
+
+        // RUE
+        if (combinedFormModel.CoordonneeFormModel.RueEntreprise.IsNullOrEmpty())
+        {
+            errorMessagesInfoGen[3] = ValidateField(false, "Rue requise");
+            isValid = false;
+        }
+        else
+        {
+            errorMessagesInfoGen[3] = ValidateField(true, string.Empty);
+        }
+
+        // VILLE
+        if (combinedFormModel.CoordonneeFormModel.VilleEntreprise.IsNullOrEmpty())
+        {
+            errorMessagesInfoGen[4] = ValidateField(false, "Ville requise");
+            isValid = false;
+        }
+        else
+        {
+            errorMessagesInfoGen[4] = ValidateField(true, string.Empty);
+        }
+
+        // CODE POSTAL
+        string CP = combinedFormModel.CoordonneeFormModel.CodePostalEntreprise;
+        if (CP.IsNullOrEmpty())
+        {
+            errorMessagesInfoGen[5] = ValidateField(false, "CP requis");
+            isValid = false;
+        }
+        else
+        {
+            string pattern = @"^(?!.*[DFIOQU])[A-VXY][0-9][A-Z] ?[0-9][A-Z][0-9]$";
+            if (!Regex.IsMatch(CP, pattern, RegexOptions.IgnoreCase))
+            {
+                errorMessagesInfoGen[5] = ValidateField(false, "Format invalide");
+                isValid = false;
+            }
+            else
+            {
+                errorMessagesInfoGen[5] = ValidateField(true, string.Empty);
+            }
+        }
+        return isValid;
+    }
+
+    private string ValidateField(bool state, string errorMessage)
+    {
+        return state ? "" 
+                       : "<span class=\"input-group-text text-danger\"><i class=\"bi bi-x-circle me-2\"></i><span class=\"texte-validation\">" + errorMessage + "</span></span>"; 
+    }
+
+    private string ValidateClass(string errorMessage)
+    {
+        if (errorMessage.IsNullOrEmpty())
+        {
+            return string.Empty;
+        }
+        return "invalid";
     }
 #endregion
     public class GroupKey
