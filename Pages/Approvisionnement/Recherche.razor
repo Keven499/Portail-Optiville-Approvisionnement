@@ -429,13 +429,13 @@ else
             produitsServiceInternal = produitsService;
             
             fournisseurFiches = await _context.Fournisseurs
-                .Where(f => f.Historiques.Any(h => h.EtatDemande != "Désactivée" && h.EtatDemande != "Modifiée"))
+                .Where(f => f.Historiques.Any(h => h.EtatDemande != "Modifiée"))
                 .Select(f => new FournisseurFiche
                 {
                     IdFournisseur = f.IdFournisseur,
                     // Utilisation d'un seul OrderByDescending
                     EtatDemande = f.Historiques
-                        .Where(h => h.EtatDemande != "Désactivée" && h.EtatDemande != "Modifiée")
+                        .Where(h => h.EtatDemande != "Modifiée")
                         .OrderByDescending(h => h.DateEtatChanged)
                         .FirstOrDefault().EtatDemande,
                     NomEntreprise = f.Identifications.FirstOrDefault().NomEntreprise,
@@ -447,6 +447,8 @@ else
                         .FirstOrDefault().DateEtatChanged
                 })
                 .ToListAsync();
+
+                fournisseurFiches.RemoveAll(f => f.EtatDemande == "Désactivée");
 
             copieFournisseurFiches = new List<FournisseurFiche>(fournisseurFiches); 
             isLoading = false;

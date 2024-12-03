@@ -22,6 +22,20 @@
                 <div class="col-8">
                 @*  NOUS SOMMES EN TRAIN D'IMPLÉMENTER HISTORIQUE DANS LA BASE DE DONNÉES, DÈS QUE CELA SERA TERMINÉ, NOUS VIENDRONS ICI POUR GÉRER L'AFFICHAGE,
                     CAR POUR L'INSTANT TRÈS RUSTIQUE ET SEMI HARDCODÉ. TRÈS NUL ET À AMÉLIORER *@
+                @if(!String.IsNullOrEmpty(raisonRefus)){
+                    <div class="card mb-2">
+                        <div class="card-header text-center">
+                            <div class="fs-5 fw-bold">Raison du refus</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="fw-bold">@raisonRefus</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
                 @if (informationToShow != null)
                 {
                     <div class="card mb-2">
@@ -166,6 +180,7 @@
     [Parameter] public bool ShowTitle { get; set; } = true;
     private List<Historique> historiqueFiche = new List<Historique>();
     private InformationToShowDTO informationToShow;
+    private string raisonRefus;
 
     protected override async Task OnInitializedAsync()
     {
@@ -185,6 +200,7 @@
 
     private void FetchModifiedData(int historiqueId)
     {
+        raisonRefus = null;
         // Fetch the raw data from the database
         var rawData = historiqueFiche
             .Where(h => h.IdHistorique == historiqueId)  // Filter by IdHistorique
@@ -206,7 +222,21 @@
 
     private async Task FecthRefusedData()
     {
-
+        informationToShow = null;
+        Console.WriteLine("Fetching refused data");
+        // Fetch the raw data from the database
+        var rawData = historiqueFiche
+            .Where(h => h.EtatDemande == "Refusé")  // Filter by Refused
+            .Select(h => new
+            {
+                h.RaisonRefus
+            })
+            .FirstOrDefault();
+        if (rawData != null)
+        {
+            raisonRefus = rawData.RaisonRefus;
+        }
+        Console.WriteLine("Raison refus: " + raisonRefus);
     }
 
     public class InformationToShowDTO
