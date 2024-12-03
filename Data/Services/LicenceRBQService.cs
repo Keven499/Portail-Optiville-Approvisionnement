@@ -16,39 +16,38 @@ namespace Portail_OptiVille.Data.Services
             _historiqueService = historiqueService;
         }
 
-        public async Task SaveLicenceRBQData(LicenceRBQFormModel licenceRBQFormModelDto, string email)
+        public async Task SaveLicenceRBQData(LicenceRBQFormModel licenceRBQFormModelDto, string email, int? IdFournisseur)
         {
             var licenceRBQdata = await _context.Licencerbqs.FindAsync(licenceRBQFormModelDto.NumeroLicence);
             if (licenceRBQdata == null)
             {
                 if (licenceRBQFormModelDto.NumeroLicence != null)
                 {
-                    var lastFournisseurId = await _context.Fournisseurs.MaxAsync(f => (int?)f.IdFournisseur);
+                    if(IdFournisseur == -1)
+                    {
+                    IdFournisseur = await _context.Fournisseurs.MaxAsync(f => (int?)f.IdFournisseur);
+                    }
                     var licenceRBQ = new Licencerbq
                     {
                         IdLicenceRbq = licenceRBQFormModelDto.NumeroLicence?.Replace("-", string.Empty),
                         Type = licenceRBQFormModelDto.TypeLicence,
                         Statut = licenceRBQFormModelDto.StatutLicence,
-                        Fournisseur = lastFournisseurId
+                        Fournisseur = IdFournisseur
                     };
 
                     try
                     {
-                        _context.Licencerbqs.Add(licenceRBQ);
                         await _context.SaveChangesAsync();
+                        var selectedCategorieRBQIds = licenceRBQFormModelDto.SousCategoSelected.Where(x => x.Value).Select(x => x.Key).ToList();
+                        var existingProduitServiceIds = licenceRBQ.IdCategorieRbqs.Select(crbq => crbq.CodeSousCategorie).ToList();
+                        var CategorieRBQToAdd = await _context.Categorierbqs.Where(crbq => selectedCategorieRBQIds.Contains(crbq.CodeSousCategorie) && !existingProduitServiceIds.Contains(crbq.CodeSousCategorie)).ToListAsync();
 
-                        foreach (var codeSousCategorie in licenceRBQFormModelDto.CodeSousCategorie)
-                        {
-                            var categorieRBq = await _context.Categorierbqs
-                                .FirstOrDefaultAsync(p => p.CodeSousCategorie == codeSousCategorie);
-
-                            if (categorieRBq != null && !licenceRBQ.IdCategorieRbqs.Contains(categorieRBq))
+                            foreach (var categorieRBQ in CategorieRBQToAdd)
                             {
-                                licenceRBQ.IdCategorieRbqs.Add(categorieRBq);
+                                licenceRBQ.IdCategorieRbqs.Add(categorieRBQ);
                             }
-                        }
-
-                        await _context.SaveChangesAsync();
+                            _context.Licencerbqs.Add(licenceRBQ);
+                            await _context.SaveChangesAsync();
                     }
                     catch (Exception ex)
                     {

@@ -36,6 +36,7 @@ builder.Services.AddScoped<ProduitServiceService>();
 builder.Services.AddScoped<PieceJointeFormModel>();
 builder.Services.AddScoped<LicenceService>();
 builder.Services.AddScoped<ConfigService>();
+builder.Services.AddScoped<EncryptionService>();
 #endregion
 
 #region Load Config from Setting.json

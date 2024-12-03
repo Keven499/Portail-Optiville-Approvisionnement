@@ -1,8 +1,12 @@
 @page "/affichage/{Id:int?}"
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.EntityFrameworkCore.Metadata.Internal
+@using Microsoft.IdentityModel.Tokens
+@using Newtonsoft.Json
 @using Portail_OptiVille.Data.Models
 @using System.Text.RegularExpressions
+@inject NavigationManager Navigation
 @using Portail_OptiVille.Data.FormModels
 @using Portail_OptiVille.Data.Exceptions
 @using Portail_OptiVille.Data.Services
@@ -20,6 +24,7 @@
 @inject FinanceService financeService
 @inject ProduitServiceService produitServiceService
 @inject LicenceRBQService licenceRBQService
+@inject EncryptionService encryptionService
 @inject ContactsService contactsService
 @inject IJSRuntime JSRuntime
 @inject PieceJointeFormModel pieceJointeFormModel
@@ -137,16 +142,28 @@
                                     <div class="col-xl-11 col-lg-11 col-sm-12 col-12 d-flex flex-column align-items-start">
                                         <label class="vertFonce texte-bold" for="reason">Raison du refus</label>
                                         <textarea @bind=strRaisonRefus id="reason" class="form-control w-100 input-vert texte-light" rows="4" style="resize: none; height: 100%;"></textarea>
-                                        <button id="btnVert" class="btn bg-vert text-white texte-bold" style="width: 200px" @onclick="ConfirmRefus"><i class="bi bi-box-arrow-left me-1"></i>Soumettre</button>
+                                        <button id="btnVert" class="btn bg-vert text-white texte-bold mt-1" style="width: 200px" @onclick="ConfirmRefus"><i class="bi bi-box-arrow-left me-1"></i>Soumettre</button>
                                     </div>  
                                 </div>                
                             </div>
                             }
+                            @if(closestHistorique.EtatDemande == "Refusé")
+                            {
+                            <div class="col-xl-6 col-lg-6 col-sm-12 col-12">
+                                <div class="row mb-3">
+                                    <div class="col-xl-11 col-lg-11 col-sm-12 col-12 d-flex flex-column align-items-start">
+                                        <label class="vertFonce texte-bold" for="reason">Raison du refus</label>
+                                        <textarea @bind="RaisonDuRefus" id="reason" class="form-control w-100 input-vert texte-light" rows="4" style="resize: none; height: 100%;"></textarea>
+                                    </div>  
+                                </div>                
+                            </div>
+                            }
+
                         </div> 
                         @if (FinanceInfoNull)
                         {
                             <div class="alert alert-warning alert-dismissible fade show text-center d-flex justify-content-center align-items-center" role="alert">
-                                <strong>Veuillez entrer vos informations financières! <a href="/affichage#FinanceDest">(Cliquez ici)</a></strong>
+                                <strong>Veuillez entrer vos informations financières! <a href="/affichage/@selectedFournisseur.IdFournisseur#FinanceDest">(Cliquez ici)</a></strong>
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
                         }                   
@@ -579,7 +596,7 @@
                     <EditForm EditContext="@editContext">
                         <DataAnnotationsValidator />
                             <div class="card-header py-2 bg-vertFonce d-flex justify-content-between align-items-center rounded-0">
-                                <h3 class="text-white titre-bold m-0">Finances</h3>                                
+                                <h3 class="text-white titre-bold m-0" id="FinanceDest">Finances</h3>                                
                                 @if (modificationFinances)
                                 {
                                     <button type="button" id="btnVert" class="btn bg-vert texte-bold text-white" style="height: 40px; width: 200px;" @onclick="ModifcationFinances"><i class="bi bi-pencil me-1"></i>Modifier</button>
@@ -867,11 +884,14 @@
     }
     private async Task SaveModifcationLicenceRBQ()
     {
-        await licenceRBQService.SaveLicenceRBQData(licenceRBQFormModel, email);
+        await licenceRBQService.SaveLicenceRBQData(licenceRBQFormModel, email, selectedFournisseur.IdFournisseur);
+        licencerbqs.Statut = licenceRBQFormModel.StatutLicence;
+        licencerbqs.Type = licenceRBQFormModel.TypeLicence;
+        licencerbqs.IdLicenceRbq = licenceRBQFormModel.NumeroLicence;
         selectedCategorieRBQ = await _context.Categorierbqs.Where(c => c.IdLicenceRbqs.Any(l => l.IdLicenceRbq == licencerbqs.IdLicenceRbq)).ToListAsync();
         groupedCategories = GroupCategoriesByType();
-        
         await JSRuntime.InvokeVoidAsync("hideModal", "ModifierModalLicence");
+        
     }
 
     private async Task SaveModifcationProduitServices()
@@ -979,6 +999,7 @@
     }
     private ProduitServiceFormModel produitServiceFormModel = new ProduitServiceFormModel();
     private List<Produitservice> allProduitService = new List<Produitservice>();
+    private string RaisonDuRefus;
     private List<Produitservice>? selectedProduitservices = new List<Produitservice>();
     private List<Categorieunspsc> categorieUNSPSC = new List<Categorieunspsc>();
     private List<string> AllCodeSousCategorie = new List<string>();
@@ -1074,7 +1095,8 @@
             }
             catch(Exception ex)
             {
-                Console.WriteLine($"Erreur lors de la récupération des informations: {ex.Message}"); 
+                Console.WriteLine($"Erreur lors de la récupération des informations(Finance): {ex.Message}"); 
+                FinanceInfoNull = true;
             }
             identification = await _context.Identifications.SingleAsync(c => c.Fournisseur == selectedFournisseur.IdFournisseur);
             selectedFichiers = await _context.Fichiers.Where(c => c.Fournisseur == selectedFournisseur.IdFournisseur).ToListAsync();
@@ -1086,50 +1108,55 @@
             selectedHistoriques = await _context.Historiques.Where(c => c.Fournisseur == Id).ToListAsync();
             closestHistorique = selectedHistoriques.Where(h => h.DateEtatChanged.HasValue).OrderBy(h => Math.Abs((h.DateEtatChanged.Value - DateTime.UtcNow).TotalDays)).FirstOrDefault();
             //closestHistorique = await _context.Historiques.Where(h => h.Fournisseur == selectedFournisseur.IdFournisseur && h.DateEtatChanged.HasValue).OrderBy(h => Math.Abs((h.DateEtatChanged.Value - DateTime.UtcNow).TotalDays)).FirstOrDefaultAsync();
-            if(identification.Neq != null)
+
+            try
             {
-                try{
-                    licencerbqs = await _context.Licencerbqs.SingleAsync(c => c.Fournisseur == selectedFournisseur.IdFournisseur);
-                    selectedCategorieRBQ = await _context.Categorierbqs.Where(c => c.IdLicenceRbqs.Any(l => l.IdLicenceRbq == licencerbqs.IdLicenceRbq)).ToListAsync();
-                    selectedLicencerbqs = await _context.Licencerbqs.Where(l => l.Fournisseur == selectedFournisseur.IdFournisseur).Include(l => l.IdCategorieRbqs).ToListAsync();
-                    allCategoriesForm = await _context.Categorierbqs.ToListAsync();
-                    selectedCurrentCategorieRBQ = allCategoriesForm.ToDictionary(c => c.CodeSousCategorie, c => false);
-                
-                    allCategories = await _context.Categorierbqs.ToListAsync(); 
-                    foreach(var categorie in allCategoriesForm)
+                licencerbqs = await _context.Licencerbqs.SingleAsync(c => c.Fournisseur == selectedFournisseur.IdFournisseur);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"Erreur lors de la récupération de la licence: {ex.Message}"); 
+            }
+
+            if(licencerbqs != null)
+            {
+                allCategoriesForm = await _context.Categorierbqs.ToListAsync();
+                allCategories = await _context.Categorierbqs.ToListAsync();
+                selectedCategorieRBQ = await _context.Categorierbqs.Where(c => c.IdLicenceRbqs.Any(l => l.IdLicenceRbq == licencerbqs.IdLicenceRbq)).ToListAsync();
+                selectedLicencerbqs = await _context.Licencerbqs.Where(l => l.Fournisseur == selectedFournisseur.IdFournisseur).Include(l => l.IdCategorieRbqs).ToListAsync();
+                selectedCurrentCategorieRBQ = allCategoriesForm.ToDictionary(c => c.CodeSousCategorie, c => false);
+
+                foreach(var categorie in allCategoriesForm)
+                {
+                    AllCodeSousCategorie.Add(categorie.CodeSousCategorie);
+                }
+
+                licenceRBQFormModel = new LicenceRBQFormModel
+                {
+                    NumeroLicence = licencerbqs.IdLicenceRbq,
+                    StatutLicence = licencerbqs.Statut,
+                    TypeLicence = licencerbqs.Type,
+                    CodeSousCategorie = AllCodeSousCategorie,
+                    SousCategoSelected = selectedCurrentCategorieRBQ
+                };
+
+                foreach(var item in selectedCurrentCategorieRBQ)
+                {
+                    foreach(var cate in selectedCategorieRBQ)
                     {
-                        AllCodeSousCategorie.Add(categorie.CodeSousCategorie);
-                    }
-                    licenceRBQFormModel = new LicenceRBQFormModel
-                    {
-                        NumeroLicence = licencerbqs.IdLicenceRbq,
-                        StatutLicence = licencerbqs.Statut,
-                        TypeLicence = licencerbqs.Type,
-                        CodeSousCategorie = AllCodeSousCategorie,
-                        SousCategoSelected = allCategories.ToDictionary(c => c.CodeSousCategorie, c => false)
-                    };
-                    foreach(var item in selectedCurrentCategorieRBQ)
-                    {
-                        foreach(var cate in selectedCategorieRBQ)
+                        if (cate.CodeSousCategorie == item.Key)
                         {
-                            if (cate.CodeSousCategorie == item.Key)
-                            {
-                                licenceRBQFormModel.SousCategoSelected[item.Key] = true;
-                            }
+                            licenceRBQFormModel.SousCategoSelected[item.Key] = true;
                         }
                     }
-
-                    if(licencerbqs == null && selectedCategorieRBQ == null)
-                    {
-                        LicenceRBQInfoNull = true;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Erreur NEQ: {ex.Message}");
                 }
             }
-                //allCategories = await _context.Categorierbqs.ToListAsync();
+
+            if(licencerbqs == null && selectedCategorieRBQ == null)
+            {
+                LicenceRBQInfoNull = true;
+            }
+
             Console.WriteLine("allCategoriesRBQ.count:" + allCategories.Count);
             fournisseurProduitIds = await _context.Database
             .SqlQueryRaw<string>(@"
@@ -1161,6 +1188,7 @@
                 }
             }
             GetGroupProduitService();
+            RaisonDuRefus = encryptionService.Decrypt(closestHistorique.RaisonRefus);
             groupedCategories = GroupCategoriesByType();
             combinedFormModel.FillData(coordonnee, identification, selectedTelephones);
             phoneExistsResults = await GetPhoneExistenceResults();
@@ -1495,21 +1523,19 @@ private async Task ConfirmChange(ChangeEventArgs e)
     private async Task ConfirmRefus()
     {
         var isConfirmed = await JSRuntime.InvokeAsync<bool>("confirmRefus");
-
         if (isConfirmed)
-        {
-            Historique? historique = _context.Historiques.FirstOrDefault(h => h.Fournisseur == selectedFournisseur.IdFournisseur);
-            if(historique is not null)
-            {
-                historique.DateEtatChanged = DateTime.Now;
-                historique.EtatDemande = "Refusé";
-                historique.RaisonRefus = strRaisonRefus;
-                _context.SaveChanges();
-            }
-            else
-            {
-                Console.WriteLine("Historique introuvable");
-            }
+        {   
+            string[] newData = {encryptionService.Encrypt(strRaisonRefus)};
+            string[] keyData = {"Raison du refus"};
+            var oldDict = new Dictionary<string, object> { { "Section", "Historique" } };
+            var newDict = new Dictionary<string, object> { { "Section", "Historique" } };
+            for (int i = 0; i < newData.Length; i++)
+                {
+                        newDict.Add(keyData[i], newData[i]);
+                }
+                string newJSON = JsonConvert.SerializeObject(newDict, Formatting.None);
+            await historiqueService.ModifyEtat("Refusé", selectedFournisseur.IdFournisseur, email, encryptionService.Encrypt(strRaisonRefus), null, newJSON);
         }
+        Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
     }
 }
