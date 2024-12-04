@@ -59,8 +59,8 @@ namespace Portail_OptiVille.Data.Services
         {
             bool isEqual = true;
             var identification = await _context.Identifications.FindAsync(identicationFormModel.IdIdentification);
-            string[] oldData = {identification.Neq, identification.NomEntreprise, identification.AdresseCourriel};
-            string[] newData = {identicationFormModel.NEQ, identicationFormModel.NomEntreprise, identicationFormModel.CourrielEntreprise};
+            string[] oldData = {identification.Neq  ?? "", identification.NomEntreprise, identification.AdresseCourriel};
+            string[] newData = {identicationFormModel.NEQ  ?? "", identicationFormModel.NomEntreprise, identicationFormModel.CourrielEntreprise};
             string[] keyData = {"NEQ", "Nom de l'entreprise", "Adresse courriel"};
             var oldDict = new Dictionary<string, object> { { "Section", "Identification" } };
             var newDict = new Dictionary<string, object> { { "Section", "Identification" } };

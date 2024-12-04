@@ -1332,7 +1332,10 @@
                 }
             }
             GetGroupProduitService();
-            RaisonDuRefus = encryptionService.Decrypt(closestHistorique.RaisonRefus);
+            if(closestHistorique.RaisonRefus != null)
+            {
+                RaisonDuRefus = encryptionService.Decrypt(closestHistorique.RaisonRefus);
+            }
             groupedCategories = GroupCategoriesByType();
             combinedFormModel.FillData(coordonnee, identification, selectedTelephones);
             phoneExistsResults = await GetPhoneExistenceResults();
