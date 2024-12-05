@@ -147,16 +147,19 @@
                                 </div>                
                             </div>
                             }
-                            @if(closestHistorique.EtatDemande == "Refusé")
+                            @if(closestHistorique != null)
                             {
-                            <div class="col-xl-6 col-lg-6 col-sm-12 col-12">
-                                <div class="row mb-3">
-                                    <div class="col-xl-11 col-lg-11 col-sm-12 col-12 d-flex flex-column align-items-start">
-                                        <label class="vertFonce texte-bold" for="reason">Raison du refus</label>
-                                        <textarea @bind="RaisonDuRefus" id="reason" class="form-control w-100 input-vert texte-light" rows="4" style="resize: none; height: 100%;"></textarea>
-                                    </div>  
-                                </div>                
-                            </div>
+                                @if(closestHistorique.EtatDemande == "Refusé")
+                                {
+                                <div class="col-xl-6 col-lg-6 col-sm-12 col-12">
+                                    <div class="row mb-3">
+                                        <div class="col-xl-11 col-lg-11 col-sm-12 col-12 d-flex flex-column align-items-start">
+                                            <label class="vertFonce texte-bold" for="reason">Raison du refus</label>
+                                            <textarea @bind="RaisonDuRefus" id="reason" class="form-control w-100 input-vert texte-light" rows="4" style="resize: none; height: 100%;"></textarea>
+                                        </div>  
+                                    </div>                
+                                </div>
+                                }
                             }
 
                         </div> 
