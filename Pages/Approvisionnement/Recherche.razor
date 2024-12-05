@@ -516,6 +516,11 @@ else
         stateString = cbxDicState.Any(kv => kv.Value) 
             ? string.Join(",", cbxDicState.Where(kv => kv.Value).Select(kv => kv.Key)) 
             : null;
+        Console.WriteLine(ville);
+        Console.WriteLine(regionAdministrative);
+        Console.WriteLine(codeUNSPSC);
+        Console.WriteLine(codeSousCategorie);
+        Console.WriteLine(stateString);
         var fournisseurIdList = await _context.Database
         .SqlQueryRaw<int>(@"
             SELECT DISTINCT f.idFournisseur
@@ -523,29 +528,30 @@ else
             LEFT JOIN Coordonnee c ON f.idFournisseur = c.fournisseur
             LEFT JOIN FournisseurProduitService fps ON f.idFournisseur = fps.idFournisseur
             LEFT JOIN ProduitService ps ON fps.idProduitService = ps.codeUNSPSC
-            LEFT JOIN FournisseurLicenceRBQ flrbq ON f.idFournisseur = (SELECT fournisseur FROM LicenceRBQ WHERE idLicenceRBQ = flrbq.idLicenceRBQ)
+            LEFT JOIN FournisseurLicenceRBQ flrbq ON f.idFournisseur = (
+                SELECT fournisseur 
+                FROM LicenceRBQ 
+                WHERE idLicenceRBQ = flrbq.idLicenceRBQ
+            )
             LEFT JOIN CategorieRBQ crbq ON flrbq.idCategorieRBQ = crbq.codeSousCategorie
-            LEFT JOIN Historique h ON f.idFournisseur = h.fournisseur
+            LEFT JOIN (
+                SELECT h1.fournisseur, h1.EtatDemande
+                FROM Historique h1
+                INNER JOIN (
+                    SELECT fournisseur, MAX(DateEtatChanged) AS MaxDate
+                    FROM Historique
+                    WHERE EtatDemande NOT IN ('Désactivée', 'Modifiée')
+                    GROUP BY fournisseur
+                ) AS LastValidState
+                ON h1.fournisseur = LastValidState.fournisseur
+                AND h1.DateEtatChanged = LastValidState.MaxDate
+            ) AS LastHistorique ON f.idFournisseur = LastHistorique.fournisseur
             WHERE
                 (FIND_IN_SET(c.ville, {0}) > 0 OR {0} IS NULL)
                 AND (FIND_IN_SET(c.regionAdministrative, {1}) > 0 OR {1} IS NULL)
                 AND (FIND_IN_SET(ps.codeUNSPSC, {2}) > 0 OR {2} IS NULL)
                 AND (FIND_IN_SET(crbq.codeSousCategorie, {3}) > 0 OR {3} IS NULL)
-                AND EXISTS (
-                    SELECT 1
-                    FROM Historique h2
-                    WHERE h2.fournisseur = f.idFournisseur
-                    AND h2.EtatDemande NOT IN ('Désactivée', 'Modifiée')
-                    ORDER BY h2.DateEtatChanged DESC
-                    LIMIT 1
-                ) AND FIND_IN_SET(
-                    (SELECT h2.EtatDemande
-                    FROM Historique h2
-                    WHERE h2.fournisseur = f.idFournisseur
-                    AND h2.EtatDemande NOT IN ('Désactivée', 'Modifiée')
-                    ORDER BY h2.DateEtatChanged DESC
-                    LIMIT 1), {4}) > 0
-                OR {4} IS NULL
+                AND (FIND_IN_SET(LastHistorique.EtatDemande, {4}) > 0 OR {4} IS NULL);
         ", ville, regionAdministrative, codeUNSPSC, codeSousCategorie, stateString)
         .ToListAsync();
         var fournisseurIdSet = new HashSet<string>(fournisseurIdList.Select(id => id.ToString()));
