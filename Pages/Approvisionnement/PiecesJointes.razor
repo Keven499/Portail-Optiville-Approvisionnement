@@ -165,6 +165,9 @@
     public long MaxSize { get; set; } = 0;
     [Parameter] public bool ShowTitle { get; set; } = true;
 
+    [Parameter]
+    public long LimiteFile { get; set; } = 0;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -245,6 +248,11 @@
             try
             {
                 var fileExtension = Path.GetExtension(file.Name).ToLower();
+                if (fileList.Count > LimiteFile)
+                {
+                    errorTable.Add($"Vous dépassez le maximum autorisée, Maximum: {LimiteFile} fichiers");
+                    continue;
+                }
                 if (!allowedExtensions.Contains(fileExtension))
                 {
                     errorTable.Add($"L'extension {fileExtension} n'est pas autorisée");

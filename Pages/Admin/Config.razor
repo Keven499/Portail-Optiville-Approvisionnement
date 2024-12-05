@@ -53,6 +53,12 @@
                                         readonly="@(!isEditing)" />
                             @((MarkupString)GetValidationHTML(() => configModel.MaxFileSize))
                         </div>
+                        <div class="col-xl-4 col-lg-4 col-10 col-sm-8 py-2">
+                            <label for="LimiteMaxFichiers" class="vertFonce texte-bold">Limite de fichiers</label>
+                            <input type="number" @bind="configModel.MaxFileLimite" TValue="int" class="form-control @GetInputClass(() => configModel.MaxFileLimite) input-vert texte-light" id="TailleMaxFichiers"
+                                        readonly="@(!isEditing)" />
+                            @((MarkupString)GetValidationHTML(() => configModel.MaxFileLimite))
+                        </div>
                     </div>
                         <div class="card-footer bg-vertFonce d-flex justify-content-center">
                             <div>
@@ -96,6 +102,7 @@
         configModel.CourrielFinance = configData.CourrielFinance; 
         configModel.DelaiBeforeRevision = configData.DelaiRevision; 
         configModel.MaxFileSize = configData.TailleMaxFichiers;
+        configModel.MaxFileLimite = configData.LimiteMaxFichiers;
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

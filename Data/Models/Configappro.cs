@@ -14,4 +14,6 @@ public partial class Configappro
     public int TailleMaxFichiers { get; set; }
 
     public string CourrielFinance { get; set; } = null!;
+
+    public int LimiteMaxFichiers { get; set; }
 }
