@@ -71,7 +71,9 @@
 @*Demande*@
                     <div class="card-header py-2 bg-vertFonce d-flex justify-content-between align-items-center">
                         <h3 class="text-white titre-bold m-0">Demande</h3>
+                        @if(isResponsable){
                         <button type="button" style="height: 40px; width: 200px;" class="btn bg-danger text-white texte-bold" data-bs-target="#ModalConfirmationDeleteFiche" data-bs-toggle="modal"><i class="bi bi-trash me-1"></i>Supprimer la fiche</button>
+                        }
                     </div>
 @*Bouton confirmation suppression*@
                     <div class="modal fade" id="ModalConfirmationDeleteFiche" tabindex="-1" aria-labelledby="ModalConfirmationDeleteFiche" aria-hidden="true" data-bs-backdrop="static">
@@ -757,6 +759,7 @@
 </style>
 
 @code{
+    private bool isResponsable = false;
     private bool isValidFormFinance = false;
     private List<bool> phoneExistsResults;
     private string email = string.Empty;
@@ -1146,6 +1149,37 @@
         {
             Console.WriteLine($"Erreur lors de la récupération de l'adresse courriel: {ex.Message}");
             navigationManager.NavigateTo("/",true);
+        }
+        if(firstRender){
+
+            var Role = await protectedSessionStorage.GetAsync<string>("Role");
+            if(Role.Success)
+            {
+                if(Role.Value == "Administrateur" || Role.Value == "Responsable")
+                {
+                    isResponsable = true;
+                }
+                else
+                {
+                    isResponsable = false;
+                }
+            }
+            else
+            {
+                var _cookie = await cookie.GetValue("SToken");
+                string role = tokenGenerator.GetValueFromToken(_cookie).Split(":")[1];
+                if(!String.IsNullOrEmpty(role)){
+                    if(role == "Administrateur" || role == "Responsable")
+                    {
+                        isResponsable = true;
+                    }
+                    else
+                    {
+                        isResponsable = false;
+                    }
+                }
+            }
+            StateHasChanged();
         }
     } 
 
