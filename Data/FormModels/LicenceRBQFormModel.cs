@@ -5,6 +5,7 @@ namespace Portail_OptiVille.Data.FormModels
 {
     public class LicenceRBQFormModel
     {
+        
         public string? NumeroLicence { get; set; }
 
         [Required(ErrorMessage = "Statut requis")]

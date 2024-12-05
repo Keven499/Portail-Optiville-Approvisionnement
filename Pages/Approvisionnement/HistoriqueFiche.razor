@@ -2,7 +2,9 @@
 @using Microsoft.IdentityModel.Tokens
 @using Portail_OptiVille.Data.Models
 @using System.Text.Json
+@using Portail_OptiVille.Data.Services
 @inject A2024420517riGr1Eq6Context _context
+@inject EncryptionService encryptionService
 
 @*
     HISTORIQUE
@@ -18,11 +20,11 @@
             <h3 class="text-white titre-bold m-0">Historique</h3>
         </div>
         <div class="card-body">
-            <div class="row">
+            <div class="row d-flex justify-content-center">
                 <div class="col-8">
                 @*  NOUS SOMMES EN TRAIN D'IMPLÉMENTER HISTORIQUE DANS LA BASE DE DONNÉES, DÈS QUE CELA SERA TERMINÉ, NOUS VIENDRONS ICI POUR GÉRER L'AFFICHAGE,
                     CAR POUR L'INSTANT TRÈS RUSTIQUE ET SEMI HARDCODÉ. TRÈS NUL ET À AMÉLIORER *@
-                @if(!String.IsNullOrEmpty(raisonRefus)){
+                @if (!String.IsNullOrEmpty(raisonRefus)) {
                     <div class="card mb-2">
                         <div class="card-header text-center">
                             <div class="fs-5 fw-bold">Raison du refus</div>
@@ -30,7 +32,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-12">
-                                    <div class="fw-bold">@raisonRefus</div>
+                                    <div class="fw-bold">@encryptionService.Decrypt(raisonRefus)</div>
                                 </div>
                             </div>
                         </div>

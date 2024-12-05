@@ -823,10 +823,10 @@
     private List<string> listeProvinces = new List<string>{"Québec", "Ontario", "Manitoba", "Saskatchewan", "Alberta", "Colombie-Britannique",
         "Île-du-Prince-Édouard", "Nouveau-Brunswick", "Nouvelle-Écosse", "Terre-Neuve-et-Labrador", "Nunavut", "Territoires du Nord-Ouest",
         "Yukon"};
-    private LicenceRBQ LicenceRBQRef;   
+    private LicenceRBQ licenceRBQRef;   
     private ContactFormHoster ContactFormHosterRef; 
     public Action<ContactFormHoster>? AssignReferenceContactFormHoster => (contactFormHoster) => ContactFormHosterRef = contactFormHoster;
-    private Action<LicenceRBQ> AssignReferenceLicenceRBQ => (licenceRBQ) => LicenceRBQRef = licenceRBQ;
+    private Action<LicenceRBQ> AssignReferenceLicenceRBQ => (licenceRBQ) => licenceRBQRef = licenceRBQ;
     List<IGrouping<GroupKey, Produitservice>>? groupedServices;
     private Dictionary<string, bool> selectedCurrentCategorieRBQ = new Dictionary<string, bool>();
     private EditContext editContext;
@@ -910,6 +910,12 @@
     }
     private async Task SaveModifcationLicenceRBQ()
     {
+        Task<bool> isValidTask = licenceRBQRef.TriggerValidation();
+        bool isValid = await isValidTask;
+        if (!isValid)
+        {
+            return;
+        }
         await licenceRBQService.SaveLicenceRBQData(licenceRBQFormModel, email, selectedFournisseur.IdFournisseur);
         licencerbqs.Statut = licenceRBQFormModel.StatutLicence;
         licencerbqs.Type = licenceRBQFormModel.TypeLicence;
@@ -922,8 +928,12 @@
 
     private async Task SaveModifcationProduitServices()
     {
+        bool isValid = produitServiceRef.TriggerValidation();
+        if (!isValid)
+        {
+            return;
+        }
         await produitServiceService.UpdateProduitServiceData(produitServiceFormModel, selectedFournisseur.IdFournisseur, email);
-
         selectedProduitservices = allProduitService
         .Where(p => produitServiceFormModel.SousProduitSelected.ContainsKey(p.CodeUnspsc) &&
                     produitServiceFormModel.SousProduitSelected[p.CodeUnspsc])
