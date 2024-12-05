@@ -129,13 +129,13 @@ namespace Portail_OptiVille.Data.Services
                         Console.WriteLine("File is null or has an empty name, skipping.");
                         continue;
                     }
-                    isEqual = false;
                     Console.WriteLine(keyData  + indexAdd);
 
                     var filePath = Path.Combine(folderPath, fichierFromList.Nom).ToLower();
                     if (!existingFileNames.Contains(fichierFromList.Nom) &&
                         pieceJointeFormModelDto.FileStreams.TryGetValue(fichierFromList.Nom, out var fileStream))
                     {
+                        isEqual = false;
                         using (var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
                         {
                             fileStream.Position = 0;
