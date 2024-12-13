@@ -53,7 +53,7 @@
                             </select>
                         </div>
                         <div class="col-xl-1 col-lg-1 col-4 col-sm-4">
-                            <button type="button" class="btn btn-danger w-100" id="btnSupp" @onclick="() => OnDeleteUser(employe)"><i class="bi bi-trash"></i></button>
+                            <button type="button" class="btn btn-danger w-100" id="btnDelUser" @onclick="() => OnDeleteUser(employe)"><i class="bi bi-trash"></i></button>
                         </div>
                         <hr class="mt-2 mb-2"/>
                     </div>
@@ -228,7 +228,7 @@
         var isValid = (message == null);
         return isValid
         ? ""
-        : "<div style=\"display: flex; justify-content: left;\">" +
+        : "<div style=\"display: flex; justify-content: center;\">" +
           "<span style=\"display: flex; align-items: center; border-radius: 0; background: none; border: none;\" class=\"input-group-text text-danger\">" +
           "<i class=\"bi bi-x-circle me-2\"></i>" +
           $"<span class=\"text-wrap\" style=\"letter-spacing: 1px;\">{message}</span>" +
@@ -253,9 +253,9 @@
                 adminCount--;
             }
         }
-        if (adminCount != 2)
+        if (adminCount < 2)
         {
-            messages.Add("2 administrateurs en tout temps");
+            messages.Add("2 administrateurs minimum");
             isRespectHierarchy = false;
             return isRespectHierarchy;
         }
