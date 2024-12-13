@@ -64,7 +64,7 @@
     private LogInModel logInModel = new LogInModel();
     private bool isSubmit = false;
     private bool isValidForm = false;
-     private ValidationMessageStore validationMessageStore;
+    private ValidationMessageStore validationMessageStore;
     private EditContext editContext;
 
     protected override void OnInitialized()
@@ -142,22 +142,22 @@
                     }
                     else
                     {
+                        isValidForm = false;
                         logInModel.MotDePasse = "";
                         validationMessageStore.Add(() => logInModel.Username, "Données incorrectes");
                         validationMessageStore.Add(() => logInModel.MotDePasse, "Données incorrectes");
-                        await JsRuntime.InvokeVoidAsync("alert", "Mot de passe ou nom d'utilisateur incorrect !");
                     }
                 }
                 else
                 {
+                    isValidForm = false;
+                    logInModel.MotDePasse = "";
                     validationMessageStore.Add(() => logInModel.Username, "Données incorrectes");
-                    await JsRuntime.InvokeVoidAsync("alert", "Mot de passe ou nom d'utilisateur incorrect !");
-
+                    validationMessageStore.Add(() => logInModel.MotDePasse, "Données incorrectes");
                 }
             }
             catch
             {
-                await JsRuntime.InvokeVoidAsync("alert", "Une erreur est survenue !");
                 NavigationManager.NavigateTo("/");
             }
         }
