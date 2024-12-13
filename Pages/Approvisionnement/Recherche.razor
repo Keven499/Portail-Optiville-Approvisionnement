@@ -228,9 +228,9 @@ else
                                     <div class="col-12">
                                     @{
                                         i = 0;
-                                        foreach (var city in cities)
+                                        foreach (var city in citiesCopy)
                                         {
-                                            bool isLast = (i == cities.Count - 1);
+                                            bool isLast = (i == citiesCopy.Count - 1);
                                             <div style="margin-bottom: @(isLast ? "0" : "5px");" class="col-12">
                                                 <label class="d-flex align-content-center">
                                                     <input type="checkbox" id="categorie@(j)" class="check-vert me-2"
@@ -375,12 +375,14 @@ else
     private List<Produitservice> produitsService = new List<Produitservice>();
     private List<Produitservice> produitsServiceInternal = new List<Produitservice>();
     private List<string> cities = new List<string>();
+    private List<string> citiesCopy;
     private List<FournisseurFiche> fournisseurFiches;
     private List<FournisseurFiche> copieFournisseurFiches;
     private Dictionary<string, bool> cbxDicCategoriesRBQ;
     private Dictionary<string, bool> cbxDicProductService;
     private Dictionary<string, bool> cbxDicVilles;
     private Dictionary<string, bool> cbxDicRegionsAdmini;
+    private Dictionary<string, bool> cbxDicRegionsAdminiForQuery;
     private Dictionary<string, bool> cbxDicState = new Dictionary<string, bool>
     {
         { "Accepté", false },
@@ -410,6 +412,7 @@ else
     };
     string? ville = null;
     string? regionAdministrative = null;
+    string? regionAdministrativeForQuery = null;
     string? codeUNSPSC = null;
     string? codeSousCategorie = null;
     string? stateString;
@@ -421,8 +424,10 @@ else
             categoriesRBQ = await _context.Categorierbqs.ToListAsync();
             cbxDicCategoriesRBQ = categoriesRBQ.ToDictionary(c => c.CodeSousCategorie, c => false);
             cities = await listeVillesAPI.GetVilles();
+            citiesCopy = new List<string>(cities);
             cbxDicVilles = cities.ToDictionary(city => city, city => false);
             cbxDicRegionsAdmini = regionsAdmini2D.ToDictionary(region => region[1], region => false);
+            cbxDicRegionsAdminiForQuery = regionsAdmini2D.ToDictionary(region => "'" + region[1] + region[0], region => false);
             // TEST AVEC SEULEMENT 500 LIGNES
             produitsService = await _context.Produitservices.Take(500).ToListAsync();
             cbxDicProductService = produitsService.ToDictionary(c => c.CodeUnspsc, c => false);
@@ -456,6 +461,10 @@ else
         catch (Exception ex)
         {
             Console.WriteLine($"A problem occurred while retrieving data: {ex.Message}");
+        }
+        foreach (var region in cbxDicRegionsAdminiForQuery.Keys)
+        {
+            Console.WriteLine(region);
         }
     }
 
@@ -499,13 +508,22 @@ else
         }
     }
 
+    private async void FiltrageVilleQuery()
+    {
+
+    }
+
     private async void FiltrageQuery()
     {
+
         ville = cbxDicVilles.Any(kv => kv.Value) 
             ? string.Join(",", cbxDicVilles.Where(kv => kv.Value).Select(kv => kv.Key)) 
             : null;
         regionAdministrative = cbxDicRegionsAdmini.Any(kv => kv.Value) 
             ? string.Join(",", cbxDicRegionsAdmini.Where(kv => kv.Value).Select(kv => kv.Key)) 
+            : null;
+        regionAdministrativeForQuery += cbxDicRegionsAdminiForQuery.Any(kv => kv.Value) 
+            ? string.Join(",", cbxDicRegionsAdminiForQuery.Where(kv => kv.Value).Select(kv => kv.Key)) 
             : null;
         codeUNSPSC = cbxDicProductService.Any(kv => kv.Value) 
             ? string.Join(",", cbxDicProductService.Where(kv => kv.Value).Select(kv => kv.Key)) 
@@ -518,6 +536,7 @@ else
             : null;
         Console.WriteLine(ville);
         Console.WriteLine(regionAdministrative);
+        Console.WriteLine(regionAdministrativeForQuery);
         Console.WriteLine(codeUNSPSC);
         Console.WriteLine(codeSousCategorie);
         Console.WriteLine(stateString);
@@ -592,8 +611,17 @@ else
     {
         if (e.Value is bool isChecked)
         {
-            cbxDicRegionsAdmini[regionAdmini] = (bool)e.Value;
+            cbxDicRegionsAdmini[regionAdmini] = isChecked;
+            cbxDicRegionsAdminiForQuery[regionAdmini] = isChecked;
+            if (!isChecked && !cbxDicRegionsAdmini.Any(kv => kv.Value))
+            {
+                Console.WriteLine("No regions are selected.");
+                citiesCopy = cities;
+                return; 
+            }
         }
+        // FILTRER LES VILLES SELON LA RÉGION
+        FiltrageVilleQuery();
         FiltrageQuery();
     }
 
@@ -666,7 +694,6 @@ else
             await protectedSessionStorage.DeleteAsync("Email");
             await cookie.destroy("SToken");
         } 
-
 
         // usersessions = _context.Usersessions.Where(u => u.OwnerEmail == email).ToArray();
         // foreach (var usersession in usersessions)
