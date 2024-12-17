@@ -138,7 +138,7 @@
 
                         await cookie.SetValue("SToken", token, COOKIE_EXPIRATION);
 
-                        NavigationManager.NavigateTo("/index", true);
+                        NavigationManager.NavigateTo("/recherche", true);
                     }
                     else
                     {
@@ -193,7 +193,7 @@
                 if (result.Success || !string.IsNullOrEmpty(result.Value))
                 {
                     Console.WriteLine($"Adresse courriel: {result.Value}");
-                    NavigationManager.NavigateTo("/index", true);
+                    NavigationManager.NavigateTo("/recherche", true);
                 }
 
             }
