@@ -38,5 +38,37 @@ namespace Portail_OptiVille.Data.Attributes
                 return new List<string>();
             }
         }
+
+        public async Task<List<string>> GetVillesFromRegions(string valuesString)
+        {
+            try
+            {
+                // EXAMPLE value string "'Region1','Region2','Region3'"
+                string sqlQuery = $@"
+                    SELECT DISTINCT `munnom` 
+                    FROM `19385b4e-5503-4330-9e59-f998f5918363` 
+                    WHERE `regadm` IN ({valuesString}) 
+                    ORDER BY `munnom`";
+                var response = await _httpClient.GetAsync($"https://www.donneesquebec.ca/recherche/api/3/action/datastore_search_sql?sql={Uri.EscapeDataString(sqlQuery)}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    var apiResponse = JsonSerializer.Deserialize<VilleApiResponse.CityApiResponse>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    var villes = apiResponse?.Result?.Records?.Select(record => record.Munnom).Distinct().ToList();
+                    return villes ?? new List<string>();
+                }
+                else
+                {
+                    Console.WriteLine($"API call failed with status code: {response.StatusCode}");
+                    return new List<string>(); 
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return new List<string>();
+            }
+        }
     }
 }

@@ -164,14 +164,7 @@
                                 }
                             }
 
-                        </div> 
-                        @if (FinanceInfoNull)
-                        {
-                            <div class="alert alert-warning alert-dismissible fade show text-center d-flex justify-content-center align-items-center" role="alert">
-                                <strong>Veuillez entrer vos informations financières! <a href="/affichage/@selectedFournisseur.IdFournisseur#FinanceDest">(Cliquez ici)</a></strong>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        }                   
+                        </div>                  
                     </div>
                 @* Informations générales*@
                 <EditForm Model="combinedFormModel" OnValidSubmit="SaveModifcationInfo">
@@ -617,7 +610,7 @@
                     <div class="row">
                         <div class="col-xl-12 col-lg-12 col-sm-12 col-12">    
                             <h3 class="texte-20bold">Total: @GetFormatSize()</h3>                                            
-                            <PiecesJointes PieceJointeFormModel="pieceJointeFormModel" ActivationModification="ModifcationPieceJointesActivation" ModifcationPieceJointesActivationONState="ModifcationPieceJointesActivationONState" MaxSize="configappro.TailleMaxFichiers" ShowTitle="false"></PiecesJointes>                
+                            <PiecesJointes PieceJointeFormModel="pieceJointeFormModel" ActivationModification="ModifcationPieceJointesActivation" ModifcationPieceJointesActivationONState="ModifcationPieceJointesActivationONState" MaxSize="configappro.TailleMaxFichiers" ShowTitle="false" LimiteFile="configappro.LimiteMaxFichiers"></PiecesJointes>           
                         </div>
                     </div>
                 </div>

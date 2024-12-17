@@ -108,6 +108,9 @@ public partial class A2024420517riGr1Eq6Context : DbContext
             entity.Property(e => e.DelaiRevision)
                 .HasColumnType("int(11)")
                 .HasColumnName("delaiRevision");
+            entity.Property(e => e.LimiteMaxFichiers)
+                .HasColumnType("int(11)")
+                .HasColumnName("limiteMaxFichiers");
             entity.Property(e => e.TailleMaxFichiers)
                 .HasColumnType("int(11)")
                 .HasColumnName("tailleMaxFichiers");

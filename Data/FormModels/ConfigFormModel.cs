@@ -18,5 +18,8 @@ namespace Portail_OptiVille.Data.FormModels {
         [Required(ErrorMessage = "Taille des fichiers requis")]
         [Range(1, 1000, ErrorMessage = "Entre 1 et 1000 MO")]
         public int MaxFileSize { get; set; }
+
+        [Required(ErrorMessage = "Limite de fichiers requise")]
+        public int MaxFileLimite { get; set; }
     }
 }

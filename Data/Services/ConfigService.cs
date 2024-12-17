@@ -20,6 +20,7 @@ namespace Portail_OptiVille.Data.Services
             allConfigsOld.CourrielFinance = configApproNew.CourrielFinance;
             allConfigsOld.DelaiRevision = configApproNew.DelaiBeforeRevision;
             allConfigsOld.TailleMaxFichiers = configApproNew.MaxFileSize;
+            allConfigsOld.LimiteMaxFichiers = configApproNew.MaxFileLimite;
             _context.Configappros.Update(allConfigsOld);
             await _context.SaveChangesAsync();
         }
