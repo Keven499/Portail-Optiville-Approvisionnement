@@ -427,7 +427,7 @@ else
             citiesCopy = new List<string>(cities);
             cbxDicVilles = cities.ToDictionary(city => city, city => false);
             cbxDicRegionsAdmini = regionsAdmini2D.ToDictionary(region => region[1], region => false);
-            cbxDicRegionsAdminiForQuery = regionsAdmini2D.ToDictionary(region => "'" + region[1] + region[0], region => false);
+            cbxDicRegionsAdminiForQuery = regionsAdmini2D.ToDictionary(region => "'" + region[1] + " " + region[0] + "'", region => false);
             // TEST AVEC SEULEMENT 500 LIGNES
             produitsService = await _context.Produitservices.Take(500).ToListAsync();
             cbxDicProductService = produitsService.ToDictionary(c => c.CodeUnspsc, c => false);
@@ -462,10 +462,10 @@ else
         {
             Console.WriteLine($"A problem occurred while retrieving data: {ex.Message}");
         }
-        foreach (var region in cbxDicRegionsAdminiForQuery.Keys)
+        @* foreach (var region in cbxDicRegionsAdminiForQuery.Keys)
         {
             Console.WriteLine(region);
-        }
+        } *@
     }
 
     private void OnSearchProduct()
@@ -510,20 +510,19 @@ else
 
     private async void FiltrageVilleQuery()
     {
-
+        regionAdministrativeForQuery = cbxDicRegionsAdminiForQuery.Any(kv => kv.Value) 
+            ? string.Join(",", cbxDicRegionsAdminiForQuery.Where(kv => kv.Value).Select(kv => kv.Key)) 
+            : null;
+        citiesCopy = await listeVillesAPI.GetVillesFromRegions(regionAdministrativeForQuery);
     }
 
     private async void FiltrageQuery()
     {
-
         ville = cbxDicVilles.Any(kv => kv.Value) 
             ? string.Join(",", cbxDicVilles.Where(kv => kv.Value).Select(kv => kv.Key)) 
             : null;
         regionAdministrative = cbxDicRegionsAdmini.Any(kv => kv.Value) 
             ? string.Join(",", cbxDicRegionsAdmini.Where(kv => kv.Value).Select(kv => kv.Key)) 
-            : null;
-        regionAdministrativeForQuery += cbxDicRegionsAdminiForQuery.Any(kv => kv.Value) 
-            ? string.Join(",", cbxDicRegionsAdminiForQuery.Where(kv => kv.Value).Select(kv => kv.Key)) 
             : null;
         codeUNSPSC = cbxDicProductService.Any(kv => kv.Value) 
             ? string.Join(",", cbxDicProductService.Where(kv => kv.Value).Select(kv => kv.Key)) 
@@ -536,7 +535,6 @@ else
             : null;
         Console.WriteLine(ville);
         Console.WriteLine(regionAdministrative);
-        Console.WriteLine(regionAdministrativeForQuery);
         Console.WriteLine(codeUNSPSC);
         Console.WriteLine(codeSousCategorie);
         Console.WriteLine(stateString);
@@ -609,19 +607,22 @@ else
 
     private void OnCheckboxChangeRegionAdmini(string regionAdmini, ChangeEventArgs e)
     {
-        if (e.Value is bool isChecked)
+        var regionWithId = regionsAdmini2D.FirstOrDefault(r => r[1] == regionAdmini);
+        if (regionWithId != null)
         {
-            cbxDicRegionsAdmini[regionAdmini] = isChecked;
-            cbxDicRegionsAdminiForQuery[regionAdmini] = isChecked;
-            if (!isChecked && !cbxDicRegionsAdmini.Any(kv => kv.Value))
+            string regionKey = $"'{regionAdmini} {regionWithId[0]}'";
+            if (e.Value is bool isChecked)
             {
-                Console.WriteLine("No regions are selected.");
-                citiesCopy = cities;
-                return; 
+                cbxDicRegionsAdmini[regionAdmini] = isChecked;
+                cbxDicRegionsAdminiForQuery[regionKey] = isChecked;
+                if (!isChecked && !cbxDicRegionsAdmini.Any(kv => kv.Value))
+                {
+                    Console.WriteLine("No regions are selected.");
+                    citiesCopy = cities;
+                }
             }
         }
-        // FILTRER LES VILLES SELON LA RÉGION
-        FiltrageVilleQuery();
+        //FiltrageVilleQuery();
         FiltrageQuery();
     }
 
