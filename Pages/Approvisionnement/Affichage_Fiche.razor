@@ -6,7 +6,6 @@
 @using Newtonsoft.Json
 @using Portail_OptiVille.Data.Models
 @using System.Text.RegularExpressions
-@inject NavigationManager Navigation
 @using Portail_OptiVille.Data.FormModels
 @using Portail_OptiVille.Data.Exceptions
 @using Portail_OptiVille.Data.Services
@@ -15,6 +14,9 @@
 @using Portail_OptiVille.Pages.Approvisionnement.Contact
 @using System.Linq.Expressions
 @using System.Timers
+@using Portail_OptiVille.Data.Attributes
+@inject ListeVillesAPI listeVillesAPI
+@inject NavigationManager Navigation
 @inject A2024420517riGr1Eq6Context _context
 @inject NavigationManager navigationManager
 @inject FichierService fichierService
@@ -33,6 +35,7 @@
 @inject ICookie cookie
 @inject A2024420517riGr1Eq6Context _context
 @inject JwtTokenGenerator tokenGenerator
+
 <link rel="icon" type="image/x-icon" href="images/fiche.png">
 
 <PageTitle>Fiche</PageTitle>
@@ -284,7 +287,12 @@
                                             <label for="villeEntreprise" class="vertFonce texte-bold mb-0 mb-md-0 me-md-3">Ville</label>
                                             <div class="flex-grow-1 d-none d-md-block ligneTxt"></div>
                                             <div>
-                                                <input type="text" style="width: 325px;" class="form-control @ValidateClass(errorMessagesInfoGen[4]) input-vert texte-light py-1" id="villeEntreprise" @bind="@combinedFormModel.CoordonneeFormModel.VilleEntreprise" readonly="@modificationInfo">
+                                                <select style="width: 325px;" class="form-select @ValidateClass(errorMessagesInfoGen[4]) input-vert texte-light py-1" id="villeEntreprise" @bind="@combinedFormModel.CoordonneeFormModel.VilleEntreprise" readonly="@modificationInfo">
+                                                @foreach (var city in cities)
+                                                {
+                                                    <option value="@city">@city</option>
+                                                }
+                                                </select>
                                                 @((MarkupString)errorMessagesInfoGen[4])
                                             </div>
                                         </div>
@@ -755,6 +763,7 @@
     private bool isResponsable = false;
     private bool isValidFormFinance = false;
     private List<bool> phoneExistsResults;
+    private List<string> cities = new List<string>();
     private string email = string.Empty;
     private string[] errorMessagesInfoGen = Enumerable.Repeat(string.Empty, 6).ToArray();
     private bool isRefused = false;
@@ -1245,6 +1254,7 @@
         editContext.OnValidationStateChanged += (sender, args) => StateHasChanged();
         try
         {
+            cities = await listeVillesAPI.GetVilles();
             selectedFournisseur = await _context.Fournisseurs.FindAsync(Id);
             selectedContacts = await _context.Contacts.Where(c => c.Fournisseur == selectedFournisseur.IdFournisseur).ToListAsync();
 
